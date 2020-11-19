@@ -779,8 +779,6 @@ public class InputManagerService extends IInputManager.Stub
             throw new IllegalArgumentException("displayId must >= 0.");
         }
         final String name = "[Gesture Monitor] " + requestedName;
-        final int pid = Binder.getCallingPid();
-        final int uid = Binder.getCallingUid();
 
         final long ident = Binder.clearCallingIdentity();
         try {
@@ -815,6 +813,9 @@ public class InputManagerService extends IInputManager.Stub
      * @param connectionToken The input channel to unregister.
      */
     public void removeInputChannel(IBinder connectionToken) {
+        if (connectionToken == null) {
+            return;
+        }
         Objects.requireNonNull(connectionToken, "connectionToken must not be null");
         mNative.removeInputChannel(connectionToken);
     }
