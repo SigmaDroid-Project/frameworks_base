@@ -890,11 +890,10 @@ public class ApplicationPackageManager extends PackageManager {
         String packageName = ActivityThread.currentPackageName();
         if (packageName != null &&
                 packageName.equals("com.google.android.apps.photos") &&
-                SystemProperties.getBoolean("persist.sys.pixelprops.gphotos", true)) {
+                SystemProperties.getBoolean("persist.sys.pixelprops.gphotos", false)) {
             if (Arrays.asList(featuresPixel).contains(name)) return false;
             if (Arrays.asList(featuresPixelOthers).contains(name)) return true;
             if (Arrays.asList(featuresP23).contains(name)) return false;
-            if (Arrays.asList(featuresTensor).contains(name)) return false;
             if (Arrays.asList(featuresNexus).contains(name)) return true;
         }
         if (Arrays.asList(featuresTensor).contains(name) &&
@@ -905,6 +904,7 @@ public class ApplicationPackageManager extends PackageManager {
                 return false;
             }
         }
+        if (Arrays.asList(featuresAndroid).contains(name)) return true;
         if (Arrays.asList(featuresPixel).contains(name)) return true;
         if (Arrays.asList(featuresPixelOthers).contains(name)) return true;
         return mHasSystemFeatureCache.query(new HasSystemFeatureQuery(name, version));
