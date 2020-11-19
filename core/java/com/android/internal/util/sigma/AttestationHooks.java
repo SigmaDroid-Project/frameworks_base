@@ -42,7 +42,7 @@ import java.util.Map;
 public final class AttestationHooks {
 
     private static final String TAG = "AttestationHooks";
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     private static final String[] sCertifiedProps =
             Resources.getSystem().getStringArray(R.array.config_certifiedBuildProperties);
@@ -78,7 +78,7 @@ public final class AttestationHooks {
         "DEVICE", "cheetah",
         "PRODUCT", "cheetah",
         "MODEL", "Pixel 7 Pro",
-        "FINGERPRINT", "google/cheetah/cheetah:13/TQ3A.230805.001/10316531:user/release-keys"
+        "FINGERPRINT", "google/cheetah/cheetah:13/TQ3A.230605.012/10204971:user/release-keys"
     );
 
     private static volatile String sProcessName;
@@ -100,18 +100,14 @@ public final class AttestationHooks {
 
         /* Set certified properties for GMSCore
          * Set stock fingerprint for ARCore
-         * Set Pixel XL for Google Photos
+         * Set Pixel XL for Google Photos and Snapchat
          */
         if (sIsGms) {
             setCertifiedPropsForGms();
-        }
-
-        if (!sStockFp.isEmpty() && packageName.equals(PACKAGE_ARCORE)) {
+        } else if (!sStockFp.isEmpty() && packageName.equals(PACKAGE_ARCORE)) {
             dlog("Setting stock fingerprint for: " + packageName);
             setPropValue("FINGERPRINT", sStockFp);
-        }
-
-        if (packageName.equals(PACKAGE_GPHOTOS)) {
+        } else if (packageName.equals(PACKAGE_GPHOTOS)) {
             if (!SystemProperties.getBoolean("persist.sys.pixelprops.gphotos", false)) {
                 dlog("Photos spoofing disabled by system prop");
                 return;
@@ -119,9 +115,7 @@ public final class AttestationHooks {
                 dlog("Spoofing Pixel XL for: " + packageName);
                 sPixelXLProps.forEach(AttestationHooks::setPropValue);
             }
-        }
-
-        if (packageName.equals(PACKAGE_NETFLIX)) {
+        } else if (packageName.equals(PACKAGE_NETFLIX)) {
             if (!SystemProperties.getBoolean("persist.sys.pixelprops.netflix", false)) {
                 dlog("Netflix spoofing disabled by system prop");
                 return;

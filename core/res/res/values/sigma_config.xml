@@ -7,6 +7,9 @@
     <!-- Device model (Build.MODEL) to spoof for netflix, if not empty -->
     <string name="config_netflixSpoofModel" translatable="false"></string>
 
+    <!-- Build fingerprint from the stock ROM -->
+    <string name="config_stockFingerprint" translatable="false"></string>
+
     <!-- Build properties from a GMS certified device against current platform SPL level -->
     <string-array name="config_certifiedBuildProperties" translatable="false">
         <item>marlin</item>   <!-- Build.DEVICE -->
