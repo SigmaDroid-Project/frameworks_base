@@ -7248,6 +7248,12 @@ public final class Settings {
         public static final String SEEK_BAR_BATTERY_CHARGE_LEVEL_SOUND = "battery_level_charge_seek_bar";
 
         /**
+         * Enable\Disable swipe up or down gesture on ambient display like OOS
+         * @hide
+         */
+        public static final String DOZE_AMBIENT_SWIPE = "doze_ambient_swipe";
+
+        /**
          * Gesture navbar IME space.
          * Supported modes: 0 for normal length, 1 for narrow and 2 for hidden.
          * Default 0.
