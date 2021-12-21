@@ -22,16 +22,11 @@ import static com.android.systemui.doze.util.BurnInHelperKt.getBurnInProgressOff
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
-import android.database.ContentObserver;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.AnimationDrawable;
-import android.graphics.drawable.Drawable;
 import android.hardware.fingerprint.FingerprintSensorPropertiesInternal;
-import android.net.Uri;
-import android.os.UserHandle;
 import android.provider.Settings;
 import android.util.AttributeSet;
-import android.util.DisplayUtils;
 import android.util.Log;
 import android.util.MathUtils;
 import android.view.Gravity;
@@ -43,11 +38,17 @@ import android.graphics.Rect;
 import com.android.systemui.Dependency;
 import com.android.systemui.R;
 import com.android.systemui.plugins.statusbar.StatusBarStateController;
+import com.android.systemui.tuner.TunerService;
 
 public class UdfpsAnimation extends ImageView {
 
     private static final boolean DEBUG = true;
     private static final String LOG_TAG = "UdfpsAnimations";
+
+    private static final String UDFPS_ANIM =
+            "system:" + Settings.System.UDFPS_ANIM;
+    private static final String UDFPS_ANIM_STYLE =
+            "system:" + Settings.System.UDFPS_ANIM_STYLE;
 
     private boolean mShowing = false;
     private Context mContext;
@@ -59,13 +60,15 @@ public class UdfpsAnimation extends ImageView {
     private WindowManager mWindowManager;
 
     private boolean mIsKeyguard;
+    private boolean mEnabled;
 
     private final int mMaxBurnInOffsetX;
     private final int mMaxBurnInOffsetY;
 
+    private int mSelectedAnim;
     private String[] mStyleNames;
 
-    private static final String UDFPS_ANIMATIONS_PACKAGE = "com.alpha.udfps.animations";
+    private final String mUdfpsAnimationPackage;
 
     private Resources mApkResources;
 
@@ -76,15 +79,15 @@ public class UdfpsAnimation extends ImageView {
 
         mWindowManager = windowManager;
 
-        final float scaleFactor = DisplayUtils.getScaleFactor(mContext);
+        mMaxBurnInOffsetX = context.getResources()
+            .getDimensionPixelSize(R.dimen.udfps_burn_in_offset_x);
+        mMaxBurnInOffsetY = context.getResources()
+            .getDimensionPixelSize(R.dimen.udfps_burn_in_offset_y);
 
-        mMaxBurnInOffsetX = (int) (context.getResources()
-            .getDimensionPixelSize(R.dimen.udfps_burn_in_offset_x) * scaleFactor);
-        mMaxBurnInOffsetY = (int) (context.getResources()
-            .getDimensionPixelSize(R.dimen.udfps_burn_in_offset_y) * scaleFactor);
+        mUdfpsAnimationPackage = "com.crdroid.udfps.animations";
 
         mAnimationSize = mContext.getResources().getDimensionPixelSize(R.dimen.udfps_animation_size);
-        mAnimationOffset = (int) (mContext.getResources().getDimensionPixelSize(R.dimen.udfps_animation_offset) * scaleFactor);
+        mAnimationOffset = mContext.getResources().getDimensionPixelSize(R.dimen.udfps_animation_offset);
 
         mAnimParams.height = mAnimationSize;
         mAnimParams.width = mAnimationSize;
@@ -92,96 +95,60 @@ public class UdfpsAnimation extends ImageView {
         mAnimParams.format = PixelFormat.TRANSLUCENT;
         mAnimParams.type = WindowManager.LayoutParams.TYPE_VOLUME_OVERLAY; // it must be behind Udfps icon
         mAnimParams.flags =  WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
-                | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+                | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
                 | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
         mAnimParams.gravity = Gravity.TOP | Gravity.CENTER;
-        mAnimParams.y = (int) (props.getLocation().sensorLocationY * scaleFactor) - (int) (props.getLocation().sensorRadius * scaleFactor)
+        mAnimParams.y = props.getLocation().sensorLocationY - props.getLocation().sensorRadius
                 - (mAnimationSize / 2) + mAnimationOffset;
 
         try {
             PackageManager pm = mContext.getPackageManager();
-            mApkResources = pm.getResourcesForApplication(UDFPS_ANIMATIONS_PACKAGE);
+            mApkResources = pm.getResourcesForApplication(mUdfpsAnimationPackage);
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
         int res = mApkResources.getIdentifier("udfps_animation_styles",
-                "array", UDFPS_ANIMATIONS_PACKAGE);
+                "array", mUdfpsAnimationPackage);
         mStyleNames = mApkResources.getStringArray(res);
 
         setScaleType(ImageView.ScaleType.CENTER_INSIDE);
-
-        Uri udfpsAnimStyle = Settings.System.getUriFor(Settings.System.UDFPS_ANIM_STYLE);
-        ContentObserver contentObserver = new ContentObserver(null) {
-            @Override
-            public void onChange(boolean selfChange, Uri uri) {
-                int value = Settings.System.getIntForUser(mContext.getContentResolver(),
-                        Settings.System.UDFPS_ANIM_STYLE, 0, UserHandle.USER_CURRENT);
-                int style = (value < 0 || value >= mStyleNames.length) ? 0 : value;
-                mContext.getMainExecutor().execute(() -> {
-                    updateAnimationStyle(style);
-                });
+        TunerService.Tunable tunable = (key, newValue) -> {
+            switch (key) {
+                case UDFPS_ANIM:
+                    mEnabled = TunerService.parseIntegerSwitch(newValue, false);
+                    break;
+                case UDFPS_ANIM_STYLE:
+                    mSelectedAnim = newValue == null ? 0 : Integer.parseInt(newValue);
+                    updateAnimationStyle(mStyleNames[mSelectedAnim]);
+                    break;
             }
         };
-        mContext.getContentResolver().registerContentObserver(
-                udfpsAnimStyle, false, contentObserver, UserHandle.USER_CURRENT);
-        contentObserver.onChange(true, udfpsAnimStyle);
+        Dependency.get(TunerService.class).addTunable(tunable, UDFPS_ANIM, UDFPS_ANIM_STYLE);
     }
 
-    private void updateAnimationStyle(int styleIdx) {
-        if (styleIdx == 0) {
-            recognizingAnim = null;
-            setBackgroundDrawable(null);
-        } else {
-            Drawable bgDrawable = getBgDrawable(styleIdx);
-            setBackgroundDrawable(bgDrawable);
-            recognizingAnim = bgDrawable != null ? (AnimationDrawable) getBackground() : null;
-        }
-    }
-
-    private Drawable getBgDrawable(int styleIdx) {
-        String drawableName = mStyleNames[styleIdx];
+    private void updateAnimationStyle(String drawableName) {
         if (DEBUG) Log.i(LOG_TAG, "Updating animation style to:" + drawableName);
-        try {
-            int resId = mApkResources.getIdentifier(drawableName, "drawable", UDFPS_ANIMATIONS_PACKAGE);
-            if (DEBUG) Log.i(LOG_TAG, "Got resource id: "+ resId +" from package" );
-            return mApkResources.getDrawable(resId);
-        } catch (Resources.NotFoundException e) {
-            return null;
-        }
-    }
-
-    public boolean isAnimationEnabled() {
-        return recognizingAnim != null;
-    }
-
-    public void updatePosition(FingerprintSensorPropertiesInternal props) {
-        mAnimParams.y = props.getLocation().sensorLocationY - props.getLocation().sensorRadius
-                - (mAnimationSize / 2) + mAnimationOffset;
-        // Update view if it's showing already.
-        if (mShowing) {
-            showAnimation();
-        }
+        int resId = mApkResources.getIdentifier(drawableName, "drawable", mUdfpsAnimationPackage);
+        if (DEBUG) Log.i(LOG_TAG, "Got resource id: "+ resId +" from package" );
+        setBackgroundDrawable(mApkResources.getDrawable(resId));
+        recognizingAnim = (AnimationDrawable) getBackground();
     }
 
     public void show() {
-        if (!mShowing && mIsKeyguard && isAnimationEnabled()) {
+        if (!mShowing && mIsKeyguard && mEnabled) {
             mShowing = true;
-            showAnimation();
-        }
-    }
-
-    private void showAnimation() {
-        try {
-            if (getWindowToken() == null) {
-                mWindowManager.addView(this, mAnimParams);
-            } else {
-                mWindowManager.updateViewLayout(this, mAnimParams);
+            try {
+                if (getWindowToken() == null) {
+                    mWindowManager.addView(this, mAnimParams);
+                } else {
+                    mWindowManager.updateViewLayout(this, mAnimParams);
+                }
+            } catch (RuntimeException e) {
+                // Ignore
             }
-        } catch (RuntimeException e) {
-            // Ignore
-        }
-        if (recognizingAnim != null) {
-            recognizingAnim.start();
+            if (recognizingAnim != null) {
+                recognizingAnim.start();
+            }
         }
     }
 
