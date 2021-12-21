@@ -344,14 +344,16 @@ class AuthRippleController @Inject constructor(
     private val udfpsControllerCallback =
         object : UdfpsController.Callback {
             override fun onFingerDown() {
-                if (udfpsController?.isAnimationEnabled() == false) {
+                if (Settings.System.getInt(sysuiContext.contentResolver,
+                       Settings.System.UDFPS_ANIM, 0) == 0) {
                     showDwellRipple()
                 }
             }
 
             override fun onFingerUp() {
-                if (udfpsController?.isAnimationEnabled() == false) {
-                    mView.retractDwellRipple()
+                if (Settings.System.getInt(sysuiContext.contentResolver,
+                        Settings.System.UDFPS_ANIM, 0) == 0) {
+                mView.retractDwellRipple()
                 }
             }
         }
