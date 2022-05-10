@@ -20,6 +20,7 @@ import android.app.Service
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Color
+import android.graphics.Typeface
 import android.graphics.PixelFormat
 import android.os.Handler
 import android.os.IBinder
@@ -37,6 +38,7 @@ import com.android.systemui.keyguard.WakefulnessLifecycle
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.io.RandomAccessFile
+import java.lang.Math
 
 import javax.inject.Inject
 
@@ -88,19 +90,28 @@ class FPSInfoService @Inject constructor(
     }
 
     private var fpsReadInterval = FPS_MEASURE_INTERVAL_DEFAULT
+    private var marginTop = 0
 
     override fun onCreate() {
         super.onCreate()
         coroutineScope = CoroutineScope(Dispatchers.IO)
 
+        marginTop = resources.getDimensionPixelSize(R.dimen.fps_info_margin_top)
         windowManager = getSystemService(WindowManager::class.java)
         configuration = resources.configuration
-        layoutParams.y = getTopInset()
+        layoutParams.y = getTopInset() + marginTop
+
+        val density = getResources().getDisplayMetrics().density
 
         fpsInfoView = TextView(this).apply {
-            text = getString(R.string.fps_text_placeholder, 0)
-            setBackgroundColor(ColorUtils.setAlphaComponent(Color.BLACK, BACKGROUND_ALPHA))
-            setTextColor(Color.WHITE)
+            text = "00"
+            val textSize = (Math.round(8 * density)).toFloat()
+            setTextSize(textSize)
+            val customBG = resources.getDrawable(R.drawable.fpsinfo_bg)
+            background = customBG
+            val textColor = resources.getInteger(android.R.color.system_accent1_50)
+            setTextColor(textColor)
+            typeface = Typeface.DEFAULT_BOLD
             val padding = resources.getDimensionPixelSize(R.dimen.fps_info_text_padding)
             setPadding(padding, padding, padding, padding)
         }
@@ -126,7 +137,7 @@ class FPSInfoService @Inject constructor(
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         if (configuration.orientation != newConfig.orientation) {
-            layoutParams.y = getTopInset()
+            layoutParams.y = getTopInset() + marginTop
             if (fpsInfoView.parent != null)
                 windowManager.updateViewLayout(fpsInfoView, layoutParams)
         }
@@ -143,7 +154,7 @@ class FPSInfoService @Inject constructor(
             do {
                 val fps = measureFps()
                 handler.post {
-                    fpsInfoView.text = getString(R.string.fps_text_placeholder, fps)
+                    fpsInfoView.text = if (fps < 10) "0$fps" else "$fps"
                 }
                 delay(fpsReadInterval)
             } while (isActive)
@@ -194,7 +205,5 @@ class FPSInfoService @Inject constructor(
     private companion object {
         private const val TAG = "FPSInfoService"
         private const val FPS_MEASURE_INTERVAL_DEFAULT = 1000L
-
-        private const val BACKGROUND_ALPHA = 120
     }
 }
