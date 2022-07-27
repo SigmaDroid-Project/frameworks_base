@@ -2545,8 +2545,8 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
                 ? Utils.getColorAttr(mContext, android.R.attr.colorBackgroundFloating)
                 : Utils.getColorAttr(mContext, com.android.internal.R.attr.textColorOnAccent);
 
-        final ColorStateList inverseTextTint = Utils.getColorAttr(
-                mContext, com.android.internal.R.attr.textColorOnAccent);
+        final ColorStateList colorAccent = Utils.getColorAttr(
+                mContext, com.android.internal.R.attr.colorAccent);
 
         row.sliderProgressSolid.setTintList(colorTint);
         if (row.sliderProgressIcon != null) {
