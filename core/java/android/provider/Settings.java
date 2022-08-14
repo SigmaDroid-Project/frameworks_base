@@ -6573,6 +6573,12 @@ public final class Settings {
         public static final String VOLUME_SLIDER_HAPTICS_INTENSITY = "volume_slider_haptics_intensity";
 
         /**
+         * Max visible notification icons in the Statusbar
+         * @hide
+         */
+        public static final String MAX_VISIBLE_NOTIFICATION_ICONS = "max_visible_notification_icons";
+
+        /**
          * Which Vibration Pattern to use
          * 0: dzzz-dzzz
          * 1: dzzz-da
@@ -6829,6 +6835,7 @@ public final class Settings {
             PRIVATE_SETTINGS.add(CAMERA_FLASH_NOTIFICATION);
             PRIVATE_SETTINGS.add(SCREEN_FLASH_NOTIFICATION);
             PRIVATE_SETTINGS.add(SCREEN_FLASH_NOTIFICATION_COLOR);
+            PRIVATE_SETTINGS.add(MAX_VISIBLE_NOTIFICATION_ICONS);
         }
 
         /**
