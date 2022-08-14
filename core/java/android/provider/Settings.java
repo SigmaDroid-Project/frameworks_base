@@ -6568,6 +6568,12 @@ public final class Settings {
         public static final String VOLUME_SLIDER_HAPTICS_INTENSITY = "volume_slider_haptics_intensity";
 
         /**
+         * Max visible notification icons in the Statusbar
+         * @hide
+         */
+        public static final String MAX_VISIBLE_NOTIFICATION_ICONS = "max_visible_notification_icons";
+
+        /**
          * Keys we no longer back up under the current schema, but want to continue to
          * process when restoring historical backup datasets.
          *
@@ -6580,8 +6586,6 @@ public final class Settings {
         };
 
         /**
-         * These are all public system settings
-         *
          * @hide
          */
         @UnsupportedAppUsage(maxTargetSdk = Build.VERSION_CODES.R, trackingBug = 170729553)
@@ -6697,6 +6701,7 @@ public final class Settings {
             PRIVATE_SETTINGS.add(CAMERA_FLASH_NOTIFICATION);
             PRIVATE_SETTINGS.add(SCREEN_FLASH_NOTIFICATION);
             PRIVATE_SETTINGS.add(SCREEN_FLASH_NOTIFICATION_COLOR);
+            PRIVATE_SETTINGS.add(MAX_VISIBLE_NOTIFICATION_ICONS);
         }
 
         /**
