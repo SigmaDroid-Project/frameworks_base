@@ -1282,7 +1282,7 @@ public class UdfpsController implements DozeReceiver, Dumpable {
         }
     }
 
-    public boolean isFingerDown() {
+    public synchronized boolean isFingerDown() {
         return mOnFingerDown;
     }
 
@@ -1300,7 +1300,7 @@ public class UdfpsController implements DozeReceiver, Dumpable {
         updateViewDimAmount();
     }
 
-    private void onFingerDown(
+    private synchronized void onFingerDown(
             long requestId,
             int x,
             int y,
@@ -1319,7 +1319,7 @@ public class UdfpsController implements DozeReceiver, Dumpable {
                 false /* isAod */);
     }
 
-    private void onFingerDown(
+    private synchronized void onFingerDown(
             long requestId,
             int pointerId,
             float x,
@@ -1356,7 +1356,6 @@ public class UdfpsController implements DozeReceiver, Dumpable {
                 mKeyguardUpdateMonitor.requestFaceAuth(FaceAuthApiRequestReason.UDFPS_POINTER_DOWN);
             }
         }
-        mOnFingerDown = true;
         if (mAlternateTouchProvider != null) {
             mBiometricExecutor.execute(() -> {
                 mAlternateTouchProvider.onPointerDown(requestId, (int) x, (int) y, minor, major);
@@ -1388,12 +1387,13 @@ public class UdfpsController implements DozeReceiver, Dumpable {
         for (Callback cb : mCallbacks) {
             cb.onFingerDown();
         }
-        if (mUdfpsAnimation != null) {
+        if (!mOnFingerDown && mUdfpsAnimation != null) {
             mUdfpsAnimation.show();
         }
+        mOnFingerDown = true;
     }
 
-    private void onFingerUp(long requestId, @NonNull UdfpsView view) {
+    private synchronized void onFingerUp(long requestId, @NonNull UdfpsView view) {
         onFingerUp(
                 requestId,
                 view,
@@ -1408,7 +1408,7 @@ public class UdfpsController implements DozeReceiver, Dumpable {
                 false /* isAod */);
     }
 
-    private void onFingerUp(
+    private synchronized void onFingerUp(
             long requestId,
             @NonNull UdfpsView view,
             int pointerId,
