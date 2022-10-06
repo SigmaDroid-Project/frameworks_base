@@ -30,8 +30,6 @@ import android.util.AttributeSet;
 import android.util.DisplayUtils;
 import android.util.Log;
 import android.util.MathUtils;
-import android.view.Display;
-import android.view.DisplayInfo;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
@@ -78,13 +76,6 @@ public class UdfpsAnimation extends ImageView {
            FingerprintSensorPropertiesInternal props) {
         super(context);
         mContext = context;
-            DisplayInfo displayInfo = new DisplayInfo();
-            mContext.getDisplay().getDisplayInfo(displayInfo);
-            final Display.Mode maxDisplayMode =
-                    DisplayUtils.getMaximumResolutionDisplayMode(displayInfo.supportedModes);
-            final float scaleFactor = DisplayUtils.getPhysicalPixelDisplaySizeRatio(
-                    maxDisplayMode.getPhysicalWidth(), maxDisplayMode.getPhysicalHeight(),
-                    displayInfo.getNaturalWidth(), displayInfo.getNaturalHeight());
 
         mWindowManager = windowManager;
 
@@ -92,15 +83,14 @@ public class UdfpsAnimation extends ImageView {
 
         mEnabled = true; // enable by default
         mSelectedAnim = 0;  // Set default animation style
-
-        mMaxBurnInOffsetX = (int) ((int) (context.getResources()
-            .getDimensionPixelSize(R.dimen.udfps_burn_in_offset_x) * scaleFactor) * scaleFactor);
-        mMaxBurnInOffsetY = (int) ((int) (context.getResources()
-            .getDimensionPixelSize(R.dimen.udfps_burn_in_offset_y) * scaleFactor) * scaleFactor);
+        mMaxBurnInOffsetX = (int) (context.getResources()
+            .getDimensionPixelSize(R.dimen.udfps_burn_in_offset_x) * scaleFactor);
+        mMaxBurnInOffsetY = (int) (context.getResources()
+            .getDimensionPixelSize(R.dimen.udfps_burn_in_offset_y) * scaleFactor);
 
         mUdfpsAnimationPackage = "com.crdroid.udfps.animations";
 
-        mAnimationSize = (int) (mContext.getResources().getDimensionPixelSize(R.dimen.udfps_animation_size) * scaleFactor);
+        mAnimationSize = mContext.getResources().getDimensionPixelSize(R.dimen.udfps_animation_size);
         mAnimationOffset = (int) (mContext.getResources().getDimensionPixelSize(R.dimen.udfps_animation_offset) * scaleFactor);
 
         mAnimParams.height = mAnimationSize;
