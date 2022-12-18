@@ -94,7 +94,4 @@
     <!-- Define device configs on boot -->
     <java-symbol type="array" name="global_device_configs_override" />
     <java-symbol type="array" name="device_configs_override" />
-
-    <!-- Smart Pixels UDFPS -->
-    <java-symbol type="bool" name="disable_smart_pixels_on_udfps"/>
 </resources>
