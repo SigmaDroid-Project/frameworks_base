@@ -236,7 +236,6 @@ public class UdfpsController implements DozeReceiver, Dumpable {
 
     private UdfpsAnimation mUdfpsAnimation;
 
-    private boolean mDisableSmartPixels;
     private boolean mLowPowerMode = false;
     private boolean mSmartPixelsFlag = false;
     private int mSmartPixelsEnabled = 0;
@@ -270,9 +269,7 @@ public class UdfpsController implements DozeReceiver, Dumpable {
     private final ScreenLifecycle.Observer mScreenObserver = new ScreenLifecycle.Observer() {
         @Override
         public void onScreenTurnedOn() {
-            if (mDisableSmartPixels) {
-                isSmartPixelsEnabled();
-            }
+            isSmartPixelsEnabled();
             mScreenOn = true;
             if (mAodInterruptRunnable != null) {
                 mAodInterruptRunnable.run();
@@ -976,7 +973,6 @@ public class UdfpsController implements DozeReceiver, Dumpable {
         udfpsHapticsSimulator.setUdfpsController(this);
         udfpsShell.setUdfpsOverlayController(mUdfpsOverlayController);
         mUdfpsVendorCode = mContext.getResources().getInteger(R.integer.config_udfpsVendorCode);
-        mDisableSmartPixels = mContext.getResources().getBoolean(com.android.internal.R.bool.disable_smart_pixels_on_udfps);
         boolean screenOffFodSupported = mContext.getResources().getBoolean(
                 com.android.internal.R.bool.config_supportScreenOffUdfps) ||
                 !TextUtils.isEmpty(mContext.getResources().getString(
@@ -1396,7 +1392,7 @@ public class UdfpsController implements DozeReceiver, Dumpable {
         mExecution.assertIsMainThread();
 
         if (!mSmartPixelsFlag) {
-            if (mDisableSmartPixels && ((mSmartPixelsEnabled == 1) || ((mSmartPixelsOnPowerSave == 1) && mLowPowerMode))) {
+            if ((mSmartPixelsEnabled == 1) || ((mSmartPixelsOnPowerSave == 1) && mLowPowerMode)) {
                 disableSmartPixels();
             }
             mSmartPixelsFlag = true;
@@ -1498,7 +1494,7 @@ public class UdfpsController implements DozeReceiver, Dumpable {
         mActivePointerId = -1;
         mAcquiredReceived = false;
 
-        if (mDisableSmartPixels && ((mSmartPixelsEnabled == 1) || ((mSmartPixelsOnPowerSave == 1) && mLowPowerMode))) {
+        if ((mSmartPixelsEnabled == 1) || ((mSmartPixelsOnPowerSave == 1) && mLowPowerMode)) {
             enableSmartPixels();
         }
         mSmartPixelsFlag = false;

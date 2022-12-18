@@ -124,7 +124,4 @@
     </string-array>
     <string-array name="device_configs_override" translatable="false">
     </string-array>
-
-    <!-- Smart Pixels UDFPS -->
-    <bool name="disable_smart_pixels_on_udfps">false</bool>
 </resources>
