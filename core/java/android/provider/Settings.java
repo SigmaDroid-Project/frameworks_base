@@ -13054,6 +13054,12 @@ public final class Settings {
         public static final String SHOW_MEDIA_SQUIGGLE_ANIMATION = "show_media_squiggle_animation";
 
         /**
+         * Whether to trigger doze for new notifications
+         * @hide
+         */
+        public static final String DOZE_FOR_NOTIFICATIONS = "doze_for_notifications";
+
+        /**
          * Whether to show ambient instead of waking for the tap gesture
          * @hide
          */
