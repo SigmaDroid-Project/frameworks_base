@@ -111,7 +111,6 @@ public class BrightnessController implements ToggleSlider.Listener, MirroredBrig
 
     private ValueAnimator mSliderAnimator;
     private boolean mUserChangedBrightness;
-
     private Vibrator mVibrator;
     private static final VibrationEffect BRIGHTNESS_SLIDER_HAPTIC =
             VibrationEffect.get(VibrationEffect.EFFECT_TICK);
