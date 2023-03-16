@@ -66,7 +66,6 @@ import com.android.internal.app.IAppOpsService;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -285,33 +284,6 @@ public class Camera {
     private static final int CAMERA_FACE_DETECTION_SW = 1;
 
     /**
-     * @hide
-     */
-    public static boolean shouldExposeAuxCamera() {
-        /**
-         * Force to expose only two cameras
-         * if the package name does not falls in this bucket
-         */
-        String packageName = ActivityThread.currentOpPackageName();
-    	if (packageName == null)
-    	    return true;
-        List<String> packageList = new ArrayList<>(Arrays.asList(
-                SystemProperties.get("vendor.camera.aux.packagelist", ",").split(",")));
-        List<String> packageExcludelist = new ArrayList<>(Arrays.asList(
-                SystemProperties.get("vendor.camera.aux.packageexcludelist", ",").split(",")));
-
-        // Append packages from lineage-sdk resources
-        Resources res = ActivityThread.currentApplication().getResources();
-        packageList.addAll(Arrays.asList(res.getStringArray(
-                org.lineageos.platform.internal.R.array.config_cameraAuxPackageAllowList)));
-        packageExcludelist.addAll(Arrays.asList(res.getStringArray(
-                org.lineageos.platform.internal.R.array.config_cameraAuxPackageExcludeList)));
-
-        return (packageList.isEmpty() || packageList.contains(packageName)) &&
-                !packageExcludelist.contains(packageName);
-    }
-
-    /**
      * Returns the number of physical cameras available on this device.
      * The return value of this method might change dynamically if the device
      * supports external cameras and an external camera is connected or
@@ -326,20 +298,7 @@ public class Camera {
      * @return total number of accessible camera devices, or 0 if there are no
      *   cameras or an error was encountered enumerating them.
      */
-    public static int getNumberOfCameras() {
-        int numberOfCameras = _getNumberOfCameras();
-        if (!shouldExposeAuxCamera() && numberOfCameras > 2) {
-            numberOfCameras = 2;
-        }
-        return numberOfCameras;
-    }
-
-    /**
-     * Returns the number of physical cameras available on this device.
-     *
-     * @hide
-     */
-    public native static int _getNumberOfCameras();
+    public native static int getNumberOfCameras();
 
     private static final boolean sLandscapeToPortrait =
             SystemProperties.getBoolean(CameraManager.LANDSCAPE_TO_PORTRAIT_PROP, false);
@@ -358,9 +317,6 @@ public class Camera {
      *    low-level failure).
      */
     public static void getCameraInfo(int cameraId, CameraInfo cameraInfo) {
-        if (cameraId >= getNumberOfCameras()) {
-            throw new RuntimeException("Unknown camera ID");
-        }
         boolean overrideToPortrait = shouldOverrideToPortrait();
 
         _getCameraInfo(cameraId, overrideToPortrait, cameraInfo);
@@ -580,9 +536,6 @@ public class Camera {
 
     /** used by Camera#open, Camera#open(int) */
     Camera(int cameraId) {
-        if (cameraId >= getNumberOfCameras()) {
-            throw new RuntimeException("Unknown camera ID");
-        }
         int err = cameraInit(cameraId);
         if (checkInitErrors(err)) {
             if (err == -EACCES) {
