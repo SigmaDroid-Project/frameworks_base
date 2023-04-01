@@ -2806,6 +2806,11 @@ public final class PowerManagerService extends SystemService
             return false;
         }
 
+        // On Always On Charging, SystemUI shows the charging indicator
+        if (mAlwaysOnChargingEnabled && mIsPowered && getGlobalWakefulnessLocked() == WAKEFULNESS_DOZING) {
+            return false;
+        }
+
         // Otherwise wake up!
         return true;
     }
