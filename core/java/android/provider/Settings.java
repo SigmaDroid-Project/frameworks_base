@@ -11903,8 +11903,8 @@ public final class Settings {
          * @hide
          */
         public static final String LOCKSCREEN_USE_DOUBLE_LINE_CLOCK =
-                "lockscreen_use_double_line_clock";        
-        
+                "lockscreen_use_double_line_clock";
+
         /**
          * Whether to use the lockscreen custom clock
          *
@@ -13052,6 +13052,19 @@ public final class Settings {
          * @hide
          */
         public static final String SHOW_MEDIA_SQUIGGLE_ANIMATION = "show_media_squiggle_animation";
+
+        /**
+         * Whether to show ambient instead of waking for the tap gesture
+         * @hide
+         */
+        public static final String DOZE_TAP_GESTURE_AMBIENT = "doze_tap_gesture_ambient";
+
+        /**
+         * Whether to show ambient instead of waking for the pickup gesture
+         * Do note quick pickup (device sensor) is already configured to do that
+         * @hide
+         */
+        public static final String DOZE_PICK_UP_GESTURE_AMBIENT = "doze_pick_up_gesture_ambient";
 
         /**
          * These entries are considered common between the personal and the managed profile,
