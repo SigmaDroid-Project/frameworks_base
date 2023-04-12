@@ -48,6 +48,7 @@ import android.widget.TextView
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.ContextCompat
 import com.android.settingslib.Utils
+import com.android.systemui.FontSizeUtils
 import com.android.systemui.R
 import com.android.systemui.animation.LaunchableView
 import com.android.systemui.animation.LaunchableViewDelegate
@@ -128,6 +129,7 @@ open class QSTileViewImpl @JvmOverloads constructor(
             Utils.getColorAttrDefaultColor(context, android.R.attr.textColorSecondary)
     private val colorSecondaryLabelUnavailable =
         Utils.getColorAttrDefaultColor(context, com.android.internal.R.attr.textColorTertiary)
+    private val colorSecondaryLabelActiveRandom = colorLabelActiveRandom
 
     // QS Style 2
     private val colorActiveAlpha = ContextCompat.getColorStateList(context, R.drawable.color_accent_alpha)?.defaultColor ?: Utils.applyAlpha(TILE_ALPHA, Utils.getColorAttrDefaultColor(context, android.R.attr.colorAccent))
@@ -236,8 +238,8 @@ open class QSTileViewImpl @JvmOverloads constructor(
     }
 
     fun updateResources() {
-        label.setTextSize(TypedValue.COMPLEX_UNIT_SP, labelSize)
-        secondaryLabel.setTextSize(TypedValue.COMPLEX_UNIT_SP, labelSize)
+        FontSizeUtils.updateFontSize(label, R.dimen.qs_tile_text_size)
+        FontSizeUtils.updateFontSize(secondaryLabel, R.dimen.qs_tile_secondary_label_text_size)
 
         val iconSize = context.resources.getDimensionPixelSize(R.dimen.qs_icon_size)
         _icon.layoutParams.apply {
