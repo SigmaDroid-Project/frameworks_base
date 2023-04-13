@@ -494,7 +494,7 @@ public class NetworkControllerImpl extends BroadcastReceiver
         };
 
         mDemoModeController.addCallback(this);
-        mProviderModelBehavior = mFeatureFlags.isEnabled(Flags.COMBINED_STATUS_BAR_SIGNAL_ICONS);
+        mProviderModelBehavior = SystemProperties.getBoolean("persist.sys.flags.combined_signal_icons", true);
 
         mSettingsObserver.observe();
         mSettingsObserver.update();
@@ -923,7 +923,7 @@ public class NetworkControllerImpl extends BroadcastReceiver
                     break;
                 case 24:
                     resId = R.drawable.ic_volte_zirco;
-                    break; 
+                    break;
                 // Dynamic
                 case 1:
                 default:
@@ -1068,7 +1068,7 @@ public class NetworkControllerImpl extends BroadcastReceiver
                     break;
                 case 24:
                     resId = R.drawable.ic_volte_zirco;
-                    break; 
+                    break;
                  // Dynamic
                 case 1:
                 default:
@@ -1195,7 +1195,7 @@ public class NetworkControllerImpl extends BroadcastReceiver
                     break;
                 case 24:
                     resId = R.drawable.ic_volte_zirco;
-                    break; 
+                    break;
                 // Dynamic
                 case 1:
                 default:
@@ -1281,7 +1281,7 @@ public class NetworkControllerImpl extends BroadcastReceiver
                     break;
                 case 24:
                     resId = R.drawable.ic_volte_zirco;
-                    break; 
+                    break;
                 // Dynamic
                 case 1:
                 default:
@@ -1371,7 +1371,7 @@ public class NetworkControllerImpl extends BroadcastReceiver
                     break;
                 case 24:
                     resId = R.drawable.ic_volte_zirco;
-                    break; 
+                    break;
                 // Dynamic
                 case 1:
                 default:
