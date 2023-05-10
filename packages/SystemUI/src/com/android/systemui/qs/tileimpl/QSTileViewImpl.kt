@@ -217,7 +217,7 @@ open class QSTileViewImpl @JvmOverloads constructor(
         updateResources()
     }
 
-    override fun isHapticFeedbackEnabled(): Booolean {
+    override fun isHapticFeedbackEnabled(): Boolean {
         return (System.getIntForUser(context.contentResolver,
             System.QS_HAPTIC_FEEDBACK, 0, UserHandle.USER_CURRENT) == 1)
     }
