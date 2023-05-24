@@ -19,12 +19,15 @@ package com.android.settingslib.development;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.os.SystemProperties;
 import android.os.UserManager;
 import android.provider.Settings;
 
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 public class DevelopmentSettingsEnabler {
+
+    private static final String ADB_SECURE_PROP = "ro.adb.secure";
 
     public static final String DEVELOPMENT_SETTINGS_CHANGED_ACTION =
             "com.android.settingslib.development.DevelopmentSettingsEnabler.SETTINGS_CHANGED";
@@ -43,7 +46,7 @@ public class DevelopmentSettingsEnabler {
         final UserManager um = (UserManager) context.getSystemService(Context.USER_SERVICE);
         final boolean settingEnabled = Settings.Global.getInt(context.getContentResolver(),
                 Settings.Global.DEVELOPMENT_SETTINGS_ENABLED,
-                Build.TYPE.equals("eng") ? 1 : 0) != 0;
+                SystemProperties.getInt(ADB_SECURE_PROP, 0) == 0 ? 1 : 0) != 0;
         final boolean hasRestriction = um.hasUserRestriction(
                 UserManager.DISALLOW_DEBUGGING_FEATURES);
         final boolean isAdmin = um.isAdminUser();
