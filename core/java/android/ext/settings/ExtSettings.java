@@ -22,6 +22,13 @@ public class ExtSettings {
             SUPL_SERVER_STANDARD, SUPL_DISABLED, SUPL_SERVER_GRAPHENEOS_PROXY // valid values
     );
 
+    // also read in packages/modules/DnsResolver (DnsTlsTransport.cpp and doh/network/driver.rs)
+    public static final IntSysProperty CONNECTIVITY_CHECKS = new IntSysProperty(
+            "persist.sys.connectivity_checks",
+            ConnChecksSetting.VAL_DEFAULT,
+            ConnChecksSetting.VAL_GRAPHENEOS, ConnChecksSetting.VAL_STANDARD, ConnChecksSetting.VAL_DISABLED
+    );
+
     private ExtSettings() {}
 
     // used for making settings defined in this class unreadable by third-party apps
