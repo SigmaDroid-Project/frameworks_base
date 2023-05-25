@@ -263,4 +263,7 @@
 
     <!-- Default FOD pressed color -->
     <integer name="config_udfps_pressed_color">0</integer>
+
+    <!-- Mock Oplus LinearmotorVibratorService -->
+    <bool name="config_mockOplusLinearmotorVibratorService">false</bool>
 </resources>
