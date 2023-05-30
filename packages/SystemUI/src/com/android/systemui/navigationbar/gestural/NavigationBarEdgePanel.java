@@ -299,24 +299,20 @@ public class NavigationBarEdgePanel extends View implements NavigationEdgeBackPl
      */
     public static class Factory {
         private final LatencyTracker mLatencyTracker;
-        private final VibratorHelper mVibratorHelper;
         private final Executor mBackgroundExecutor;
 
         @Inject
         public Factory(
                 LatencyTracker latencyTracker,
-                VibratorHelper vibratorHelper,
                 @Background Executor backgroundExecutor) {
             mLatencyTracker = latencyTracker;
             mBackgroundExecutor = backgroundExecutor;
-            mVibratorHelper = vibratorHelper;
         }
 
         public NavigationBarEdgePanel create(Context context) {
             return new NavigationBarEdgePanel(
                 context,
                 mLatencyTracker,
-                mVibratorHelper,
                 mBackgroundExecutor
             );
         }
