@@ -2485,13 +2485,6 @@ final class InstallPackageHelper {
                     }
                 }
             }
-
-            if (!Build.isDebuggable() && dataOwnerPkg != null && dataOwnerPkg.isSystem()) {
-                if (dataOwnerPkg.getLongVersionCode() == pkgLite.getLongVersionCode()) {
-                    return Pair.create(INSTALL_FAILED_SESSION_INVALID,
-                            "Not allowed to update system package to the same versionCode");
-                }
-            }
         }
         return Pair.create(PackageManager.INSTALL_SUCCEEDED, null);
     }
