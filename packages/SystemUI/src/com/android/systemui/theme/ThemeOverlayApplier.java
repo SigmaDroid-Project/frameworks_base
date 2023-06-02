@@ -138,7 +138,8 @@ public class ThemeOverlayApplier implements Dumpable {
     @VisibleForTesting
     static final String OVERLAY_CATEGORY_QS_PANEL =
             "android.theme.customization.qs_panel";
-
+    static final String OVERLAY_CATEGORY_BRIGHTNESS_SLIDER =
+            "android.theme.customization.brightness_slider";
 
     /*
      * All theme customization categories used by the system, in order that they should be applied,
@@ -161,7 +162,8 @@ public class ThemeOverlayApplier implements Dumpable {
             OVERLAY_CATEGORY_ICON_WIFI,
             OVERLAY_CATEGORY_NAVBAR,
             OVERLAY_CATEGORY_LOCK_CLOCK_FONT,
-            OVERLAY_CATEGORY_QS_PANEL);
+            OVERLAY_CATEGORY_QS_PANEL,
+            OVERLAY_CATEGORY_BRIGHTNESS_SLIDER);
 
     /* Categories that need to be applied to the current user as well as the system user. */
     @VisibleForTesting
@@ -175,7 +177,8 @@ public class ThemeOverlayApplier implements Dumpable {
             OVERLAY_CATEGORY_ICON_SYSUI,
             OVERLAY_CATEGORY_NAVBAR,
             OVERLAY_CATEGORY_LOCK_CLOCK_FONT,
-            OVERLAY_CATEGORY_QS_PANEL);
+            OVERLAY_CATEGORY_QS_PANEL,
+            OVERLAY_CATEGORY_BRIGHTNESS_SLIDER);
 
     /* Allowed overlay categories for each target package. */
     private final Map<String, Set<String>> mTargetPackageToCategories = new ArrayMap<>();
@@ -224,6 +227,7 @@ public class ThemeOverlayApplier implements Dumpable {
         mCategoryToTargetPackage.put(OVERLAY_CATEGORY_NAVBAR, SYSUI_PACKAGE);
         mCategoryToTargetPackage.put(OVERLAY_CATEGORY_LOCK_CLOCK_FONT, ANDROID_PACKAGE);
         mCategoryToTargetPackage.put(OVERLAY_CATEGORY_QS_PANEL, SYSUI_PACKAGE);
+        mCategoryToTargetPackage.put(OVERLAY_CATEGORY_BRIGHTNESS_SLIDER, SYSUI_PACKAGE);
 
         dumpManager.registerDumpable(TAG, this);
     }
