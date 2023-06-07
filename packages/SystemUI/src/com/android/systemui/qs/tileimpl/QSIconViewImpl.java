@@ -45,6 +45,8 @@ import com.android.systemui.qs.AlphaControlledSignalTileView.AlphaControlledSlas
 
 import android.provider.Settings.System;
 
+import com.android.internal.util.crdroid.ThemeUtils;
+
 import java.util.Objects;
 import java.util.Random;
 
@@ -248,15 +250,8 @@ public class QSIconViewImpl extends QSIconView {
      * Color to tint the tile icon based on state
      */
     private static int getIconColorForState(Context context, QSTile.State state) {
-        int qsPanelStyle = System.getIntForUser(context.getContentResolver(),
-                     System.QS_PANEL_STYLE, 0, UserHandle.USER_CURRENT);
 
-        Random mRandomColor = new Random();
-        int mRandomTint = Color.rgb((float) 
-        (mRandomColor.nextInt(256) / 2f + 0.5),
-         mRandomColor.nextInt(256),
-         mRandomColor.nextInt(256));
-        int mWhiteTint = Color.WHITE; 
+        ThemeUtils mThemeUtils = new ThemeUtils(context);
 
         if (state.disabledByPolicy || state.state == Tile.STATE_UNAVAILABLE) {
             return Utils.getColorAttrDefaultColor(
@@ -264,21 +259,21 @@ public class QSIconViewImpl extends QSIconView {
         } else if (state.state == Tile.STATE_INACTIVE) {
             return Utils.getColorAttrDefaultColor(context, android.R.attr.textColorPrimary);
         } else if (state.state == Tile.STATE_ACTIVE) {
-             if (qsPanelStyle == 1 || qsPanelStyle == 2 || qsPanelStyle == 10) {
-               return Utils.getColorAttrDefaultColor(context,
-                        android.R.attr.colorAccent);
-             } else if (qsPanelStyle == 3) {
-               return mRandomTint;
-             } else if (qsPanelStyle == 4 || qsPanelStyle == 6 || qsPanelStyle == 9) {
-               return mWhiteTint;
-             } else {
-              return Utils.getColorAttrDefaultColor(context,
-                    com.android.internal.R.attr.textColorPrimaryInverse);
-             }
+            if (mThemeUtils.shouldRandomizeTileColors()) {
+                Random mRandomColor = new Random();
+                return Color.rgb((float) (mRandomColor.nextInt(256) / 2f + 0.5),
+                        mRandomColor.nextInt(256), mRandomColor.nextInt(256));
+            } else if (mThemeUtils.shouldTintTileIcon()) {
+                return Utils.getColorAttrDefaultColor(context, android.R.attr.colorAccent);
+            } else if (mThemeUtils.shouldApplyWhiteTint()){
+                return Color.WHITE;
+            } else {
+                return Utils.getColorAttrDefaultColor(context,
+                        com.android.internal.R.attr.textColorPrimaryInverse);
+            }
         } else {
             Log.e("QSIconView", "Invalid state " + state);
             return 0;
-
         }
     }
 

@@ -44,6 +44,8 @@ import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.google.android.collect.Lists;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -58,6 +60,29 @@ public class ThemeUtils {
 
     public static final String FONT_KEY = "android.theme.customization.font";
     public static final String ICON_SHAPE_KEY= "android.theme.customization.adaptive_icon_shape";
+
+    static final String QS_PANEL_CATEGORY = "android.theme.customization.qs_panel";
+    static final String OVERLAY_QS_PANEL_CYBERPUNK = "com.android.systemui.qs_panel.cyberpunk";
+    static final String OVERLAY_QS_PANEL_NEUMORPH = "com.android.systemui.qs_panel.neumorph";
+    static final String OVERLAY_QS_PANEL_OUTLINE = "com.android.systemui.qs_panel.outline";
+    static final String OVERLAY_QS_PANEL_REFLECTED = "com.android.systemui.qs_panel.reflected";
+    static final String OVERLAY_QS_PANEL_SHADED = "com.android.systemui.qs_panel.shaded";
+    static final String OVERLAY_QS_PANEL_SURROUND = "com.android.systemui.qs_panel.surround";
+    static final String OVERLAY_QS_PANEL_THIN_OUTLINE = "com.android.systemui.qs_panel.thin";
+    static final String OVERLAY_QS_PANEL_TWO_TONE_ACCENT = "com.android.systemui.qs_panel.twotoneaccent";
+    static final String OVERLAY_QS_PANEL_TWO_TONE_TRANSPARENT = "com.android.systemui.qs_panel.wotoneaccenttrans";
+    static final String OVERLAY_QS_PANEL_COLOR_POP = "com.android.systemui.qs_panel.colorpop";
+
+    static final List<String> QS_WHITE_TEXT_OVERLAYS = Lists.newArrayList(
+            OVERLAY_QS_PANEL_NEUMORPH,
+            OVERLAY_QS_PANEL_OUTLINE,
+            OVERLAY_QS_PANEL_REFLECTED,
+            OVERLAY_QS_PANEL_SHADED,
+            OVERLAY_QS_PANEL_SURROUND);
+
+    static final List<String> QS_TINT_OVERLAYS = Lists.newArrayList(
+            OVERLAY_QS_PANEL_TWO_TONE_ACCENT,
+            OVERLAY_QS_PANEL_TWO_TONE_TRANSPARENT);
 
     public static final Comparator<OverlayInfo> OVERLAY_INFO_COMPARATOR =
             Comparator.comparingInt(a -> a.priority);
@@ -230,5 +255,35 @@ public class ThemeUtils {
             }
         }
         return true;
+    }
+
+    public boolean shouldTintTileBackground() {
+        for (int i = 1; i < QS_TINT_OVERLAYS.size(); i++) {
+            if (isOverlayEnabled(QS_TINT_OVERLAYS.get(i))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean shouldTintTileIcon() {
+        return shouldTintTileBackground();
+    }
+
+    public boolean shouldTintTileLabel() {
+        return shouldTintTileIcon();
+    }
+
+    public boolean shouldRandomizeTileColors() {
+        return isOverlayEnabled(OVERLAY_QS_PANEL_COLOR_POP);
+    }
+
+    public boolean shouldApplyWhiteTint() {
+        for (int i = 1; i < QS_WHITE_TEXT_OVERLAYS.size(); i++) {
+            if (isOverlayEnabled(QS_WHITE_TEXT_OVERLAYS.get(i))) {
+                return true;
+            }
+        }
+        return false;
     }
 }
