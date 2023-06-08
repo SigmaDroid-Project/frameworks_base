@@ -76,6 +76,8 @@ public abstract class QSPanelControllerBase<T extends QSPanel> extends ViewContr
             "system:" + Settings.System.QS_TILE_LABEL_HIDE;
     private static final String QS_TILE_LABEL_SIZE =
             "system:" + Settings.System.QS_TILE_LABEL_SIZE;
+    private static final String QS_TILE_SECONDARY_LABEL_SIZE =
+            "system:" + Settings.System.QS_TILE_SECONDARY_LABEL_SIZE;
     private static final String QQS_LAYOUT_ROWS =
             "system:" + Settings.System.QQS_LAYOUT_ROWS;
     private static final String QQS_LAYOUT_ROWS_LANDSCAPE =
@@ -219,6 +221,8 @@ public abstract class QSPanelControllerBase<T extends QSPanel> extends ViewContr
         mTunerService.addTunable(this, QS_LAYOUT_COLUMNS_LANDSCAPE);
         mTunerService.addTunable(this, QS_TILE_LABEL_HIDE);
         mTunerService.addTunable(this, QS_TILE_LABEL_SIZE);
+        mTunerService.addTunable(this, QS_TILE_SECONDARY_LABEL_SIZE);
+
         mTunerService.addTunable(this, QQS_LAYOUT_ROWS);
         mTunerService.addTunable(this, QQS_LAYOUT_ROWS_LANDSCAPE);
     }
@@ -523,6 +527,17 @@ public abstract class QSPanelControllerBase<T extends QSPanel> extends ViewContr
             case QS_LAYOUT_COLUMNS_LANDSCAPE:
             case QS_TILE_LABEL_HIDE:
             case QS_TILE_LABEL_SIZE:
+                if (mView.getTileLayout() != null) {
+                    mView.getTileLayout().updateSettings();
+                    setTiles();
+                }
+                break;
+            case QS_TILE_SECONDARY_LABEL_SIZE:
+                if (mView.getTileLayout() != null) {
+                    mView.getTileLayout().updateSettings();
+                    setTiles();
+                }
+                break;
             case QQS_LAYOUT_ROWS:
             case QQS_LAYOUT_ROWS_LANDSCAPE:
                 if (mView.getTileLayout() != null) {
