@@ -260,9 +260,10 @@ public class QSIconViewImpl extends QSIconView {
             return Utils.getColorAttrDefaultColor(context, android.R.attr.textColorPrimary);
         } else if (state.state == Tile.STATE_ACTIVE) {
             if (mThemeUtils.shouldRandomizeTileColors()) {
-                Random mRandomColor = new Random();
+                /* Random mRandomColor = new Random();
                 return Color.rgb((float) (mRandomColor.nextInt(256) / 2f + 0.5),
-                        mRandomColor.nextInt(256), mRandomColor.nextInt(256));
+                        mRandomColor.nextInt(256), mRandomColor.nextInt(256)); */
+                return Color.WHITE;
             } else if (mThemeUtils.shouldTintTileIcon()) {
                 return Utils.getColorAttrDefaultColor(context, android.R.attr.colorAccent);
             } else if (mThemeUtils.shouldApplyWhiteTint()){

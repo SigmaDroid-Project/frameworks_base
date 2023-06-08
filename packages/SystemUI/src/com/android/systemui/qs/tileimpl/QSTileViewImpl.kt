@@ -141,9 +141,9 @@ open class QSTileViewImpl @JvmOverloads constructor(
         randomColor.nextInt(256).toFloat()
     )
 
-    private val colorActiveRandom = Utils.applyAlpha(TILE_ALPHA, randomTint)
     private val colorLabelActiveRandom = randomTint
-    private val colorSecondaryLabelActiveRandom = randomTint
+    private val colorActiveRandom = Utils.applyAlpha(TILE_ALPHA, colorLabelActiveRandom)
+    private val colorSecondaryLabelActiveRandom = colorLabelActiveRandom
 
     private lateinit var label: TextView
     protected lateinit var secondaryLabel: TextView
@@ -191,10 +191,10 @@ open class QSTileViewImpl @JvmOverloads constructor(
     private var shouldVibrateOnTouch = false;
 
     private val themeUtils = ThemeUtils(context)
-    private val shouldTintTileBackground: Boolean = themeUtils.shouldTintTileBackground()
-    private val shouldTintTileLabel: Boolean = themeUtils.shouldTintTileLabel()
-    private val shouldRandomizeTileColors: Boolean = themeUtils.shouldRandomizeTileColors()
-    private val shouldApplyWhiteTint: Boolean = themeUtils.shouldApplyWhiteTint()
+    private var shouldTintTileBackground = false
+    private var shouldTintTileLabel = false
+    private var shouldRandomizeTileColors = false
+    private var shouldApplyWhiteTint = false
 
     init {
         setId(generateViewId())
@@ -212,6 +212,11 @@ open class QSTileViewImpl @JvmOverloads constructor(
 
         val iconSize = resources.getDimensionPixelSize(R.dimen.qs_icon_size)
         addView(_icon, LayoutParams(iconSize, iconSize))
+
+        shouldTintTileBackground = themeUtils.shouldTintTileBackground()
+        shouldTintTileLabel = themeUtils.shouldTintTileLabel()
+        shouldRandomizeTileColors = themeUtils.shouldRandomizeTileColors()
+        shouldApplyWhiteTint = themeUtils.shouldApplyWhiteTint()
 
         shouldVibrateOnTouch = isHapticFeedbackEnabled()
         createAndAddLabels()
@@ -712,7 +717,7 @@ open class QSTileViewImpl @JvmOverloads constructor(
         return when {
             state == Tile.STATE_UNAVAILABLE || disabledByPolicy -> colorLabelUnavailable
             state == Tile.STATE_ACTIVE ->
-                if (shouldRandomizeTileColors) colorLabelActiveRandom
+                if (shouldRandomizeTileColors) colorActiveSurround
                 else if (shouldTintTileLabel) colorActive
                 else if (shouldApplyWhiteTint) colorActiveSurround
                 else colorLabelActive
@@ -728,7 +733,7 @@ open class QSTileViewImpl @JvmOverloads constructor(
         return when {
             state == Tile.STATE_UNAVAILABLE || disabledByPolicy -> colorSecondaryLabelUnavailable
             state == Tile.STATE_ACTIVE ->
-                if (shouldRandomizeTileColors) colorSecondaryLabelActiveRandom
+                if (shouldRandomizeTileColors) colorActiveSurround
                 else if (shouldTintTileLabel) colorActive
                 else if (shouldApplyWhiteTint) colorActiveSurround
                 else colorSecondaryLabelActive
