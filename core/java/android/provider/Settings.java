@@ -6551,6 +6551,11 @@ public final class Settings {
         /**
          * @hide
          */
+        public static final String QS_TILE_SECONDARY_LABEL_SIZE = "qs_tile_secondary_label_size";
+
+        /**
+         * @hide
+         */
         public static final String QS_TILE_UI_STYLE = "qs_tile_ui_style";
 
         /**
