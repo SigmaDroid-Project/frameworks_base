@@ -6607,6 +6607,11 @@ public final class Settings {
         /**
          * @hide
          */
+        public static final String QS_TILE_SECONDARY_LABEL_SIZE = "qs_tile_secondary_label_size";
+
+        /**
+         * @hide
+         */
         public static final String MAX_VISIBLE_NOTIFICATION_ICONS = "max_visible_notification_icons";
 
         /**
