@@ -237,7 +237,10 @@ open class QSTileViewImpl @JvmOverloads constructor(
     private var vertical = false
     private val forceHideCheveron = true
     private var labelHide = false
-    private var labelSize = 14f
+   private var labelSize = 14f
+   private var secondaryLabelSize = 13f
+
+    private var shouldVibrateOnTouch = false;
 
     init {
         val typedValue = TypedValue()
@@ -311,8 +314,9 @@ open class QSTileViewImpl @JvmOverloads constructor(
 
     fun updateResources() {
         labelSize = TileUtils.getQSTileLabelSize(context)
+        secondaryLabelSize = TileUtils.getQSTileSecondaryLabelSize(context)
         label.setTextSize(TypedValue.COMPLEX_UNIT_SP, labelSize)
-        secondaryLabel.setTextSize(TypedValue.COMPLEX_UNIT_SP, labelSize)
+        secondaryLabel.setTextSize(TypedValue.COMPLEX_UNIT_SP, secondaryLabelSize)
 
         if (isA11Style) {
             updateA11StyleResources()
