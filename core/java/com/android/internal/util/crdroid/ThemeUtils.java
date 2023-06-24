@@ -73,18 +73,6 @@ public class ThemeUtils {
     static final String OVERLAY_QS_PANEL_TWO_TONE_TRANSPARENT = "com.android.systemui.qs_panel.twotoneaccenttrans";
     static final String OVERLAY_QS_PANEL_COLOR_POP = "com.android.systemui.qs_panel.colorpop";
 
-    static final List<String> QS_WHITE_TEXT_OVERLAYS = Lists.newArrayList(
-            OVERLAY_QS_PANEL_NEUMORPH,
-            OVERLAY_QS_PANEL_OUTLINE,
-            OVERLAY_QS_PANEL_REFLECTED,
-            OVERLAY_QS_PANEL_SHADED,
-            OVERLAY_QS_PANEL_SURROUND,
-            OVERLAY_QS_PANEL_THIN_OUTLINE);
-
-    static final List<String> QS_TINT_OVERLAYS = Lists.newArrayList(
-            OVERLAY_QS_PANEL_TWO_TONE_ACCENT,
-            OVERLAY_QS_PANEL_TWO_TONE_TRANSPARENT);
-
     public static final Comparator<OverlayInfo> OVERLAY_INFO_COMPARATOR =
             Comparator.comparingInt(a -> a.priority);
 
@@ -256,35 +244,5 @@ public class ThemeUtils {
             }
         }
         return true;
-    }
-
-    public boolean shouldTintTileBackground() {
-        for (int i = 0; i < QS_TINT_OVERLAYS.size(); i++) {
-            if (isOverlayEnabled(QS_TINT_OVERLAYS.get(i))) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean shouldTintTileIcon() {
-        return shouldTintTileBackground();
-    }
-
-    public boolean shouldTintTileLabel() {
-        return shouldTintTileIcon();
-    }
-
-    public boolean shouldRandomizeTileColors() {
-        return isOverlayEnabled(OVERLAY_QS_PANEL_COLOR_POP);
-    }
-
-    public boolean shouldApplyWhiteTint() {
-        for (int i = 0; i < QS_WHITE_TEXT_OVERLAYS.size(); i++) {
-            if (isOverlayEnabled(QS_WHITE_TEXT_OVERLAYS.get(i))) {
-                return true;
-            }
-        }
-        return false;
     }
 }

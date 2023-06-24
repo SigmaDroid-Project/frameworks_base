@@ -26,7 +26,6 @@ import android.content.res.Resources.ID_NULL
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.RippleDrawable
 import android.os.Trace
-import android.graphics.Color
 import android.os.UserHandle
 import android.service.quicksettings.Tile
 import android.text.TextUtils
@@ -46,8 +45,6 @@ import android.widget.LinearLayout
 import android.widget.Switch
 import android.widget.TextView
 import androidx.annotation.VisibleForTesting
-import android.annotation.SuppressLint;
-import com.android.internal.util.crdroid.ThemeUtils
 import com.android.settingslib.Utils
 import com.android.systemui.R
 import com.android.systemui.animation.LaunchableView
@@ -60,9 +57,6 @@ import com.android.systemui.qs.TileUtils
 import com.android.systemui.qs.logging.QSLogger
 import com.android.systemui.qs.tileimpl.QSIconViewImpl.QS_ANIM_LENGTH
 import java.util.Objects
-import java.util.Random
-
-
 import android.provider.Settings.System
 
 private const val TAG = "QSTileViewImpl"
@@ -79,8 +73,6 @@ open class QSTileViewImpl @JvmOverloads constructor(
         private const val SECONDARY_LABEL_NAME = "secondaryLabel"
         private const val CHEVRON_NAME = "chevron"
         const val UNAVAILABLE_ALPHA = 0.3f
-        const val TILE_ALPHA = 0.2f
-        const val INACTIVE_ALPHA = 0.2f
         @VisibleForTesting
         internal const val TILE_STATE_RES_PREFIX = "tile_states_"
     }
@@ -104,46 +96,27 @@ open class QSTileViewImpl @JvmOverloads constructor(
             field = value
             updateHeight()
         }
+    private val colorActive = Utils.getColorStateListDefaultColor(
+            context, R.color.qs_color_accent_primary)
 
-    private val colorActive = Utils.getColorAttrDefaultColor(context,
-            android.R.attr.colorAccent)
-    private val colorInactive = Utils.getColorAttrDefaultColor(context, R.attr.offStateColor)
+    private val colorInactive = Utils.getColorStateListDefaultColor(context,
+            R.color.qs_color_inactive)
+
     private val colorUnavailable = Utils.applyAlpha(UNAVAILABLE_ALPHA, colorInactive)
 
-    private val colorLabelActive = Utils.getColorAttrDefaultColor(context,
-            com.android.internal.R.attr.textColorPrimaryInverse)
+    private val colorLabelActive = Utils.getColorStateListDefaultColor(context,
+            R.color.qs_text_color_active)
     private val colorLabelInactive =
-            Utils.getColorAttrDefaultColor(context, android.R.attr.textColorPrimary)
+            Utils.getColorStateListDefaultColor(context, R.color.qs_text_color_inactive)
     private val colorLabelUnavailable =
         Utils.getColorAttrDefaultColor(context, com.android.internal.R.attr.textColorTertiary)
 
     private val colorSecondaryLabelActive =
-            Utils.getColorAttrDefaultColor(context, android.R.attr.textColorSecondaryInverse)
+            Utils.getColorStateListDefaultColor(context, R.color.qs_text_color_active);
     private val colorSecondaryLabelInactive =
-            Utils.getColorAttrDefaultColor(context, android.R.attr.textColorSecondary)
+            Utils.getColorStateListDefaultColor(context, R.color.qs_text_color_inactive)
     private val colorSecondaryLabelUnavailable =
         Utils.getColorAttrDefaultColor(context, com.android.internal.R.attr.textColorTertiary)
-
-    // Two-tone
-    private val colorActiveAlpha = Utils.applyAlpha(TILE_ALPHA, Utils.getColorAttrDefaultColor(context, android.R.attr.colorAccent))
-    private val colorInactiveAlpha = resources.getColor(R.color.qs_translucent_bg)
-
-    // Random
-    private var randomColor: Random = Random()
-
-    // White
-    private val colorActiveSurround = resources.getColor(R.color.qs_white_bg)
-    
-    @SuppressLint("NewApi")
-    private var randomTint: Int = Color.rgb(
-        (randomColor.nextInt(256) / 2f + 0.5).toFloat(),
-        randomColor.nextInt(256).toFloat(),
-        randomColor.nextInt(256).toFloat()
-    )
-
-    private val colorLabelActiveRandom = randomTint
-    private val colorActiveRandom = Utils.applyAlpha(TILE_ALPHA, colorLabelActiveRandom)
-    private val colorSecondaryLabelActiveRandom = colorLabelActiveRandom
 
     private lateinit var label: TextView
     protected lateinit var secondaryLabel: TextView
@@ -155,7 +128,7 @@ open class QSTileViewImpl @JvmOverloads constructor(
     protected var showRippleEffect = true
 
     private lateinit var ripple: RippleDrawable
-    protected lateinit var colorBackgroundDrawable: Drawable
+    private lateinit var colorBackgroundDrawable: Drawable
     private var paintColor: Int = 0
     private val singleAnimator: ValueAnimator = ValueAnimator().apply {
         setDuration(QS_ANIM_LENGTH)
@@ -189,13 +162,6 @@ open class QSTileViewImpl @JvmOverloads constructor(
     private var labelSize = 14f
 
     private var shouldVibrateOnTouch = false;
-
-    private val themeUtils = ThemeUtils(context)
-    private var shouldTintTileBackground = false
-    private var shouldTintTileLabel = false
-    private var shouldRandomizeTileColors = false
-    private var shouldApplyWhiteTint = false
-
     init {
         setId(generateViewId())
 
@@ -213,10 +179,6 @@ open class QSTileViewImpl @JvmOverloads constructor(
         val iconSize = resources.getDimensionPixelSize(R.dimen.qs_icon_size)
         addView(_icon, LayoutParams(iconSize, iconSize))
 
-        shouldTintTileBackground = themeUtils.shouldTintTileBackground()
-        shouldTintTileLabel = themeUtils.shouldTintTileLabel()
-        shouldRandomizeTileColors = themeUtils.shouldRandomizeTileColors()
-        shouldApplyWhiteTint = themeUtils.shouldApplyWhiteTint()
 
         shouldVibrateOnTouch = isHapticFeedbackEnabled()
         createAndAddLabels()
@@ -701,11 +663,8 @@ open class QSTileViewImpl @JvmOverloads constructor(
     private fun getBackgroundColorForState(state: Int, disabledByPolicy: Boolean = false): Int {
         return when {
             state == Tile.STATE_UNAVAILABLE || disabledByPolicy -> colorUnavailable
-            state == Tile.STATE_ACTIVE ->
-                if (shouldRandomizeTileColors) colorActiveRandom
-                else if (shouldTintTileBackground) colorActiveAlpha
-                else colorActive
-            state == Tile.STATE_INACTIVE -> if(shouldTintTileBackground) colorInactiveAlpha else colorInactive
+            state == Tile.STATE_ACTIVE -> colorActive
+            state == Tile.STATE_INACTIVE -> colorInactive
             else -> {
                 Log.e(TAG, "Invalid state $state")
                 0
@@ -716,11 +675,7 @@ open class QSTileViewImpl @JvmOverloads constructor(
     private fun getLabelColorForState(state: Int, disabledByPolicy: Boolean = false): Int {
         return when {
             state == Tile.STATE_UNAVAILABLE || disabledByPolicy -> colorLabelUnavailable
-            state == Tile.STATE_ACTIVE ->
-                if (shouldRandomizeTileColors) colorActiveSurround
-                else if (shouldTintTileLabel) colorActive
-                else if (shouldApplyWhiteTint) colorActiveSurround
-                else colorLabelActive
+            state == Tile.STATE_ACTIVE -> colorLabelActive
             state == Tile.STATE_INACTIVE -> colorLabelInactive
             else -> {
                 Log.e(TAG, "Invalid state $state")
@@ -732,11 +687,7 @@ open class QSTileViewImpl @JvmOverloads constructor(
     private fun getSecondaryLabelColorForState(state: Int, disabledByPolicy: Boolean = false): Int {
         return when {
             state == Tile.STATE_UNAVAILABLE || disabledByPolicy -> colorSecondaryLabelUnavailable
-            state == Tile.STATE_ACTIVE ->
-                if (shouldRandomizeTileColors) colorActiveSurround
-                else if (shouldTintTileLabel) colorActive
-                else if (shouldApplyWhiteTint) colorActiveSurround
-                else colorSecondaryLabelActive
+            state == Tile.STATE_ACTIVE -> colorSecondaryLabelActive
             state == Tile.STATE_INACTIVE -> colorSecondaryLabelInactive
             else -> {
                 Log.e(TAG, "Invalid state $state")

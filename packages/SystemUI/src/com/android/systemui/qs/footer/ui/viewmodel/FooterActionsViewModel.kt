@@ -146,12 +146,8 @@ class FooterActionsViewModel(
                 R.drawable.ic_settings,
                 ContentDescription.Resource(R.string.accessibility_quick_settings_settings)
             ),
-            iconTint =
-                Utils.getColorAttrDefaultColor(
-                    context,
-                    com.android.internal.R.attr.textColorPrimary,
-                ),
-            backgroundColor = R.attr.offStateColor,
+            iconTint = R.color.qs_color_button_settings,
+            backgroundColor = R.color.qs_color_inactive,
             this::onSettingsButtonClicked,
             this::onSettingsButtonLongClicked
         )
@@ -162,15 +158,11 @@ class FooterActionsViewModel(
             FooterActionsButtonViewModel(
                 id = R.id.pm_lite,
                 Icon.Resource(
-                    android.R.drawable.ic_lock_power_off,
+                    R.drawable.ic_qs_lock_power_off,
                     ContentDescription.Resource(R.string.accessibility_quick_settings_power_menu)
                 ),
-                iconTint =
-                    Utils.getColorAttrDefaultColor(
-                        context,
-                        com.android.internal.R.attr.textColorPrimaryInverse,
-                    ),
-                backgroundColor = com.android.internal.R.attr.colorAccent,
+                R.color.qs_color_button_power,
+                backgroundColor = R.color.qs_color_button_power_background,
                 this::onPowerButtonClicked,
                 this::doNothingLongClick,
             )
@@ -283,7 +275,7 @@ class FooterActionsViewModel(
                     ),
                 ),
             iconTint = null,
-            backgroundColor = R.attr.offStateColor,
+            backgroundColor = R.color.qs_color_inactive,
             onClick = this::onUserSwitcherClicked,
             onLongClick = this::doNothingLongClick,
         )
