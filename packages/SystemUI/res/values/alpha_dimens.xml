@@ -36,4 +36,8 @@
 
     <dimen name="qs_tile_stroke">2.5dip</dimen>
 
+    <!-- Alpha value for QS active/inactive colors -->
+    <item name="qs_color_active_alpha" format="float" type="dimen">1</item>
+    <item name="qs_color_inactive_alpha" format="float" type="dimen">1</item>
+
 </resources>

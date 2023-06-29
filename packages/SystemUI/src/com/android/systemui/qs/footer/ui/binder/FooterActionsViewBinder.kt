@@ -238,10 +238,9 @@ object FooterActionsViewBinder {
         }
 
         val backgroundResource =
-            when (model.backgroundColor) {
-                R.attr.offStateColor -> R.drawable.qs_footer_action_circle
-                com.android.internal.R.attr.colorAccent -> R.drawable.qs_footer_action_circle_color
-                else -> error("Unsupported icon background resource ${model.backgroundColor}")
+            when (model.id) {
+                R.id.pm_lite -> R.drawable.qs_footer_action_circle_color
+                else -> R.drawable.qs_footer_action_circle
             }
         buttonView.setBackgroundResource(backgroundResource)
         buttonView.setOnClickListener { model.onClick(Expandable.fromView(buttonView)) }
@@ -251,11 +250,6 @@ object FooterActionsViewBinder {
         val iconView = button.icon
 
         IconViewBinder.bind(icon, iconView)
-        if (model.iconTint != null) {
-            iconView.setColorFilter(model.iconTint, PorterDuff.Mode.SRC_IN)
-        } else {
-            iconView.clearColorFilter()
-        }
     }
 }
 
