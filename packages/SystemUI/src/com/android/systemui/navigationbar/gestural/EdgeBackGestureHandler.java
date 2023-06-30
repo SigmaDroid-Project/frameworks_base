@@ -212,7 +212,7 @@ public class EdgeBackGestureHandler implements PluginListener<NavigationEdgeBack
     private final Rect mNavBarOverlayExcludedBounds = new Rect();
     private final Region mExcludeRegion = new Region();
     private final Region mUnrestrictedExcludeRegion = new Region();
-    private final NavigationBarEdgePanel.Factory mNavBarEdgePanelFactory;
+    private final Provider<NavigationBarEdgePanel> mNavBarEdgePanelProvider;
     private final Provider<BackGestureTfClassifierProvider>
             mBackGestureTfClassifierProviderProvider;
     private final FeatureFlags mFeatureFlags;
@@ -374,7 +374,7 @@ public class EdgeBackGestureHandler implements PluginListener<NavigationEdgeBack
             IWindowManager windowManagerService,
             Optional<Pip> pipOptional,
             FalsingManager falsingManager,
-            NavigationBarEdgePanel.Factory navigationBarEdgePanelFactory,
+            Provider<NavigationBarEdgePanel> navigationBarEdgePanelProvider,
             Provider<BackGestureTfClassifierProvider> backGestureTfClassifierProviderProvider,
             FeatureFlags featureFlags) {
         mContext = context;
@@ -393,7 +393,7 @@ public class EdgeBackGestureHandler implements PluginListener<NavigationEdgeBack
         mWindowManagerService = windowManagerService;
         mPipOptional = pipOptional;
         mFalsingManager = falsingManager;
-        mNavBarEdgePanelFactory = navigationBarEdgePanelFactory;
+        mNavBarEdgePanelProvider = navigationBarEdgePanelProvider;
         mBackGestureTfClassifierProviderProvider = backGestureTfClassifierProviderProvider;
         mFeatureFlags = featureFlags;
         mLastReportedConfig.setTo(mContext.getResources().getConfiguration());
@@ -656,7 +656,7 @@ public class EdgeBackGestureHandler implements PluginListener<NavigationEdgeBack
             setEdgeBackPlugin(
                     mBackPanelControllerFactory.create(mContext));
         } else {
-            setEdgeBackPlugin(mNavBarEdgePanelFactory.create(mContext));
+            setEdgeBackPlugin(mNavBarEdgePanelProvider.get());
         }
     }
 
@@ -1197,7 +1197,7 @@ public class EdgeBackGestureHandler implements PluginListener<NavigationEdgeBack
         private final IWindowManager mWindowManagerService;
         private final Optional<Pip> mPipOptional;
         private final FalsingManager mFalsingManager;
-        private final NavigationBarEdgePanel.Factory mNavBarEdgePanelFactory;
+        private final Provider<NavigationBarEdgePanel> mNavBarEdgePanelProvider;
         private final Provider<BackGestureTfClassifierProvider>
                 mBackGestureTfClassifierProviderProvider;
         private final FeatureFlags mFeatureFlags;
@@ -1217,7 +1217,7 @@ public class EdgeBackGestureHandler implements PluginListener<NavigationEdgeBack
                        IWindowManager windowManagerService,
                        Optional<Pip> pipOptional,
                        FalsingManager falsingManager,
-                       NavigationBarEdgePanel.Factory navBarEdgePanelFactory,
+                       Provider<NavigationBarEdgePanel> navBarEdgePanelProvider,
                        Provider<BackGestureTfClassifierProvider>
                                backGestureTfClassifierProviderProvider,
                        FeatureFlags featureFlags) {
@@ -1235,7 +1235,7 @@ public class EdgeBackGestureHandler implements PluginListener<NavigationEdgeBack
             mWindowManagerService = windowManagerService;
             mPipOptional = pipOptional;
             mFalsingManager = falsingManager;
-            mNavBarEdgePanelFactory = navBarEdgePanelFactory;
+            mNavBarEdgePanelProvider = navBarEdgePanelProvider;
             mBackGestureTfClassifierProviderProvider = backGestureTfClassifierProviderProvider;
             mFeatureFlags = featureFlags;
         }
@@ -1258,7 +1258,7 @@ public class EdgeBackGestureHandler implements PluginListener<NavigationEdgeBack
                     mWindowManagerService,
                     mPipOptional,
                     mFalsingManager,
-                    mNavBarEdgePanelFactory,
+                    mNavBarEdgePanelProvider,
                     mBackGestureTfClassifierProviderProvider,
                     mFeatureFlags);
         }
