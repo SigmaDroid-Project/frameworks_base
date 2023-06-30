@@ -147,9 +147,13 @@
     <!-- Parallel space blocklist -->
     <string-array name="config_parallelSpaceBlocklist" />
 
-  <!-- List of system apps that are allowed to be locked with app lock.
+    <!-- List of system apps that are allowed to be locked with app lock.
         Use with extreme caution. -->
-  <string-array name="config_appLockAllowedSystemApps" translatable="false" />
+    <string-array name="config_appLockAllowedSystemApps" translatable="false" />
+
+    <!-- InputFilter Class-->
+    <string name="config_deviceInputFilterLibs" translatable="false"></string>
+    <string name="config_deviceInputFilterClasses" translatable="false"></string>
 
     <!-- Mock Oplus LinearmotorVibratorService -->
     <bool name="config_mockOplusLinearmotorVibratorService">false</bool>
