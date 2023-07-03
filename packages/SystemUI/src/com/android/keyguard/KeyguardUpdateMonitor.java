@@ -82,6 +82,7 @@ import android.app.trust.TrustManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -100,6 +101,7 @@ import android.hardware.fingerprint.FingerprintManager;
 import android.hardware.fingerprint.FingerprintManager.AuthenticationCallback;
 import android.hardware.fingerprint.FingerprintManager.AuthenticationResult;
 import android.hardware.fingerprint.FingerprintSensorPropertiesInternal;
+import android.net.Uri;
 import android.nfc.NfcAdapter;
 import android.os.CancellationSignal;
 import android.os.Handler;
@@ -341,9 +343,6 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener, Dumpab
     private final ArrayList<WeakReference<KeyguardUpdateMonitorCallback>>
             mCallbacks = Lists.newArrayList();
     private ContentObserver mDeviceProvisionedObserver;
-    private ContentObserver mFaceUnlockPrefObserver;
-    private final ContentObserver mTimeFormatChangeObserver;
-    private ContentObserver mSettingsChangeObserver;
 
     private boolean mSwitchingUser;
 
@@ -497,6 +496,8 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener, Dumpab
     SparseArray<BiometricAuthenticated> mUserFaceAuthenticated = new SparseArray<>();
 
     private static int sCurrentUser;
+
+    SettingsObserver mSettingsObserver;
 
     private final boolean mFaceAuthOnlyOnSecurityView;
     public static final int FACE_UNLOCK_BEHAVIOR_DEFAULT = 0;
@@ -808,6 +809,7 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener, Dumpab
         final boolean wasKeyguardVisible = isKeyguardVisible();
         mKeyguardShowing = showing;
         mKeyguardOccluded = occluded;
+        mPrimaryBouncerFullyShown = false;
         final boolean isKeyguardVisible = isKeyguardVisible();
         mLogger.logKeyguardShowingChanged(showing, occluded, isKeyguardVisible);
 
@@ -2228,6 +2230,8 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener, Dumpab
         mTelephonyListenerManager = telephonyListenerManager;
         mDeviceProvisioned = isDeviceProvisionedInSettingsDb();
         mStrongAuthTracker = new StrongAuthTracker(context);
+        mFaceAuthOnlyOnSecurityView = mContext.getResources().getBoolean(
+                com.android.internal.R.bool.config_faceAuthOnlyOnSecurityView);
         mBackgroundExecutor = backgroundExecutor;
         mBroadcastDispatcher = broadcastDispatcher;
         mInteractionJankMonitor = interactionJankMonitor;
@@ -2254,8 +2258,6 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener, Dumpab
         mFpm = fingerprintManager;
         mFaceManager = faceManager;
         mActiveUnlockConfig.setKeyguardUpdateMonitor(this);
-        mFaceAuthOnlyOnSecurityView = mContext.getResources().getBoolean(
-                com.android.internal.R.bool.config_faceAuthOnlyOnSecurityView);
         mFaceAcquiredInfoIgnoreList = Arrays.stream(
                 mContext.getResources().getIntArray(
                         R.array.config_face_acquire_device_entry_ignorelist))
@@ -2264,8 +2266,6 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener, Dumpab
         mConfigFaceAuthSupportedPosture = mContext.getResources().getInteger(
                 R.integer.config_face_auth_supported_posture);
         mFaceWakeUpTriggersConfig = faceWakeUpTriggersConfig;
-
-        updateFingerprintSettings();
 
         mPocketManager = (PocketManager) context.getSystemService(Context.POCKET_SERVICE);
         if (mPocketManager != null) {
@@ -2485,69 +2485,82 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener, Dumpab
         mTelephonyListenerManager.addActiveDataSubscriptionIdListener(mPhoneStateListener);
         initializeSimState();
 
-        mTimeFormatChangeObserver = new ContentObserver(mHandler) {
-            @Override
-            public void onChange(boolean selfChange) {
+        mFingerprintInteractiveToAuthProvider = interactiveToAuthProvider.orElse(null);
+
+        mSettingsObserver = new SettingsObserver(context, mHandler);
+        mSettingsObserver.observe();
+    }
+
+    private final class SettingsObserver extends ContentObserver {
+
+        private final Context mContext;
+
+        private final Uri mFaceUnlockMethod =
+                Settings.Secure.getUriFor(Settings.Secure.FACE_UNLOCK_METHOD);
+        private final Uri mSfpsPerformantAuthEnabled =
+                Settings.Secure.getUriFor(Settings.Secure.SFPS_PERFORMANT_AUTH_ENABLED);
+        private final Uri mTimeFormat =
+                Settings.System.getUriFor(Settings.System.TIME_12_24);
+
+        SettingsObserver(Context context, Handler handler) {
+            super(handler);
+            mContext = context;
+        }
+
+        void observe() {
+            ContentResolver resolver = mContext.getContentResolver();
+            resolver.registerContentObserver(
+                    mFaceUnlockMethod, false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(
+                    mSfpsPerformantAuthEnabled, false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(
+                    mTimeFormat, false, this, UserHandle.USER_ALL);
+
+            updateFaceUnlockBehavior();
+            updateFingerprintSettings();
+        }
+
+        void unobserve(){
+            mContext.getContentResolver().unregisterContentObserver(this);
+        }
+
+        @Override
+        public void onChange(boolean selfChange, Uri uri) {
+            update(uri);
+        }
+
+        public void update(Uri uri) {
+            if (mFaceUnlockMethod.equals(uri)) {
+                updateFaceUnlockBehavior();
+            } else if (mSfpsPerformantAuthEnabled.equals(uri)) {
+                updateFingerprintSettings();
+            } else if (mTimeFormat.equals(uri)) {
                 mHandler.sendMessage(mHandler.obtainMessage(
                         MSG_TIME_FORMAT_UPDATE,
                         Settings.System.getString(
                                 mContext.getContentResolver(),
                                 Settings.System.TIME_12_24)));
             }
-        };
-
-        mContext.getContentResolver().registerContentObserver(
-                Settings.System.getUriFor(Settings.System.TIME_12_24),
-                false, mTimeFormatChangeObserver, UserHandle.USER_ALL);
-
-        mFingerprintInteractiveToAuthProvider = interactiveToAuthProvider.orElse(null);
-
-        mSettingsChangeObserver = new ContentObserver(mHandler) {
-            @Override
-            public void onChange(boolean selfChange) {
-                updateFingerprintSettings();
-            }
-        };
-        mContext.getContentResolver().registerContentObserver(
-                Settings.Secure.getUriFor(Settings.Secure.SFPS_PERFORMANT_AUTH_ENABLED),
-                false, mSettingsChangeObserver, UserHandle.USER_ALL);
-    }
-
-    private void updateFingerprintSettings() {
-        boolean defFingerprintSettings = mContext.getResources().getBoolean(
-                com.android.internal.R.bool.config_performantAuthDefault);
-        if (defFingerprintSettings) {
-            mFingerprintWakeAndUnlock = Settings.Secure.getIntForUser(mContext.getContentResolver(),
-                    Settings.Secure.SFPS_PERFORMANT_AUTH_ENABLED,
-                    1, UserHandle.USER_CURRENT) == 1;
-        } else {
-            mFingerprintWakeAndUnlock = defFingerprintSettings;
         }
-
-        updateFaceUnlockBehavior();
-        mFaceUnlockPrefObserver = new ContentObserver(mHandler) {
-            @Override
-            public void onChange(boolean selfChange) {
-                updateFaceUnlockBehavior();
-            }
-        };
-
-        mContext.getContentResolver().registerContentObserver(
-                mSecureSettings.getUriFor(Settings.Secure.FACE_UNLOCK_METHOD),
-                false,
-                mFaceUnlockPrefObserver,
-                getCurrentUser());
-
     }
 
     private void updateFaceUnlockBehavior() {
-        if (mFaceAuthOnlyOnSecurityView) {
+        ContentResolver resolver = mContext.getContentResolver();
+        if (mFaceAuthOnlyOnSecurityView){
             mFaceUnlockBehavior = FACE_UNLOCK_BEHAVIOR_SWIPE;
-        } else {
-            mFaceUnlockBehavior = Settings.Secure.getIntForUser(mContext.getContentResolver(),
+        }else{
+            mFaceUnlockBehavior = Settings.Secure.getIntForUser(resolver,
                 Settings.Secure.FACE_UNLOCK_METHOD, FACE_UNLOCK_BEHAVIOR_DEFAULT,
                 UserHandle.USER_CURRENT);
         }
+    }
+
+    private void updateFingerprintSettings() {
+        int defFingerprintSettings = mContext.getResources().getBoolean(
+                com.android.internal.R.bool.config_performantAuthDefault) ? 1: 0;
+        mFingerprintWakeAndUnlock = Settings.Secure.getIntForUser(mContext.getContentResolver(),
+                    Settings.Secure.SFPS_PERFORMANT_AUTH_ENABLED,
+                    defFingerprintSettings, UserHandle.USER_CURRENT) == 1;
     }
 
     private void initializeSimState() {
@@ -2892,7 +2905,7 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener, Dumpab
         // Don't trigger active unlock if primary auth is required
         final boolean primaryAuthRequired = !isUnlockingWithBiometricAllowed(true);
 
-        boolean shouldTriggerActiveUnlock =
+        final boolean shouldTriggerActiveUnlock =
                 (mAuthInterruptActive || triggerActiveUnlockForAssistant || awakeKeyguard)
                         && !mSwitchingUser
                         && !userCanDismissLockScreen
@@ -2900,10 +2913,6 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener, Dumpab
                         && !primaryAuthRequired
                         && !mKeyguardGoingAway
                         && !mSecureCameraLaunched;
-
-        if (shouldTriggerActiveUnlock && mFaceUnlockBehavior == FACE_UNLOCK_BEHAVIOR_SWIPE && !mPrimaryBouncerFullyShown) {
-            shouldTriggerActiveUnlock = false;
-        }
 
         // Aggregate relevant fields for debug logging.
         logListenerModelData(
@@ -2949,18 +2958,7 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener, Dumpab
         final int user = getCurrentUser();
         final boolean userDoesNotHaveTrust = !getUserHasTrust(user);
         final boolean shouldListenForFingerprintAssistant = shouldListenForFingerprintAssistant();
-        final boolean shouldListenKeyguardState;
-        if (!mFingerprintWakeAndUnlock) {
-            shouldListenKeyguardState =
-                (isKeyguardVisible()
-                        || mPrimaryBouncerIsOrWillBeShowing
-                        || shouldListenForFingerprintAssistant
-                        || (mKeyguardOccluded && mIsDreaming))
-                        && mDeviceInteractive && !mGoingToSleep && !mKeyguardGoingAway
-                        || (mKeyguardOccluded && userDoesNotHaveTrust
-                            && (mOccludingAppRequestingFp || isUdfps || mAlternateBouncerShowing));
-        } else {
-            shouldListenKeyguardState =
+        final boolean shouldListenKeyguardState =
                 isKeyguardVisible()
                         || !mDeviceInteractive
                         || (mPrimaryBouncerIsOrWillBeShowing && !mKeyguardGoingAway)
@@ -2968,8 +2966,7 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener, Dumpab
                         || shouldListenForFingerprintAssistant
                         || (mKeyguardOccluded && mIsDreaming)
                         || (mKeyguardOccluded && userDoesNotHaveTrust
-                            && (mOccludingAppRequestingFp || isUdfps || mAlternateBouncerShowing));
-        }
+                            && (mOccludingAppRequestingFp || isUdfps));
 
         // Only listen if this KeyguardUpdateMonitor belongs to the primary user. There is an
         // instance of KeyguardUpdateMonitor for each user but KeyguardUpdateMonitor is user-aware.
@@ -3076,7 +3073,7 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener, Dumpab
         final boolean isPostureAllowedForFaceAuth = doesPostureAllowFaceAuth(mPostureState);
         // Only listen if this KeyguardUpdateMonitor belongs to the primary user. There is an
         // instance of KeyguardUpdateMonitor for each user but KeyguardUpdateMonitor is user-aware.
-        final boolean shouldListen =
+        boolean shouldListen =
                 (mPrimaryBouncerFullyShown
                         || mAuthInterruptActive
                         || mOccludingAppRequestingFace
@@ -3087,11 +3084,15 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener, Dumpab
                 && !mSwitchingUser && !faceDisabledForUser && userNotTrustedOrDetectionIsNeeded
                 && !mKeyguardGoingAway && biometricEnabledForUser
                 && faceAuthAllowedOrDetectionIsNeeded && mIsPrimaryUser
-                && (!mSecureCameraLaunched || mAlternateBouncerShowing)
+                && (!mSecureCameraLaunched || mOccludingAppRequestingFace)
                 && faceAndFpNotAuthenticated
                 && !mGoingToSleep
                 && isPostureAllowedForFaceAuth
                 && !mIsDeviceInPocket;
+
+        if (shouldListen && mFaceUnlockBehavior == FACE_UNLOCK_BEHAVIOR_SWIPE && !mPrimaryBouncerFullyShown){
+            shouldListen = false;
+        }
 
         // Aggregate relevant fields for debug logging.
         logListenerModelData(
@@ -4219,17 +4220,8 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener, Dumpab
             mContext.getContentResolver().unregisterContentObserver(mDeviceProvisionedObserver);
         }
 
-        if (mTimeFormatChangeObserver != null) {
-            mContext.getContentResolver().unregisterContentObserver(mTimeFormatChangeObserver);
-        }
-
-        if (mSettingsChangeObserver != null) {
-            mContext.getContentResolver().unregisterContentObserver(mSettingsChangeObserver);
-        }
-
-        if (mFaceUnlockPrefObserver != null) {
-            mContext.getContentResolver().unregisterContentObserver(
-                    mFaceUnlockPrefObserver);
+        if (mSettingsObserver != null) {
+            mSettingsObserver.unobserve();
         }
 
         mUserTracker.removeCallback(mUserChangedCallback);
