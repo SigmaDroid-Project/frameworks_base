@@ -144,10 +144,10 @@ internal class ChromaSource : Chroma {
 }
 
 internal class TonalSpec(val hue: Hue = HueSource(), val chroma: Chroma) {
-    fun shades(sourceColor: Cam): List<Int> {
+    fun shades(sourceColor: Cam, luminanceFactor: Float = 1f, chromaFactor: Float = 1f): List<Int> {
         val hue = hue.get(sourceColor)
         val chroma = chroma.get(sourceColor)
-        return Shades.of(hue.toFloat(), chroma.toFloat()).toList()
+        return Shades.of(hue.toFloat(), chroma.toFloat(), luminanceFactor, chromaFactor).toList()
     }
 }
 
@@ -227,7 +227,7 @@ class TonalPalette {
     internal constructor(spec: TonalSpec, seedColor: Int,
             luminanceFactor: Float = 1f, chromaFactor: Float = 1f) {
         val seedCam = Cam.fromInt(seedColor)
-        allShades = spec.shades(seedCam)
+        allShades = spec.shades(seedCam, luminanceFactor, chromaFactor)
         allShadesMapped = shadeKeys.zip(allShades).toMap()
 
         val h = spec.hue.get(seedCam).toFloat()
