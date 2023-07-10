@@ -402,6 +402,7 @@ android_robolectric_test {
     static_libs: [
         "androidx.test.uiautomator_uiautomator",
         "androidx.test.ext.junit",
+        "inline-mockito-robolectric-prebuilt",
     ],
     libs: [
         "android.test.runner",
