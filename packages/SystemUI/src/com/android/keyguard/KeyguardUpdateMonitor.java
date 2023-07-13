@@ -384,8 +384,6 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener, Dumpab
     private int mPostureState = DEVICE_POSTURE_UNKNOWN;
     private FingerprintInteractiveToAuthProvider mFingerprintInteractiveToAuthProvider;
 
-    private boolean mFingerprintWakeAndUnlock;
-
     /**
      * Short delay before restarting fingerprint authentication after a successful try. This should
      * be slightly longer than the time between onFingerprintAuthenticated and
@@ -2497,8 +2495,6 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener, Dumpab
 
         private final Uri mFaceUnlockMethod =
                 Settings.Secure.getUriFor(Settings.Secure.FACE_UNLOCK_METHOD);
-        private final Uri mSfpsPerformantAuthEnabled =
-                Settings.Secure.getUriFor(Settings.Secure.SFPS_PERFORMANT_AUTH_ENABLED);
         private final Uri mTimeFormat =
                 Settings.System.getUriFor(Settings.System.TIME_12_24);
 
@@ -2512,12 +2508,9 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener, Dumpab
             resolver.registerContentObserver(
                     mFaceUnlockMethod, false, this, UserHandle.USER_ALL);
             resolver.registerContentObserver(
-                    mSfpsPerformantAuthEnabled, false, this, UserHandle.USER_ALL);
-            resolver.registerContentObserver(
                     mTimeFormat, false, this, UserHandle.USER_ALL);
 
             updateFaceUnlockBehavior();
-            updateFingerprintSettings();
         }
 
         void unobserve(){
@@ -2532,8 +2525,6 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener, Dumpab
         public void update(Uri uri) {
             if (mFaceUnlockMethod.equals(uri)) {
                 updateFaceUnlockBehavior();
-            } else if (mSfpsPerformantAuthEnabled.equals(uri)) {
-                updateFingerprintSettings();
             } else if (mTimeFormat.equals(uri)) {
                 mHandler.sendMessage(mHandler.obtainMessage(
                         MSG_TIME_FORMAT_UPDATE,
@@ -2553,14 +2544,6 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener, Dumpab
                 Settings.Secure.FACE_UNLOCK_METHOD, FACE_UNLOCK_BEHAVIOR_DEFAULT,
                 UserHandle.USER_CURRENT);
         }
-    }
-
-    private void updateFingerprintSettings() {
-        int defFingerprintSettings = mContext.getResources().getBoolean(
-                com.android.internal.R.bool.config_performantAuthDefault) ? 1: 0;
-        mFingerprintWakeAndUnlock = Settings.Secure.getIntForUser(mContext.getContentResolver(),
-                    Settings.Secure.SFPS_PERFORMANT_AUTH_ENABLED,
-                    defFingerprintSettings, UserHandle.USER_CURRENT) == 1;
     }
 
     private void initializeSimState() {
