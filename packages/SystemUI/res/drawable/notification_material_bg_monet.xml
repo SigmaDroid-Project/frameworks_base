@@ -22,5 +22,6 @@
         <shape>
             <solid android:color="?androidprv:attr/colorSurface" />
         </shape>
+        <corners android:radius="?android:attr/dialogCornerRadius" />
     </item>
 </ripple>
