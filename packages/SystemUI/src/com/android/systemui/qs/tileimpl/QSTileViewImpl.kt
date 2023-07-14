@@ -72,7 +72,7 @@ open class QSTileViewImpl @JvmOverloads constructor(
         private const val LABEL_NAME = "label"
         private const val SECONDARY_LABEL_NAME = "secondaryLabel"
         private const val CHEVRON_NAME = "chevron"
-        const val UNAVAILABLE_ALPHA = 0.3f
+        const val UNAVAILABLE_ALPHA = 0.2f
         @VisibleForTesting
         internal const val TILE_STATE_RES_PREFIX = "tile_states_"
     }
@@ -97,6 +97,9 @@ open class QSTileViewImpl @JvmOverloads constructor(
             updateHeight()
         }
 
+    private var activeAlpha: Float = 0f;
+    private var inactiveAlpha: Float = 0f;
+
     private val colorActive = Utils.getColorStateListDefaultColor(
             context, R.color.qs_color_accent_primary)
     private val colorInactive = Utils.getColorStateListDefaultColor(context,
@@ -104,18 +107,18 @@ open class QSTileViewImpl @JvmOverloads constructor(
     private val colorUnavailable = Utils.applyAlpha(UNAVAILABLE_ALPHA, colorInactive)
 
     private val colorLabelActive = Utils.getColorStateListDefaultColor(context,
-            R.color.qs_text_color_active)
+            R.color.qs_color_text_active)
     private val colorLabelInactive =
-            Utils.getColorStateListDefaultColor(context, R.color.qs_text_color_inactive)
-    private val colorLabelUnavailable =
-        Utils.getColorAttrDefaultColor(context, com.android.internal.R.attr.textColorTertiary)
+            Utils.getColorStateListDefaultColor(context, R.color.qs_color_text_inactive)
+    private val colorLabelUnavailable = Utils.getColorStateListDefaultColor(context,
+            R.color.qs_color_text_unavailable)
 
     private val colorSecondaryLabelActive =
-            Utils.getColorStateListDefaultColor(context, R.color.qs_text_color_active);
+            Utils.getColorStateListDefaultColor(context, R.color.qs_color_text_active);
     private val colorSecondaryLabelInactive =
-            Utils.getColorStateListDefaultColor(context, R.color.qs_text_color_inactive)
-    private val colorSecondaryLabelUnavailable =
-        Utils.getColorAttrDefaultColor(context, com.android.internal.R.attr.textColorTertiary)
+            Utils.getColorStateListDefaultColor(context, R.color.qs_color_text_inactive)
+    private val colorSecondaryLabelUnavailable = Utils.getColorStateListDefaultColor(context,
+            R.color.qs_color_text_unavailable)
 
     private lateinit var label: TextView
     protected lateinit var secondaryLabel: TextView
@@ -168,6 +171,13 @@ open class QSTileViewImpl @JvmOverloads constructor(
         vertical = TileUtils.getQSTileVerticalLayout(context, if (vertical) 1 else 0)
         labelHide = TileUtils.getQSTileLabelHide(context)
         labelSize = TileUtils.getQSTileLabelSize(context)
+
+        var tAlpha = TypedValue()
+        context.resources.getValue(R.dimen.qs_active_alpha, tAlpha, true)
+        activeAlpha = tAlpha.getFloat()
+
+        context.resources.getValue(R.dimen.qs_inactive_alpha, tAlpha, true)
+        inactiveAlpha = tAlpha.getFloat()
 
         importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_YES
         clipChildren = false
@@ -649,8 +659,14 @@ open class QSTileViewImpl @JvmOverloads constructor(
     private fun getBackgroundColorForState(state: Int, disabledByPolicy: Boolean = false): Int {
         return when {
             state == Tile.STATE_UNAVAILABLE || disabledByPolicy -> colorUnavailable
-            state == Tile.STATE_ACTIVE -> colorActive
-            state == Tile.STATE_INACTIVE -> colorInactive
+            state == Tile.STATE_ACTIVE ->
+                    if (activeAlpha > 0 && activeAlpha < 1)
+                        Utils.applyAlpha(activeAlpha, colorActive)
+                    else colorActive
+            state == Tile.STATE_INACTIVE ->
+                    if (inactiveAlpha > 0 && inactiveAlpha < 1)
+                        Utils.applyAlpha(inactiveAlpha, colorInactive)
+                    else colorInactive
             else -> {
                 Log.e(TAG, "Invalid state $state")
                 0

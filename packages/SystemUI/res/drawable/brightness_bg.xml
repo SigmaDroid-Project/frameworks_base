@@ -17,6 +17,6 @@
 
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
     <corners android:radius="@dimen/rounded_slider_corner_radius" />
-    <solid android:color="@color/qs_color_button_brightness_background" />
+    <solid android:color="@android:color/holo_blue_light" />
     <size android:width="@dimen/rounded_slider_height" android:height="@dimen/rounded_slider_height" />
 </shape>
