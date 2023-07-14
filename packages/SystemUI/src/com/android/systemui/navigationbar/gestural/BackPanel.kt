@@ -41,7 +41,7 @@ class BackPanel(
 
     // True if the panel is currently on the left of the screen
     var isLeftPanel = false
-    
+
     var drawCircle = false
 
     /**
@@ -122,6 +122,8 @@ class BackPanel(
             minimumValue = 0f,
             maximumValue = 1f
     )
+
+    private var mTriggerLongSwipe = false
 
     private val allAnimatedFloat = setOf(
             arrowLength,
@@ -465,6 +467,10 @@ class BackPanel(
     }
 
     override fun hasOverlappingRendering() = false
+
+    fun setTriggerLongSwipe(triggerLongSwipe: Boolean) {
+        mTriggerLongSwipe = triggerLongSwipe
+    }
 
     override fun onDraw(canvas: Canvas) {
         val edgeCorner = backgroundEdgeCornerRadius.pos

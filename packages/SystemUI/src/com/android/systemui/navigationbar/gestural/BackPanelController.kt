@@ -302,13 +302,16 @@ class BackPanelController internal constructor(
                 startIsLeft = mView.isLeftPanel
                 hasPassedDragSlop = false
                 mView.resetStretch()
+                mView.setTriggerLongSwipe(false)
             }
             MotionEvent.ACTION_MOVE -> {
                 if (dragSlopExceeded(event.x, startX)) {
+                    mView.setTriggerLongSwipe(mTriggerLongSwipe)
                     handleMoveEvent(event)
                 }
             }
             MotionEvent.ACTION_UP -> {
+                mView.setTriggerLongSwipe(mTriggerLongSwipe)
                 when (currentState) {
                     GestureState.ENTRY -> {
                         if (isFlungAwayFromEdge(endX = event.x)) {
@@ -345,6 +348,7 @@ class BackPanelController internal constructor(
                 velocityTracker = null
             }
             MotionEvent.ACTION_CANCEL -> {
+                mView.setTriggerLongSwipe(mTriggerLongSwipe)
                 // Receiving a CANCEL implies that something else intercepted
                 // the gesture, i.e., the user did not cancel their gesture.
                 // Therefore, disappear immediately, with minimum fanfare.
@@ -872,6 +876,7 @@ class BackPanelController internal constructor(
             }
             GestureState.ENTRY,
             GestureState.INACTIVE -> {
+                setTriggerLongSwipe(false)
                 backCallback.setTriggerBack(false)
                 setTriggerLongSwipe(false)
             }
