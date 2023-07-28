@@ -28,10 +28,8 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.SystemClock;
-import android.os.Vibrator;
 import android.os.VibrationEffect;
 import android.util.Log;
 import android.util.MathUtils;
@@ -58,6 +56,7 @@ import com.android.systemui.dagger.qualifiers.Background;
 import com.android.systemui.plugins.NavigationEdgeBackPlugin;
 import com.android.systemui.settings.DisplayTracker;
 import com.android.systemui.shared.navigationbar.RegionSamplingHelper;
+import com.android.systemui.statusbar.VibratorHelper;
 
 import java.io.PrintWriter;
 import java.util.concurrent.Executor;
@@ -138,6 +137,7 @@ public class NavigationBarEdgePanel extends View implements NavigationEdgeBackPl
             = new PathInterpolator(1.0f / RUBBER_BAND_AMOUNT_APPEAR, 1.0f, 1.0f, 1.0f);
 
     private final WindowManager mWindowManager;
+    private final VibratorHelper mVibratorHelper;
 
     /**
      * The paint the arrow is drawn with
@@ -236,7 +236,6 @@ public class NavigationBarEdgePanel extends View implements NavigationEdgeBackPl
     private boolean mIsLongSwipeEnabled;
     private boolean mBackArrowVisibility;
     private boolean mEdgeHapticEnabled;
-    private final Vibrator mVibrator;
 
     private DynamicAnimation.OnAnimationEndListener mSetGoneEndListener
             = new DynamicAnimation.OnAnimationEndListener() {
@@ -294,11 +293,13 @@ public class NavigationBarEdgePanel extends View implements NavigationEdgeBackPl
     public NavigationBarEdgePanel(
             Context context,
             LatencyTracker latencyTracker,
+            VibratorHelper vibratorHelper,
             @Background Executor backgroundExecutor,
             DisplayTracker displayTracker) {
         super(context);
 
         mWindowManager = context.getSystemService(WindowManager.class);
+        mVibratorHelper = vibratorHelper;
 
         mDensity = context.getResources().getDisplayMetrics().density;
 
@@ -391,7 +392,6 @@ public class NavigationBarEdgePanel extends View implements NavigationEdgeBackPl
         mRegionSamplingHelper.setWindowVisible(true);
         mShowProtection = !isPrimaryDisplay;
         mLatencyTracker = latencyTracker;
-        mVibrator = context.getSystemService(Vibrator.class);
     }
 
     @Override
@@ -678,7 +678,7 @@ public class NavigationBarEdgePanel extends View implements NavigationEdgeBackPl
         boolean isSlow = Math.abs(mVelocityTracker.getXVelocity()) < 500;
         if (mEdgeHapticEnabled && (isSlow
                 || SystemClock.uptimeMillis() - mVibrationTime >= GESTURE_DURATION_FOR_CLICK_MS)) {
-            triggerHapticFeedback(triggerLongSwipe);
+            mVibratorHelper.vibrate(VibrationEffect.EFFECT_CLICK);
         }
 
         // Let's also snap the angle a bit
@@ -773,8 +773,13 @@ public class NavigationBarEdgePanel extends View implements NavigationEdgeBackPl
         mPreviousTouchTranslation = touchTranslation;
         boolean isLongSwipe = touchTranslation > mLongSwipeThreshold;
 
+        // Apply a haptic on drag slop passed
         if (!mDragSlopPassed && touchTranslation > mSwipeTriggerThreshold) {
             mDragSlopPassed = true;
+            if (mEdgeHapticEnabled) {
+                mVibratorHelper.vibrate(VibrationEffect.EFFECT_TICK);
+                mVibrationTime = SystemClock.uptimeMillis();
+            }
 
             // Let's show the arrow and animate it in!
             mDisappearAmount = 0.0f;
@@ -929,6 +934,9 @@ public class NavigationBarEdgePanel extends View implements NavigationEdgeBackPl
     private void setTriggerLongSwipe(boolean triggerLongSwipe, boolean animated) {
         if (mTriggerLongSwipe != triggerLongSwipe) {
             mTriggerLongSwipe = triggerLongSwipe;
+            if (mEdgeHapticEnabled) {
+                mVibratorHelper.vibrate(VibrationEffect.EFFECT_DOUBLE_CLICK);
+            }
             mAngleAnimation.cancel();
             updateAngle(animated);
             // Whenever the trigger back state changes the existing translation animation should be
@@ -936,12 +944,6 @@ public class NavigationBarEdgePanel extends View implements NavigationEdgeBackPl
             mTranslationAnimation.cancel();
             mBackCallback.setTriggerLongSwipe(mTriggerLongSwipe);
         }
-    }
-
-    private void triggerHapticFeedback(boolean longSwipe) {
-        AsyncTask.execute(() ->
-                mVibrator.vibrate(VibrationEffect.get(longSwipe ?
-                        VibrationEffect.EFFECT_CLICK : VibrationEffect.EFFECT_TICK)));
     }
 
     private void updateAngle(boolean animated) {
