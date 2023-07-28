@@ -173,4 +173,9 @@
     <string name="config_batterymeterLandPowersavePathMiUIPill" translatable="false">@string/config_batterymeterLandPerimeterPathMiUIPill</string>
     <string name="config_batterymeterLandErrorPerimeterPathMiUIPill" translatable="false">@string/config_batterymeterLandPerimeterPathMiUIPill</string>
 
+    <!-- Fingerprint from a certified device against current platform SPL level -->
+    <string name="config_certifiedFingerprint" translatable="false"></string>
+
+    <!-- Fingerprint from stock ROM -->
+    <string name="config_stockFingerprint" translatable="false"></string>
 </resources>
