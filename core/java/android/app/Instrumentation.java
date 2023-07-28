@@ -65,7 +65,6 @@ import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 import com.android.internal.util.alpha.GamesPropsUtils;
-import com.android.internal.util.crdroid.PixelPropsUtils;
 
 /**
  * Base class for implementing application instrumentation code.  When running
@@ -1246,7 +1245,6 @@ public class Instrumentation {
                 .instantiateApplication(cl, className);
         app.attach(context);
         String packageName = context.getPackageName();
-        PixelPropsUtils.setProps(packageName);
         GamesPropsUtils.setProps(context);
         return app;
     }
@@ -1266,7 +1264,6 @@ public class Instrumentation {
         Application app = (Application)clazz.newInstance();
         app.attach(context);
         String packageName = context.getPackageName();
-        PixelPropsUtils.setProps(packageName);
         GamesPropsUtils.setProps(context);
         return app;
     }
