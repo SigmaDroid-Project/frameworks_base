@@ -40,7 +40,6 @@ import android.graphics.Rect;
 import android.hardware.biometrics.BiometricFingerprintConstants;
 import android.hardware.biometrics.BiometricOverlayConstants;
 import android.hardware.biometrics.SensorProperties;
-import android.hardware.display.ColorDisplayManager;
 import android.hardware.display.DisplayManager;
 import android.hardware.fingerprint.FingerprintManager;
 import android.hardware.fingerprint.FingerprintSensorProperties;
@@ -234,8 +233,8 @@ public class UdfpsController implements DozeReceiver, Dumpable {
     private int[][] mBrightnessAlphaArray;
     private final int mUdfpsVendorCode;
     private boolean mScreenOffFod;
-    private boolean mDisableNightMode;
-    private boolean mNightModeActive;
+    // private boolean mDisableNightMode;
+    // private boolean mNightModeActive;
     private int mAutoModeState;
 
     private UdfpsAnimation mUdfpsAnimation;
@@ -301,7 +300,7 @@ public class UdfpsController implements DozeReceiver, Dumpable {
         public void showUdfpsOverlay(long requestId, int sensorId, int reason,
                 @NonNull IUdfpsOverlayControllerCallback callback) {
 
-            disableNightMode();
+            // disableNightMode();
 
             mFgExecutor.execute(() -> UdfpsController.this.showUdfpsOverlay(
                     new UdfpsControllerOverlay(mContext, mFingerprintManager, mInflater,
@@ -322,7 +321,7 @@ public class UdfpsController implements DozeReceiver, Dumpable {
         @Override
         public void hideUdfpsOverlay(int sensorId) {
 
-            setNightMode(mNightModeActive, mAutoModeState);
+            // setNightMode(mNightModeActive, mAutoModeState);
 
             mFgExecutor.execute(() -> {
                 if (mKeyguardUpdateMonitor.isFingerprintDetectionRunning()) {
@@ -1085,22 +1084,22 @@ public class UdfpsController implements DozeReceiver, Dumpable {
         }
     }
 
-    private void disableNightMode() {
-        ColorDisplayManager colorDisplayManager = mContext.getSystemService(ColorDisplayManager.class);
-        mAutoModeState = colorDisplayManager.getNightDisplayAutoMode();
-        mNightModeActive = colorDisplayManager.isNightDisplayActivated();
-        colorDisplayManager.setNightDisplayActivated(false);
-    }
+    // private void disableNightMode() {
+    //     ColorDisplayManager colorDisplayManager = mContext.getSystemService(ColorDisplayManager.class);
+    //     mAutoModeState = colorDisplayManager.getNightDisplayAutoMode();
+    //     mNightModeActive = colorDisplayManager.isNightDisplayActivated();
+    //     colorDisplayManager.setNightDisplayActivated(false);
+    // }
 
-    private void setNightMode(boolean activated, int autoMode) {
-        ColorDisplayManager colorDisplayManager = mContext.getSystemService(ColorDisplayManager.class);
-        colorDisplayManager.setNightDisplayAutoMode(0);
-        if (autoMode == 0) {
-            colorDisplayManager.setNightDisplayActivated(activated);
-        } else if (autoMode == 1 || autoMode == 2) {
-            colorDisplayManager.setNightDisplayAutoMode(autoMode);
-        }
-    }
+    // private void setNightMode(boolean activated, int autoMode) {
+    //     ColorDisplayManager colorDisplayManager = mContext.getSystemService(ColorDisplayManager.class);
+    //     colorDisplayManager.setNightDisplayAutoMode(0);
+    //     if (autoMode == 0) {
+    //         colorDisplayManager.setNightDisplayActivated(activated);
+    //     } else if (autoMode == 1 || autoMode == 2) {
+    //         colorDisplayManager.setNightDisplayAutoMode(autoMode);
+    //     }
+    // }
 
     /**
      * If a11y touchExplorationEnabled, play haptic to signal UDFPS scanning started.
