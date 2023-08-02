@@ -59,7 +59,7 @@ public class PropImitationHooks {
         sP7Props.put("DEVICE", "cheetah");
         sP7Props.put("PRODUCT", "cheetah");
         sP7Props.put("MODEL", "Pixel 7 Pro");
-        sP7Props.put("FINGERPRINT", "google/cheetah/cheetah:13/TQ3A.230705.001.A1/10217028:user/release-keys");
+        sP7Props.put("FINGERPRINT", "google/cheetah/cheetah:13/TQ3A.230705.001/10216780:user/release-keys");
     }
 
      private static final Map<String, Object> sPXLProps = new HashMap<>();
@@ -92,7 +92,7 @@ public class PropImitationHooks {
                 sPXLProps.forEach((k, v) -> setPropValue(k, v));
             }
         } else if (sIsGms) {
-            dlog("Setting Pixel XL fingerprint for: " + packageName);
+            dlog("Setting Pixel 2 fingerprint for: " + packageName);
             spoofBuildGms();
         } else if (!sCertifiedFp.isEmpty() && sIsFinsky) {
             dlog("Setting certified fingerprint for: " + packageName);
