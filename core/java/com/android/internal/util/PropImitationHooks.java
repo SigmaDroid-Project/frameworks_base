@@ -21,6 +21,7 @@ import android.app.Application;
 import android.content.res.Resources;
 import android.os.Build;
 import android.os.Build.VERSION;
+import android.os.SystemProperties;
 import android.util.Log;
 
 import com.android.internal.R;
@@ -33,7 +34,7 @@ import java.util.Map;
 public class PropImitationHooks {
 
     private static final String TAG = "PropImitationHooks";
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
 
     private static final String sCertifiedFp =
             Resources.getSystem().getString(R.string.config_certifiedFingerprint);
@@ -61,6 +62,16 @@ public class PropImitationHooks {
         sP7Props.put("FINGERPRINT", "google/cheetah/cheetah:13/TQ3A.230705.001.A1/10217028:user/release-keys");
     }
 
+     private static final Map<String, Object> sPXLProps = new HashMap<>();
+     static {
+         sPXLProps.put("BRAND", "google");
+         sPXLProps.put("MANUFACTURER", "Google");
+         sPXLProps.put("DEVICE", "marlin");
+         sPXLProps.put("PRODUCT", "marlin");
+         sPXLProps.put("MODEL", "Pixel XL");
+         sPXLProps.put("FINGERPRINT", "google/marlin/marlin:10/QP1A.191005.007.A3/5972272:user/release-keys");
+     }
+
     private static volatile boolean sIsGms = false;
     private static volatile boolean sIsFinsky = false;
 
@@ -75,7 +86,12 @@ public class PropImitationHooks {
         sIsGms = packageName.equals(PACKAGE_GMS) && processName.equals(PROCESS_GMS_UNSTABLE);
         sIsFinsky = packageName.equals(PACKAGE_FINSKY);
 
-        if (sIsGms) {
+        if (packageName.equals("com.google.android.apps.photos")) {
+            if (SystemProperties.getBoolean("persist.sys.pixelprops.gphotos", true)) {
+                dlog("Package is: " + packageName + " + Unlimited Google Photos storage spoof enabled, setting Pixel XL props");
+                sPXLProps.forEach((k, v) -> setPropValue(k, v));
+            }
+        } else if (sIsGms) {
             dlog("Setting Pixel XL fingerprint for: " + packageName);
             spoofBuildGms();
         } else if (!sCertifiedFp.isEmpty() && sIsFinsky) {
