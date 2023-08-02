@@ -112,6 +112,8 @@
     <java-symbol type="string" name="config_batterymeterLandPowersavePathMiUIPill" />
     <java-symbol type="string" name="config_batterymeterLandErrorPerimeterPathMiUIPill" />
 
+    <java-symbol type="id" name="qs_state_layer" />
+
     <!-- Fingerprint from a certified device against current platform SPL level -->
     <java-symbol type="string" name="config_certifiedFingerprint" />
 
