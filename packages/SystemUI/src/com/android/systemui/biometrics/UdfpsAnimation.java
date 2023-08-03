@@ -56,6 +56,7 @@ public class UdfpsAnimation extends ImageView {
     private int mAnimationOffset;
     private AnimationDrawable recognizingAnim;
 
+
     private final WindowManager.LayoutParams mAnimParams = new WindowManager.LayoutParams();
     private WindowManager mWindowManager;
 
@@ -81,6 +82,8 @@ public class UdfpsAnimation extends ImageView {
 
         final float scaleFactor = DisplayUtils.getScaleFactor(mContext);
 
+        mEnabled = true; // enable by default
+        mSelectedAnim = 0;  // Set default animation style
         mMaxBurnInOffsetX = (int) (context.getResources()
             .getDimensionPixelSize(R.dimen.udfps_burn_in_offset_x) * scaleFactor);
         mMaxBurnInOffsetY = (int) (context.getResources()
@@ -112,12 +115,14 @@ public class UdfpsAnimation extends ImageView {
         int res = mApkResources.getIdentifier("udfps_animation_styles",
                 "array", mUdfpsAnimationPackage);
         mStyleNames = mApkResources.getStringArray(res);
+        //  int defaultAnimationResId = mApkResources.getIdentifier("2130838525", "drawable", mUdfpsAnimationPackage);
+        //  recognizingAnim = (AnimationDrawable) mApkResources.getDrawable(defaultAnimationResId);  // Initialize recognizingAnim with the default animation
 
         setScaleType(ImageView.ScaleType.CENTER_INSIDE);
         TunerService.Tunable tunable = (key, newValue) -> {
             switch (key) {
                 case UDFPS_ANIM:
-                    mEnabled = TunerService.parseIntegerSwitch(newValue, false);
+                    mEnabled = TunerService.parseIntegerSwitch(newValue, true);
                     break;
                 case UDFPS_ANIM_STYLE:
                     mSelectedAnim = newValue == null ? 0 : Integer.parseInt(newValue);
