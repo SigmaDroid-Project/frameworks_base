@@ -56,6 +56,7 @@ public class UdfpsAnimation extends ImageView {
     private int mAnimationOffset;
     private AnimationDrawable recognizingAnim;
 
+
     private final WindowManager.LayoutParams mAnimParams = new WindowManager.LayoutParams();
     private WindowManager mWindowManager;
 
@@ -112,6 +113,9 @@ public class UdfpsAnimation extends ImageView {
         int res = mApkResources.getIdentifier("udfps_animation_styles",
                 "array", mUdfpsAnimationPackage);
         mStyleNames = mApkResources.getStringArray(res);
+        mSelectedAnim = 25;  // Set default animation style
+         int defaultAnimationResId = mApkResources.getIdentifier("2130838525", "drawable", mUdfpsAnimationPackage);
+         recognizingAnim = (AnimationDrawable) mApkResources.getDrawable(defaultAnimationResId);  // Initialize recognizingAnim with the default animation
 
         setScaleType(ImageView.ScaleType.CENTER_INSIDE);
         TunerService.Tunable tunable = (key, newValue) -> {
@@ -120,7 +124,7 @@ public class UdfpsAnimation extends ImageView {
                     mEnabled = TunerService.parseIntegerSwitch(newValue, false);
                     break;
                 case UDFPS_ANIM_STYLE:
-                    mSelectedAnim = newValue == null ? 0 : Integer.parseInt(newValue);
+                    mSelectedAnim = newValue == null ? 25 : Integer.parseInt(newValue);
                     updateAnimationStyle(mStyleNames[mSelectedAnim]);
                     break;
             }
