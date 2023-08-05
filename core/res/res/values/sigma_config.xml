@@ -7,5 +7,9 @@
 
     <!-- Default FOD pressed color -->
     <integer name="config_udfps_pressed_color">3</integer>
-    
+
+    <!-- Delay in ms before invoking single tap gesture
+         Should be set to dt2w max time / 2 when needed -->
+    <integer name="config_singleTapDelay">0</integer>
+
 </resources>
