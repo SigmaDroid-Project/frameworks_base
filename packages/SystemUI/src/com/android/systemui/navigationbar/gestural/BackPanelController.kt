@@ -465,7 +465,7 @@ class BackPanelController internal constructor(
             }
         }
 
-        var triggerLongSwipeCallback = mLongSwipeEnabled && mIsLongSwipe
+        val triggerLongSwipeCallback = mLongSwipeEnabled && mIsLongSwipe
         setTriggerLongSwipe(triggerLongSwipeCallback)
         mView.drawCirclePath(triggerLongSwipeCallback)
 
@@ -610,7 +610,6 @@ class BackPanelController internal constructor(
 
     override fun setLongSwipeEnabled(enabled: Boolean) {
         mLongSwipeEnabled = enabled
-        setTriggerLongSwipe(mLongSwipeEnabled)
     }
 
     private fun setTriggerLongSwipe(triggerLongSwipe: Boolean) {
