@@ -16,6 +16,7 @@
 
 package android.provider.settings.validators;
 
+import static android.provider.settings.validators.SettingsValidators.ANY_INTEGER_VALIDATOR;
 import static android.provider.settings.validators.SettingsValidators.ANY_STRING_VALIDATOR;
 import static android.provider.settings.validators.SettingsValidators.BOOLEAN_VALIDATOR;
 import static android.provider.settings.validators.SettingsValidators.COMPONENT_NAME_VALIDATOR;
@@ -211,5 +212,15 @@ public class SystemSettingsValidators {
         VALIDATORS.put(System.MAX_VISIBLE_NOTIFICATION_ICONS, NON_NEGATIVE_INTEGER_VALIDATOR);
         VALIDATORS.put(System.QS_PANEL_STYLE, NON_NEGATIVE_INTEGER_VALIDATOR);
         VALIDATORS.put(System.QS_HAPTIC_FEEDBACK, BOOLEAN_VALIDATOR);
+        VALIDATORS.put(System.QS_HEADER_IMAGE, ANY_INTEGER_VALIDATOR);
+        VALIDATORS.put(System.QS_HEADER_IMAGE_TINT, NON_NEGATIVE_INTEGER_VALIDATOR);
+        VALIDATORS.put(System.QS_HEADER_IMAGE_TINT_CUSTOM, ANY_INTEGER_VALIDATOR);
+        VALIDATORS.put(System.QS_HEADER_IMAGE_ALPHA, new InclusiveIntegerRangeValidator(0, 255));
+        VALIDATORS.put(System.QS_HEADER_IMAGE_HEIGHT_PORTRAIT, NON_NEGATIVE_INTEGER_VALIDATOR);
+        VALIDATORS.put(System.QS_HEADER_IMAGE_HEIGHT_LANDSCAPE, NON_NEGATIVE_INTEGER_VALIDATOR);
+        VALIDATORS.put(System.QS_HEADER_IMAGE_LANDSCAPE_ENABLED, BOOLEAN_VALIDATOR);
+        VALIDATORS.put(System.QS_HEADER_IMAGE_PADDING_SIDE, ANY_INTEGER_VALIDATOR);
+        VALIDATORS.put(System.QS_HEADER_IMAGE_PADDING_TOP, ANY_INTEGER_VALIDATOR);
+        VALIDATORS.put(System.QS_HEADER_IMAGE_URI, ANY_STRING_VALIDATOR);
     }
 }
