@@ -215,7 +215,7 @@ public class ImageHelper {
         return image;
     }
 
-    public static Bitmap getRoundedCornerBitmap(Bitmap bitmap) {
+    public static Bitmap getRoundedCornerBitmap(Bitmap bitmap, float roundPx) {
         if (bitmap == null) {
             return null;
         }
@@ -227,7 +227,6 @@ public class ImageHelper {
         final Paint paint = new Paint();
         final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
         final RectF rectF = new RectF(rect);
-        final float roundPx = 24;
         paint.setAntiAlias(true);
         canvas.drawARGB(0, 0, 0, 0);
         paint.setColor(color);
