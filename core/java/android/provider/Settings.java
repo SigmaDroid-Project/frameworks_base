@@ -6377,12 +6377,6 @@ public final class Settings {
         public static final String QS_BRIGHTNESS_SLIDER_HAPTIC = "qs_brightness_slider_haptic";
 
         /**
-         * QS Header
-         * @hide
-         */
-        public static final String QS_HEADER_IMAGE = "qs_header_image";
-
-        /**
          * QS Header image
          * format = "qs_header_image_" + QS_HEADER_IMAGE
          * values 0 and -1 are reserved to mark disabled state (0) and custom user image (-1)
@@ -12371,7 +12365,7 @@ public final class Settings {
          */
         @Readable
         public static final String HIDE_DEVELOPER_STATUS = "hide_developer_status";
-        
+
         /**
          *  Toggle the media squiggle animation
          *  0 = 0ff, 1 = on
