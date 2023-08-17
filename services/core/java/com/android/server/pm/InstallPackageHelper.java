@@ -2094,14 +2094,6 @@ final class InstallPackageHelper {
                     // The caller explicitly specified INSTALL_ALL_USERS flag.
                     // Thus, updating the settings to install the app for all users.
                     for (int currentUserId : allUsers) {
-                        UserInfo userInfo =
-                                UserManagerService.getInstance().getUserInfo(currentUserId);
-                        if (userInfo != null && userInfo.isParallel()) {
-                            if (DEBUG_INSTALL) {
-                                Slog.d(TAG, "User " + currentUserId + " is parallel space, skip install");
-                            }
-                            break;
-                        }
 
                         // If the app is already installed for the currentUser,
                         // keep it as installed as we might be updating the app at this place.
@@ -2116,6 +2108,14 @@ final class InstallPackageHelper {
                                 || mPm.isUserRestricted(currentUserId,
                                         UserManager.DISALLOW_DEBUGGING_FEATURES);
                         if (installedForCurrentUser || !restrictedByPolicy) {
+                            UserInfo userInfo =
+                                UserManagerService.getInstance().getUserInfo(currentUserId);
+                            if (userInfo != null && userInfo.isParallel()) {
+                                if (DEBUG_INSTALL) {
+                                    Slog.d(TAG, "User " + currentUserId + " is parallel space, skip install");
+                                }
+                                break;
+                            }
                             ps.setInstalled(true, currentUserId);
                             ps.setEnabled(COMPONENT_ENABLED_STATE_DEFAULT, currentUserId,
                                     installerPackageName);

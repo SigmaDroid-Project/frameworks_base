@@ -90,8 +90,11 @@ static void setRetriever(JNIEnv* env, jobject thiz, const sp<MediaMetadataRetrie
     if (old != NULL) {
         old->decStrong(thiz);
     }
-
-    env->SetLongField(thiz, fields.context, (jlong) retriever.get());
+    if (retriever == NULL) {
+        env->SetLongField(thiz, fields.context, 0);
+    } else {
+        env->SetLongField(thiz, fields.context, (jlong) retriever.get());
+    }
 }
 
 static void

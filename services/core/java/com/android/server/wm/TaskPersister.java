@@ -504,7 +504,14 @@ public class TaskPersister implements PersisterQueue.Listener {
     }
 
     static File getUserImagesDir(int userId) {
-        return new File(Environment.getDataSystemCeDirectory(userId), IMAGES_DIRNAME);
+        File imageDir = new File(Environment.getDataSystemCeDirectory(userId), IMAGES_DIRNAME);
+
+        if (! imageDir.exists()) {
+            // create recent_images directory to avoid error logs
+            imageDir.mkdirs();
+        }
+
+        return imageDir;
     }
 
     private static boolean createParentDirectory(String filePath) {
