@@ -4215,7 +4215,7 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener, Dumpab
 
         if (mFaceUnlockPrefObserver != null) {
             mContext.getContentResolver().unregisterContentObserver(
-            mSettingsObserver.unobserve();
+            mSettingsObserver.unobserve());
         }
 
         mUserTracker.removeCallback(mUserChangedCallback);
