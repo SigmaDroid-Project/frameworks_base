@@ -619,9 +619,6 @@ public class UdfpsController implements DozeReceiver, Dumpable {
                     // We need to persist its ID to track it during ACTION_MOVE that could include
                     // data for many other pointers because of multi-touch support.
                     mActivePointerId = event.getPointerId(0);
-                    final int idx = mActivePointerId == -1
-                            ? event.getPointerId(0)
-                            : event.findPointerIndex(mActivePointerId);
                     mVelocityTracker.addMovement(event);
                     if (shouldTriggerOnFingerDownWithActionDown()) {
                         final int idx = mActivePointerId == -1
@@ -867,82 +864,6 @@ public class UdfpsController implements DozeReceiver, Dumpable {
         );
         if (com.android.internal.util.crdroid.Utils.isPackageInstalled(mContext, "com.crdroid.udfps.animations")) {
             mUdfpsAnimation = new UdfpsAnimation(mContext, mWindowManager, mSensorProps);
-        }
-        mUdfpsVendorCode = mContext.getResources().getInteger(R.integer.config_udfpsVendorCode);
-        updateScreenOffFodState();
-        mSecureSettings.registerContentObserver(Settings.Secure.SCREEN_OFF_UDFPS_ENABLED,
-            new ContentObserver(mainHandler) {
-                @Override
-                public void onChange(boolean selfChange, Uri uri) {
-                    if (uri.getLastPathSegment().equals(Settings.Secure.SCREEN_OFF_UDFPS_ENABLED)) {
-                        updateScreenOffFodState();
-                    }
-                }
-            }
-        );
-        if (com.android.internal.util.crdroid.Utils.isPackageInstalled(mContext, "com.crdroid.udfps.animations")) {
-            mUdfpsAnimation = new UdfpsAnimation(mContext, mWindowManager, mSensorProps);
-        }
-    }
-
-    private void updateScreenOffFodState() {
-        boolean isSupported = mContext.getResources().getBoolean(
-                com.android.internal.R.bool.config_supportScreenOffUdfps);
-        mScreenOffFod = isSupported && mSecureSettings.getInt(Settings.Secure.SCREEN_OFF_UDFPS_ENABLED, 1) == 1;
-    }
-
-    private void isSmartPixelsEnabled() {
-        if (!mSmartPixelsFlag) {
-            mSmartPixelsEnabled = Settings.System.getIntForUser(
-                    mContext.getContentResolver(), Settings.System.SMART_PIXELS_ENABLE,
-                    0, UserHandle.USER_CURRENT);
-            Log.i(TAG, "SmartPixels: SmartPixels enabled - " + mSmartPixelsEnabled);
-            mSmartPixelsOnPowerSave = Settings.System.getIntForUser(
-                    mContext.getContentResolver(), Settings.System.SMART_PIXELS_ON_POWER_SAVE,
-                    0, UserHandle.USER_CURRENT);
-            Log.i(TAG, "SmartPixels: SmartPixels on Power Save enabled - " + mSmartPixelsOnPowerSave);
-            mLowPowerMode = mBatteryController.isPowerSave();
-            Log.i(TAG, "SmartPixels: Low power mode - " + mLowPowerMode);
-        }
-    }
-
-    private void disableSmartPixels() {
-        Log.i(TAG, "SmartPixels: Disable SmartPixels");
-        if (mLowPowerMode && (mSmartPixelsOnPowerSave == 1) && (mSmartPixelsEnabled == 1)) {
-            Settings.System.putIntForUser(mContext.getContentResolver(),
-                    Settings.System.SMART_PIXELS_ON_POWER_SAVE,
-                    0, UserHandle.USER_CURRENT);
-            Settings.System.putIntForUser(mContext.getContentResolver(),
-                    Settings.System.SMART_PIXELS_ENABLE,
-                    0, UserHandle.USER_CURRENT);
-        } else if (mLowPowerMode && (mSmartPixelsOnPowerSave == 1)) {
-            Settings.System.putIntForUser(mContext.getContentResolver(),
-                    Settings.System.SMART_PIXELS_ON_POWER_SAVE,
-                    0, UserHandle.USER_CURRENT);
-        } else {
-            Settings.System.putIntForUser(mContext.getContentResolver(),
-                    Settings.System.SMART_PIXELS_ENABLE,
-                    0, UserHandle.USER_CURRENT);
-        }
-    }
-
-    private void enableSmartPixels() {
-        Log.i(TAG, "SmartPixels: Enable SmartPixels");
-        if (mLowPowerMode && (mSmartPixelsOnPowerSave == 1) && (mSmartPixelsEnabled == 1)) {
-            Settings.System.putIntForUser(mContext.getContentResolver(),
-                    Settings.System.SMART_PIXELS_ON_POWER_SAVE,
-                    1, UserHandle.USER_CURRENT);
-            Settings.System.putIntForUser(mContext.getContentResolver(),
-                    Settings.System.SMART_PIXELS_ENABLE,
-                    1, UserHandle.USER_CURRENT);
-        } else if (mLowPowerMode && (mSmartPixelsOnPowerSave == 1)) {
-            Settings.System.putIntForUser(mContext.getContentResolver(),
-                    Settings.System.SMART_PIXELS_ON_POWER_SAVE,
-                    1, UserHandle.USER_CURRENT);
-        } else {
-            Settings.System.putIntForUser(mContext.getContentResolver(),
-                    Settings.System.SMART_PIXELS_ENABLE,
-                    1, UserHandle.USER_CURRENT);
         }
     }
 

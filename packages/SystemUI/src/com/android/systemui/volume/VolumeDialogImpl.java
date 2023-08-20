@@ -47,7 +47,6 @@ import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.app.Dialog;
 import android.app.KeyguardManager;
-import android.content.ComponentName;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothProfile;
 import android.content.ContentResolver;
@@ -198,9 +197,6 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
     private static final String TYPE_DISMISS = "dismiss";
     /** Volume dialog slider animation. */
     private static final String TYPE_UPDATE = "update";
-
-    private static final ComponentName SOUND_SETTING_COMPONENT = new ComponentName(
-            "com.android.settings", "com.android.settings.Settings$SoundSettingsActivity");
 
     private final int mDialogShowAnimationDurationMs;
     private final int mDialogHideAnimationDurationMs;
@@ -1457,16 +1453,75 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
                    rotateIconReverse();
                 }
             });
-            mExpandRows.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    Intent intent = new Intent().setComponent(SOUND_SETTING_COMPONENT);
-                    mMediaOutputDialogFactory.dismiss();
-                    dismissH(DISMISS_REASON_SETTINGS_CLICKED);
-                    mActivityStarter.startActivity(intent, true /* dismissShade */);
-                    return true;
+        }
+    }
+
+    private boolean shouldShowAppVolume() {
+        ContentResolver cr = mContext.getContentResolver();
+        int showAppVolume = Settings.System.getInt(cr, Settings.System.SHOW_APP_VOLUME, 0);
+        boolean ret = showAppVolume == 1;
+        mAppVolumeActivePackageName = null;
+        if (ret) {
+            ret = false;
+            AudioManager audioManager = mController.getAudioManager();
+            for (AppVolume av : audioManager.listAppVolumes()) {
+                if (av.isActive()) {
+                    ret = true;
+                    mAppVolumeActivePackageName = av.getPackageName();
+                    break;
                 }
+            }
+        }
+        return ret;
+    }
+
+    private Drawable getApplicationIcon(String packageName) {
+        PackageManager pm = mContext.getPackageManager();
+        Drawable icon = null;
+        try {
+            icon = pm.getApplicationIcon(packageName);
+        } catch (Exception e) {
+            // nothing to do
+        }
+        return icon;
+    }
+
+    public void initAppVolumeH() {
+        if (mAppVolumeView != null) {
+            mAppVolumeView.setVisibility(shouldShowAppVolume() ? VISIBLE : GONE);
+            mAppVolumeSpacer.setVisibility(shouldShowAppVolume() ? VISIBLE : GONE);
+        }
+        if (mAppVolumeIcon != null) {
+            mAppVolumeIcon.setOnClickListener(v -> {
+                Events.writeEvent(Events.EVENT_SETTINGS_CLICK);
+                Intent intent = new Intent(Settings.Panel.ACTION_APP_VOLUME);
+                dismissH(DISMISS_REASON_SETTINGS_CLICKED);
+                Dependency.get(MediaOutputDialogFactory.class).dismiss();
+                Dependency.get(ActivityStarter.class).startActivity(intent,
+                        true /* dismissShade */);
             });
+            Drawable icon = mAppVolumeActivePackageName != null ?
+                    getApplicationIcon(mAppVolumeActivePackageName) : null;
+            if (icon != null) {
+                mAppVolumeIcon.setImageTintList(null);
+                mAppVolumeIcon.setImageDrawable(icon);
+                mAppVolumeIcon.getLayoutParams().height = mTargetTapSize;
+                mAppVolumeIcon.getLayoutParams().width = mTargetTapSize;
+                mAppVolumeIcon.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                mAppVolumeIcon.setPadding(
+                        mAppVolumeView.getPaddingLeft(),
+                        mAppVolumeView.getPaddingTop(),
+                        mAppVolumeView.getPaddingRight(),
+                        mRingerRowsPadding);
+            	mAppVolumeIcon.setOutlineProvider(new ViewOutlineProvider() {
+                    @Override
+                    public void getOutline(View view, Outline outline) {
+                    	outline.setRoundRect(
+                            	0, 0, view.getWidth(), view.getHeight(), mDialogCornerRadius);
+                    }
+            	});
+            	mAppVolumeIcon.setClipToOutline(true);
+            }
         }
     }
 
