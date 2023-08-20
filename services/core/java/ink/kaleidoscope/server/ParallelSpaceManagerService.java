@@ -431,7 +431,8 @@ public final class ParallelSpaceManagerService extends SystemService {
         for (ResolveInfo resolveInfo : resolveInfos) {
             apps.add(resolveInfo.activityInfo.packageName);
         }
-        apps.removeAll(SPACE_WHITELIST_PACKAGES);
+
+       // apps.removeAll(SPACE_WHITELIST_PACKAGES);
         apps.removeAll(Arrays.asList(getContext().getResources().getStringArray(
                 com.android.internal.R.array.config_parallelSpaceWhitelist)));
         // Those packages should be handled by GmsManagerService, always install them.
