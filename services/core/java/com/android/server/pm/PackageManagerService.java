@@ -244,6 +244,7 @@ import com.nvidia.NvAppProfileService;
 
 import dalvik.system.VMRuntime;
 
+import ink.kaleidoscope.server.GmsManagerService;
 import ink.kaleidoscope.server.ParallelSpaceManagerService;
 
 import libcore.util.HexEncoding;
@@ -3115,7 +3116,7 @@ public class PackageManagerService implements PackageSender, TestUtilityService 
         if (ParallelSpaceManagerService.canInteract(callingUserId, userId)) {
             return;
         }
- 
+
         final String callerMismatchMessage = "Calling package " + callingPackage + " in user "
                 + userId + " does not belong to calling uid " + callingUid;
         if (!UserHandle.isSameApp(packageUid, callingUid)) {
@@ -3841,7 +3842,8 @@ public class PackageManagerService implements PackageSender, TestUtilityService 
                                         : ", component=" + setting.getComponentName()));
                     }
                     // Don't allow changing protected packages.
-                    if (mProtectedPackages.isPackageStateProtected(userId, packageName)) {
+                    if (mProtectedPackages.isPackageStateProtected(userId, packageName) &&
+                            !Arrays.asList(GmsManagerService.GMS_PACKAGES).contains(packageName)) {
                         throw new SecurityException(
                                 "Cannot disable a protected package: " + packageName);
                     }

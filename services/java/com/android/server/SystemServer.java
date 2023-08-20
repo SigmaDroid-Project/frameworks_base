@@ -219,6 +219,7 @@ import com.android.server.wm.WindowManagerService;
 
 import dalvik.system.VMRuntime;
 
+import ink.kaleidoscope.server.GmsManagerService;
 import ink.kaleidoscope.server.ParallelSpaceManagerService;
 
 import java.io.File;
@@ -410,6 +411,8 @@ public final class SystemServer implements Dumpable {
             "com.android.server.media.MediaCommunicationService";
     private static final String APP_COMPAT_OVERRIDES_SERVICE_CLASS =
             "com.android.server.compat.overrides.AppCompatOverridesService$Lifecycle";
+    private static final String GMS_MANAGER_SERVICE_SERVICE_CLASS =
+            "ink.kaleidoscope.server.GmsManagerService";
     private static final String PARALLEL_SPACE_SERVICE_CLASS =
             "ink.kaleidoscope.server.ParallelSpaceManagerService";
 
@@ -1680,10 +1683,6 @@ public final class SystemServer implements Dumpable {
             mSystemServiceManager.startService(LogcatManagerService.class);
             t.traceEnd();
 
-            t.traceBegin("StartSmart5gService");
-            mSystemServiceManager.startService(Smart5gService.class);
-            t.traceEnd();
-
         } catch (Throwable e) {
             Slog.e("System", "******************************************");
             Slog.e("System", "************ Failure starting core service");
@@ -2243,7 +2242,7 @@ public final class SystemServer implements Dumpable {
                 Slog.e(TAG, "Failure starting HardwarePropertiesManagerService", e);
             }
             t.traceEnd();
-          
+
             if (!isWatch) {
                 t.traceBegin("StartTwilightService");
                 mSystemServiceManager.startService(TwilightService.class);
@@ -2834,6 +2833,10 @@ public final class SystemServer implements Dumpable {
 
         t.traceBegin("AppCompatOverridesService");
         mSystemServiceManager.startService(APP_COMPAT_OVERRIDES_SERVICE_CLASS);
+        t.traceEnd();
+
+        t.traceBegin("StartGmsManagerService");
+        mSystemServiceManager.startService(GMS_MANAGER_SERVICE_SERVICE_CLASS);
         t.traceEnd();
 
         t.traceBegin("StartParallelSpaceManagerService");
