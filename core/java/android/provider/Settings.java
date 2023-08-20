@@ -12288,7 +12288,7 @@ public final class Settings {
          */
         @Readable
         public static final String HIDE_DEVELOPER_STATUS = "hide_developer_status";
-        
+
         /**
          *  Toggle the media squiggle animation
          *  0 = 0ff, 1 = on

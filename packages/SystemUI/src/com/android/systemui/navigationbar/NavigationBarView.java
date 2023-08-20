@@ -86,6 +86,7 @@ import com.android.systemui.statusbar.phone.AutoHideController;
 import com.android.systemui.statusbar.phone.CentralSurfaces;
 import com.android.systemui.statusbar.phone.LightBarTransitionsController;
 import com.android.systemui.tuner.TunerService;
+import com.android.systemui.statusbar.policy.Offset;
 import com.android.wm.shell.back.BackAnimation;
 import com.android.wm.shell.pip.Pip;
 
@@ -953,6 +954,23 @@ public class NavigationBarView extends FrameLayout implements TunerService.Tunab
         mLongClickableAccessibilityButton = longClickable;
         getAccessibilityButton().setLongClickable(longClickable);
         mContextualButtonGroup.setButtonVisibility(R.id.accessibility_button, visible);
+    }
+
+    public void offsetNavBar(Offset offset) {
+        if (isGesturalMode(mNavBarMode)) {
+            final NavigationHandle handle = (NavigationHandle) getHomeHandle().getCurrentView();
+            if (handle != null) {
+                handle.setTranslationY(offset.getY());
+                handle.invalidate();
+            }
+            return;
+        }
+        if (mNavigationBarContents == null) {
+            return;
+        }
+        mNavigationBarContents.setTranslationX(offset.getX());
+        mNavigationBarContents.setTranslationY(offset.getY());
+        invalidate();
     }
 
     @Override

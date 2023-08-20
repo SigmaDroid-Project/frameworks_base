@@ -140,6 +140,7 @@ public class PhoneStatusBarPolicy
     private final DateFormatUtil mDateFormatUtil;
     private final TelecomManager mTelecomManager;
 
+    private final Context mContext;
     private final Handler mHandler;
     private final CastController mCast;
     private final HotspotController mHotspot;

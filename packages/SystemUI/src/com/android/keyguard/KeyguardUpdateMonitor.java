@@ -2256,6 +2256,8 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener, Dumpab
         mFpm = fingerprintManager;
         mFaceManager = faceManager;
         mActiveUnlockConfig.setKeyguardUpdateMonitor(this);
+        mFaceAuthOnlyOnSecurityView = mContext.getResources().getBoolean(
+                com.android.internal.R.bool.config_faceAuthOnlyOnSecurityView);
         mFaceAcquiredInfoIgnoreList = Arrays.stream(
                 mContext.getResources().getIntArray(
                         R.array.config_face_acquire_device_entry_ignorelist))
@@ -2888,7 +2890,7 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener, Dumpab
         // Don't trigger active unlock if primary auth is required
         final boolean primaryAuthRequired = !isUnlockingWithBiometricAllowed(true);
 
-        final boolean shouldTriggerActiveUnlock =
+        boolean shouldTriggerActiveUnlock =
                 (mAuthInterruptActive || triggerActiveUnlockForAssistant || awakeKeyguard)
                         && !mSwitchingUser
                         && !userCanDismissLockScreen
@@ -2896,6 +2898,10 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener, Dumpab
                         && !primaryAuthRequired
                         && !mKeyguardGoingAway
                         && !mSecureCameraLaunched;
+
+        if (shouldTriggerActiveUnlock && mFaceUnlockBehavior == FACE_UNLOCK_BEHAVIOR_SWIPE && !mPrimaryBouncerFullyShown) {
+            shouldTriggerActiveUnlock = false;
+        }
 
         // Aggregate relevant fields for debug logging.
         logListenerModelData(
@@ -4204,6 +4210,11 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener, Dumpab
         }
 
         if (mSettingsObserver != null) {
+            mSettingsObserver.unobserve();
+        }
+
+        if (mFaceUnlockPrefObserver != null) {
+            mContext.getContentResolver().unregisterContentObserver(
             mSettingsObserver.unobserve();
         }
 

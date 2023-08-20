@@ -16,7 +16,7 @@ import android.view.ViewAnimationUtils;
 public class RetickerAnimations {
 
     static boolean mIsAnimatingTicker;
-    
+
     private static AnimatorSet animatorSet;
 
     public static void doBounceAnimationIn(View targetView) {

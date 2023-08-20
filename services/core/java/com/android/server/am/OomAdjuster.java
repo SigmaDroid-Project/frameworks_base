@@ -358,22 +358,15 @@ public class OomAdjuster {
         conditionallyEnableProactiveKills();
     }
 
-    private boolean conditionallyEnableProactiveKills() {
-    	boolean isModernKernel = false;
-    	StrictMode.ThreadPolicy oldPolicy = StrictMode.allowThreadDiskReads();
-    	try {
-            final File mglru = new File("/sys/kernel/mm/lru_gen/enabled");
-            final File psi = new File("/proc/pressure/memory");
-            final File lmk_kernel = new File("/sys/module/lowmemorykiller/parameters/minfree");
-            isModernKernel = !lmk_kernel.exists() && mglru.exists() && psi.exists();
-	} catch (Exception e) {
-	} finally {
-	    StrictMode.setThreadPolicy(oldPolicy);
-	}
-	if (DEBUG_OOM_ADJ) {
-	    Slog.i(TAG, "Detected kernel with " + (isModernKernel ? "modern" : "legacy") + " mm setup,  " + (isModernKernel ? "enabling" : "disabling") + " Proactive Kills.");
-	}
-	return isModernKernel;
+    void conditionallyEnableProactiveKills() {
+        File mglru = new File("/sys/kernel/mm/lru_gen/enabled");
+        File psi = new File("/proc/pressure/memory");
+        File lmk_kernel = new File("/sys/module/lowmemorykiller/parameters/minfree");
+
+        if (!lmk_kernel.exists() && mglru.exists() && psi.exists()) {
+            Slog.i(TAG, "Detected kernel with modern mm setup, enabling Proactive Kills.");
+            mProactiveKillsEnabled = true;
+        }
     }
 
     void initSettings() {
@@ -1130,8 +1123,6 @@ public class OomAdjuster {
         ProcessRecord selectedAppRecord = null;
         long serviceLastActivity = 0;
         int numBServices = 0;
-
-
 
         double lowSwapThresholdPercent = mConstants.LOW_SWAP_THRESHOLD_PERCENT;
         double freeSwapPercent = mProactiveKillsEnabled ? getFreeSwapPercent() : 1.00;

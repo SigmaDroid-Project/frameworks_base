@@ -1605,6 +1605,7 @@ public class NetworkControllerImpl extends BroadcastReceiver
     private void updateMobileControllers() {
         if (!mListening) {
             updateImsIcon();
+            updateImsIcon();
             return;
         }
         doUpdateMobileControllers();
@@ -1650,6 +1651,7 @@ public class NetworkControllerImpl extends BroadcastReceiver
             // but we still need to update the no sim state.
             updateNoSims();
             updateImsIcon();
+            updateImsIcon();
             return;
         }
         synchronized (mLock) {
@@ -1657,6 +1659,7 @@ public class NetworkControllerImpl extends BroadcastReceiver
         }
         updateNoSims();
         recalculateEmergency();
+        updateImsIcon();
         updateImsIcon();
     }
 
@@ -1691,6 +1694,14 @@ public class NetworkControllerImpl extends BroadcastReceiver
         return false;
     }
 
+    private boolean isSwap(final @Nullable List<SubscriptionInfo> list) {
+        if (list != null && list.size() == 2) {
+            if (list.get(0).getSubscriptionId() > list.get(1).getSubscriptionId())
+                return true;
+        }
+        return false;
+    }
+
     @GuardedBy("mLock")
     @VisibleForTesting
     void setCurrentSubscriptionsLocked(List<SubscriptionInfo> subscriptions) {
@@ -1702,6 +1713,7 @@ public class NetworkControllerImpl extends BroadcastReceiver
                         : lhs.getSimSlotIndex() - rhs.getSimSlotIndex();
             }
         });
+        mSwap = isSwap(subscriptions);
         mSwap = isSwap(subscriptions);
         Log.i(
                 TAG,
@@ -1832,6 +1844,7 @@ public class NetworkControllerImpl extends BroadcastReceiver
         }
         mWifiSignalController.notifyListeners();
         mEthernetSignalController.notifyListeners();
+        updateImsIcon();
         updateImsIcon();
     }
 

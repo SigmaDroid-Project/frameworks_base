@@ -750,7 +750,7 @@ public class ScreenshotView extends FrameLayout implements
         chips.add(mLensChip);
         mLensChip.setVisibility(LensScreenshotReceiver.isGSAEnabled(mContext) ?
             View.VISIBLE : View.GONE);
- 
+
         mScreenshotPreview.setOnClickListener(v -> {
             mShareChip.setIsPending(false);
             mEditChip.setIsPending(false);

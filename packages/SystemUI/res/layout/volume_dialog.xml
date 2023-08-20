@@ -149,7 +149,7 @@
                         android:tint="?androidprv:attr/textColorPrimaryInverse"
                         android:soundEffectsEnabled="false" />
                 </FrameLayout>
-                
+
                 <View
                     android:id="@+id/settings_container_spacer"
                     android:layout_height="8dp"

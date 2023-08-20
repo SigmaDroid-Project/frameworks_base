@@ -196,6 +196,9 @@ public class BrightnessController implements ToggleSlider.Listener, MirroredBrig
             mUpdateModeRunnable.run();
             mUpdateSliderRunnable.run();
 
+            mBrightnessSliderHaptic = Settings.System.getIntForUser(mContext.getContentResolver(),
+                Settings.System.QS_BRIGHTNESS_SLIDER_HAPTIC, 0, UserHandle.USER_CURRENT) == 1;
+
             mHandler.sendEmptyMessage(MSG_ATTACH_LISTENER);
         }
     };

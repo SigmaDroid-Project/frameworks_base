@@ -266,6 +266,7 @@ public class MobileSignalController extends SignalController<MobileState, Mobile
                 updateTelephony();
             }
         };
+
         mImsMmTelManager = ImsMmTelManager.createForSubscriptionId(info.getSubscriptionId());
         mMobileStatusTracker = mobileStatusTrackerFactory.createTracker(mMobileCallback);
         mProviderModelBehavior = SystemProperties.getBoolean("persist.sys.flags.combined_signal_icons", true);
