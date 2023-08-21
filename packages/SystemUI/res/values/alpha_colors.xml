@@ -16,6 +16,7 @@
 -->
 
 <resources>
+    <color name="nf_color_button_text">@color/notif_pill_text</color>
     <color name="qs_ripple_color">@color/qs_color_accent_primary</color>
     <color name="qs_color_button_power">@*android:color/qs_color_button_power</color>
     <color name="qs_color_button_settings">@*android:color/qs_color_button_settings</color>

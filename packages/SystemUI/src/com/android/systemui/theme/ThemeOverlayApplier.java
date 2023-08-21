@@ -144,6 +144,8 @@ public class ThemeOverlayApplier implements Dumpable {
     @VisibleForTesting
     static final String OVERLAY_CATEGORY_NF_STYLE =
             "android.theme.customization.nf_style";
+    static final String OVERLAY_CATEGORY_DATA =
+            "android.customization.sb_data";
 
     /*
      * All theme customization categories used by the system, in order that they should be applied,
@@ -168,7 +170,8 @@ public class ThemeOverlayApplier implements Dumpable {
             OVERLAY_CATEGORY_LOCK_CLOCK_FONT,
             OVERLAY_CATEGORY_QS_STYLE,
             OVERLAY_CATEGORY_BB_STYLE,
-            OVERLAY_CATEGORY_NF_STYLE);
+            OVERLAY_CATEGORY_NF_STYLE,
+            OVERLAY_CATEGORY_DATA);
 
     /* Categories that need to be applied to the current user as well as the system user. */
     @VisibleForTesting
@@ -184,7 +187,8 @@ public class ThemeOverlayApplier implements Dumpable {
             OVERLAY_CATEGORY_LOCK_CLOCK_FONT,
             OVERLAY_CATEGORY_QS_STYLE,
             OVERLAY_CATEGORY_BB_STYLE,
-            OVERLAY_CATEGORY_NF_STYLE);
+            OVERLAY_CATEGORY_NF_STYLE,
+            OVERLAY_CATEGORY_DATA);
 
     /* Allowed overlay categories for each target package. */
     private final Map<String, Set<String>> mTargetPackageToCategories = new ArrayMap<>();
@@ -235,6 +239,7 @@ public class ThemeOverlayApplier implements Dumpable {
         mCategoryToTargetPackage.put(OVERLAY_CATEGORY_QS_STYLE, SYSUI_PACKAGE);
         mCategoryToTargetPackage.put(OVERLAY_CATEGORY_BB_STYLE, SYSUI_PACKAGE);
         mCategoryToTargetPackage.put(OVERLAY_CATEGORY_NF_STYLE, SYSUI_PACKAGE);
+        mCategoryToTargetPackage.put(OVERLAY_CATEGORY_DATA, SYSUI_PACKAGE);
 
         dumpManager.registerDumpable(TAG, this);
     }

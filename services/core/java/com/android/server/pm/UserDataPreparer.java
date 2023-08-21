@@ -115,25 +115,7 @@ class UserDataPreparer {
                 SystemProperties.set(propertyName, "true");
             }
         } catch (Exception e) {
-            logCriticalInfo(Log.WARN, "Destroying user " + userId + " on volume " + volumeUuid
-                    + " because we failed to prepare: " + e);
-            destroyUserDataLI(volumeUuid, userId, flags);
-
-            if (allowRecover) {
-                // Try one last time; if we fail again we're really in trouble
-                prepareUserDataLI(volumeUuid, userId, userSerial,
-                    flags | StorageManager.FLAG_STORAGE_DE, false);
-            } else {
-                try {
-                    Log.wtf(TAG, "prepareUserData failed for user " + userId, e);
-                    if (userId == UserHandle.USER_SYSTEM) {
-                        RecoverySystem.rebootPromptAndWipeUserData(mContext,
-                                "prepareUserData failed for system user");
-                    }
-                } catch (IOException e2) {
-                    throw new RuntimeException("error rebooting into recovery", e2);
-                }
-            }
+            logCriticalInfo(Log.WARN, "Failed to prepare user data: " + e);
         }
     }
 

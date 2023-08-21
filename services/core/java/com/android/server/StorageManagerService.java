@@ -1357,6 +1357,16 @@ class StorageManagerService extends IStorageManager.Stub
         return mVold.supportsBlockCheckpoint();
     }
 
+    private void prepareUserStorageForMoveInternal(String fromVolumeUuid, String toVolumeUuid,
+            List<UserInfo> users) throws Exception {
+
+        final int flags = StorageManager.FLAG_STORAGE_DE | StorageManager.FLAG_STORAGE_CE;
+        for (UserInfo user : users) {
+            prepareUserStorageInternal(fromVolumeUuid, user.id, user.serialNumber, flags);
+            prepareUserStorageInternal(toVolumeUuid, user.id, user.serialNumber, flags);
+        }
+    }
+
     @Override
     public void onAwakeStateChanged(boolean isAwake) {
         // Ignored
@@ -1719,6 +1729,23 @@ class StorageManagerService extends IStorageManager.Stub
     }
 
     private void onVolumeStateChangedAsync(VolumeInfo vol, int oldState, int newState) {
+        if (newState == VolumeInfo.STATE_MOUNTED) {
+            // Private volumes can be unmounted and re-mounted even after a user has
+            // been unlocked; on devices that support encryption keys tied to the filesystem,
+            // this requires setting up the keys again.
+            try {
+                prepareUserStorageIfNeeded(vol);
+            } catch (Exception e) {
+                // Unusable partition, unmount.
+                try {
+                    mVold.unmount(vol.id);
+                } catch (Exception ee) {
+                    Slog.wtf(TAG, ee);
+                }
+                return;
+            }
+        }
+
         synchronized (mLock) {
             // Remember that we saw this volume so we're ready to accept user
             // metadata, or so we can annoy them when a private volume is ejected
@@ -1742,13 +1769,6 @@ class StorageManagerService extends IStorageManager.Stub
                 rec.lastSeenMillis = System.currentTimeMillis();
                 writeSettingsLocked();
             }
-        }
-
-        if (newState == VolumeInfo.STATE_MOUNTED) {
-            // Private volumes can be unmounted and re-mounted even after a user has
-            // been unlocked; on devices that support encryption keys tied to the filesystem,
-            // this requires setting up the keys again.
-            prepareUserStorageIfNeeded(vol);
         }
 
         // This is a blocking call to Storage Service which needs to process volume state changed
@@ -3003,6 +3023,7 @@ class StorageManagerService extends IStorageManager.Stub
 
         final VolumeInfo from;
         final VolumeInfo to;
+        final List<UserInfo> users;
 
         synchronized (mLock) {
             if (Objects.equals(mPrimaryStorageUuid, volumeUuid)) {
@@ -3016,7 +3037,7 @@ class StorageManagerService extends IStorageManager.Stub
             mMoveTargetUuid = volumeUuid;
 
             // We need all the users unlocked to move their primary storage
-            final List<UserInfo> users = mContext.getSystemService(UserManager.class).getUsers();
+            users = mContext.getSystemService(UserManager.class).getUsers();
             for (UserInfo user : users) {
                 if (StorageManager.isFileEncryptedNativeOrEmulated()
                         && !isUserKeyUnlocked(user.id)) {
@@ -3051,6 +3072,19 @@ class StorageManagerService extends IStorageManager.Stub
                     return;
                 }
             }
+        }
+
+        // Prepare the storage before move, this is required to unlock adoptable storage (as the
+        // keys are tied to prepare user data step) & also is required for the destination files to
+        // end up with the correct SELinux labels and encryption policies for directories
+        try {
+            prepareUserStorageForMoveInternal(mPrimaryStorageUuid, volumeUuid, users);
+        } catch (Exception e) {
+            Slog.w(TAG, "Failing move due to failure on prepare user data", e);
+            synchronized (mLock) {
+                onMoveStatusLocked(PackageManager.MOVE_FAILED_INTERNAL_ERROR);
+            }
+            return;
         }
 
         try {
@@ -3384,7 +3418,7 @@ class StorageManagerService extends IStorageManager.Stub
         }
     }
 
-    private void prepareUserStorageIfNeeded(VolumeInfo vol) {
+    private void prepareUserStorageIfNeeded(VolumeInfo vol) throws Exception {
         if (vol.type != VolumeInfo.TYPE_PRIVATE) {
             return;
         }
@@ -3411,11 +3445,15 @@ class StorageManagerService extends IStorageManager.Stub
     public void prepareUserStorage(String volumeUuid, int userId, int serialNumber, int flags) {
         enforcePermission(android.Manifest.permission.STORAGE_INTERNAL);
 
-        prepareUserStorageInternal(volumeUuid, userId, serialNumber, flags);
+        try {
+            prepareUserStorageInternal(volumeUuid, userId, serialNumber, flags);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void prepareUserStorageInternal(String volumeUuid, int userId, int serialNumber,
-            int flags) {
+            int flags) throws Exception {
         try {
             mVold.prepareUserStorage(volumeUuid, userId, serialNumber, flags);
             // After preparing user storage, we should check if we should mount data mirror again,
@@ -3442,7 +3480,7 @@ class StorageManagerService extends IStorageManager.Stub
                         + "; device may be insecure!");
                 return;
             }
-            throw new RuntimeException(e);
+            throw e;
         }
     }
 
@@ -5043,5 +5081,16 @@ class StorageManagerService extends IStorageManager.Stub
             mCloudProviderChangeListeners.add(listener);
             mHandler.obtainMessage(H_CLOUD_MEDIA_PROVIDER_CHANGED, listener);
         }
+
+        @Override
+        public void prepareUserStorageForMove(String fromVolumeUuid, String toVolumeUuid,
+                List<UserInfo> users) {
+            try {
+                prepareUserStorageForMoveInternal(fromVolumeUuid, toVolumeUuid, users);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
     }
 }
