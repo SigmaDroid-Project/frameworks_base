@@ -24,8 +24,10 @@ import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.content.res.Resources.ID_NULL
 import android.graphics.drawable.Drawable
+import android.graphics.drawable.LayerDrawable
 import android.graphics.drawable.RippleDrawable
 import android.os.Trace
+import android.os.UserHandle
 import android.service.quicksettings.Tile
 import android.text.TextUtils
 import android.util.Log
@@ -56,6 +58,7 @@ import com.android.systemui.qs.TileUtils
 import com.android.systemui.qs.logging.QSLogger
 import com.android.systemui.qs.tileimpl.QSIconViewImpl.QS_ANIM_LENGTH
 import java.util.Objects
+import android.provider.Settings.System
 
 private const val TAG = "QSTileViewImpl"
 open class QSTileViewImpl @JvmOverloads constructor(
@@ -95,21 +98,25 @@ open class QSTileViewImpl @JvmOverloads constructor(
             updateHeight()
         }
 
-    private val colorActive = Utils.getColorAttrDefaultColor(context, R.attr.shadeActive)
-    private val colorInactive = Utils.getColorAttrDefaultColor(context, R.attr.shadeInactive)
+    private val colorActive = Utils.getColorStateListDefaultColor(
+            context, R.color.qs_color_accent_primary)
+    private val colorInactive = Utils.getColorStateListDefaultColor(context,
+            R.color.qs_color_inactive)
     private val colorUnavailable = Utils.applyAlpha(UNAVAILABLE_ALPHA, colorInactive)
 
-    private val colorLabelActive = Utils.getColorAttrDefaultColor(context, R.attr.onShadeActive)
-    private val colorLabelInactive = Utils.getColorAttrDefaultColor(context, R.attr.onShadeInactive)
-    private val colorLabelUnavailable =
-        Utils.getColorAttrDefaultColor(context, R.attr.outline)
+    private val colorLabelActive = Utils.getColorStateListDefaultColor(context,
+            R.color.qs_color_text_active)
+    private val colorLabelInactive =
+            Utils.getColorStateListDefaultColor(context, R.color.qs_color_text_inactive)
+    private val colorLabelUnavailable = Utils.getColorStateListDefaultColor(context,
+            R.color.qs_color_text_unavailable)
 
     private val colorSecondaryLabelActive =
-        Utils.getColorAttrDefaultColor(context, R.attr.onShadeActiveVariant)
+            Utils.getColorStateListDefaultColor(context, R.color.qs_color_text_active);
     private val colorSecondaryLabelInactive =
-            Utils.getColorAttrDefaultColor(context, R.attr.onShadeInactiveVariant)
-    private val colorSecondaryLabelUnavailable =
-        Utils.getColorAttrDefaultColor(context, R.attr.outline)
+            Utils.getColorStateListDefaultColor(context, R.color.qs_color_text_inactive)
+    private val colorSecondaryLabelUnavailable = Utils.getColorStateListDefaultColor(context,
+            R.color.qs_color_text_unavailable)
 
     private lateinit var label: TextView
     protected lateinit var secondaryLabel: TextView
@@ -125,8 +132,10 @@ open class QSTileViewImpl @JvmOverloads constructor(
     protected var showRippleEffect = true
 
     private lateinit var ripple: RippleDrawable
-    private lateinit var colorBackgroundDrawable: Drawable
+    private lateinit var colorBackgroundDrawable: LayerDrawable
+    private var stateBackgroundLayer: LayerDrawable? = null
     private var paintColor: Int = 0
+    private var currentState: Int = 0
     private val singleAnimator: ValueAnimator = ValueAnimator().apply {
         setDuration(QS_ANIM_LENGTH)
         addUpdateListener { animation ->
@@ -281,7 +290,7 @@ open class QSTileViewImpl @JvmOverloads constructor(
 
     fun createTileBackground(): Drawable {
         ripple = mContext.getDrawable(R.drawable.qs_tile_background) as RippleDrawable
-        colorBackgroundDrawable = ripple.findDrawableByLayerId(R.id.background)
+        colorBackgroundDrawable = ripple.findDrawableByLayerId(R.id.background) as LayerDrawable
         return ripple
     }
 
@@ -592,8 +601,25 @@ open class QSTileViewImpl @JvmOverloads constructor(
     }
 
     private fun setColor(color: Int) {
-        colorBackgroundDrawable.mutate().setTint(color)
         paintColor = color
+        setStateLayer()
+    }
+
+    private fun setStateLayer() {
+        stateBackgroundLayer = when(currentState) {
+            Tile.STATE_ACTIVE -> mContext.getDrawable(
+                    R.drawable.qs_tile_active_layer) as? LayerDrawable
+            Tile.STATE_INACTIVE -> mContext.getDrawable(
+                    R.drawable.qs_tile_inactive_layer) as? LayerDrawable
+            else -> mContext.getDrawable(
+                    R.drawable.qs_tile_unavailable_layer) as? LayerDrawable
+        }
+
+        if (stateBackgroundLayer != null) {
+            var ld: LayerDrawable = colorBackgroundDrawable.mutate() as LayerDrawable
+            ld.setDrawableByLayerId(
+                    com.android.internal.R.id.qs_state_layer, stateBackgroundLayer)
+        }
     }
 
     private fun setLabelColor(color: Int) {
@@ -644,6 +670,7 @@ open class QSTileViewImpl @JvmOverloads constructor(
     }
 
     private fun getBackgroundColorForState(state: Int, disabledByPolicy: Boolean = false): Int {
+        currentState = state
         return when {
             state == Tile.STATE_UNAVAILABLE || disabledByPolicy -> colorUnavailable
             state == Tile.STATE_ACTIVE -> colorActive
