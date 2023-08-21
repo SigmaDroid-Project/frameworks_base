@@ -19,13 +19,22 @@
         xmlns:androidprv="http://schemas.android.com/apk/prv/res/android"
         android:color="?android:attr/colorControlHighlight">
     <item>
-        <shape>
-            <solid android:color="?androidprv:attr/materialColorSurfaceContainerHigh" />
+        <shape android:shape="rectangle">
+                <corners android:radius="?android:attr/dialogCornerRadius" />
+                <padding
+                    android:left="10dp"
+                    android:right="10dp" />
+             <solid android:color="?androidprv:attr/materialColorSurfaceContainerHigh" />
         </shape>
     </item>
     <item>
-        <shape>
-            <solid android:color="@color/notification_overlay_color" />
-        </shape>
+        <shape android:shape="rectangle">
+                <corners android:radius="?android:attr/dialogCornerRadius" />
+                <padding
+                    android:left="10dp"
+                    android:right="10dp" />
+             <solid android:color="?androidprv:attr/colorSurface" />
+       </shape>
     </item>
 </layer-list>
+</ripple>
