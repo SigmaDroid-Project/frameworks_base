@@ -18,6 +18,7 @@ package com.android.systemui.statusbar.notification.footer.ui.view;
 
 import static android.graphics.PorterDuff.Mode.SRC_ATOP;
 
+import static com.android.systemui.Flags.notificationBackgroundTintOptimization;
 import static com.android.systemui.util.ColorUtilKt.hexColorString;
 
 import android.annotation.ColorInt;
