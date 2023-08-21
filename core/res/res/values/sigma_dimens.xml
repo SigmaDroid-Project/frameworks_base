@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-/* //device/apps/common/assets/res/any/colors.xml
 **
-** Copyright 2006, The Android Open Source Project
+** Copyright (C) 2016-2024 crDroid Android Project
+** Copyright (C) 2023-2024, AlphaDroid
 **
 ** Licensed under the Apache License, Version 2.0 (the "License");
 ** you may not use this file except in compliance with the License.
@@ -18,7 +18,8 @@
 */
 -->
 <resources>
-
-    <color name="bootleg_accent_gradient_end_color">@color/system_accent3_600</color>
-
+    <!-- QS panel styles -->
+    <dimen name="qs_corner_radius_top">28dip</dimen>
+    <dimen name="qs_corner_radius_left">22dip</dimen>
+    <dimen name="qs_corner_radius_right">24dip</dimen>
 </resources>

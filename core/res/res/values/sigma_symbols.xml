@@ -9,4 +9,7 @@
     <java-symbol type="string" name="settings_restart_title" />
     <java-symbol type="string" name="settings_restart_message" />
 
+    <!-- QS panel styles -->
+    <java-symbol type="id" name="qs_state_layer" />
+
 </resources>
