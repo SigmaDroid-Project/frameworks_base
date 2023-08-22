@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.systemui.evolution.batterybar;
+package com.android.systemui.sigma.batterybar;
 
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;

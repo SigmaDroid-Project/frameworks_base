@@ -65,8 +65,8 @@ import androidx.annotation.Nullable;
 
 import com.android.internal.annotations.VisibleForTesting;
 import com.android.internal.util.LatencyTracker;
-import com.android.internal.util.evolution.EvolutionUtils;
-import com.android.internal.util.evolution.udfps.UdfpsUtils;
+import com.android.internal.util.sigma.SigmaUtils;
+import com.android.internal.util.sigma.udfps.UdfpsUtils;
 import com.android.keyguard.FaceAuthApiRequestReason;
 import com.android.keyguard.KeyguardUpdateMonitor;
 import com.android.systemui.Dumpable;
@@ -851,7 +851,7 @@ public class UdfpsController implements DozeReceiver, Dumpable {
         udfpsHapticsSimulator.setUdfpsController(this);
         udfpsShell.setUdfpsOverlayController(mUdfpsOverlayController);
 
-        if (EvolutionUtils.isPackageInstalled(mContext, "com.evolution.udfps.resources")) {
+        if (SigmaUtils.isPackageInstalled(mContext, "com.sigma.udfps.resources")) {
             mUdfpsAnimation = new UdfpsAnimation(mContext, mWindowManager, mSensorProps);
         }
 

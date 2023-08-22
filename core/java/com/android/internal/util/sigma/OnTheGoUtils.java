@@ -17,7 +17,7 @@
 * -->
 */
 
-package com.android.internal.util.evolution;
+package com.android.internal.util.sigma;
 
 import android.app.ActivityManager;
 import android.content.Context;

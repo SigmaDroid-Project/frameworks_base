@@ -1,5 +1,5 @@
 files:
-  - source: /**/values/evolution_strings.xml
+  - source: /**/values/sigma_strings.xml
     translation: /%original_path%-%android_code%/%original_file_name%
-  - source: /**/values/evolution_arrays.xml
+  - source: /**/values/sigma_arrays.xml
     translation: /%original_path%-%android_code%/%original_file_name%

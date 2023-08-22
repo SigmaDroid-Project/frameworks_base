@@ -232,7 +232,7 @@ interface IStatusBarService
     /** Shows rear display educational dialog */
     void showRearDisplayDialog(int currentBaseState);
 
-    /** Evolution X additions. */
+    /** SigmaDroid additions. */
     void toggleCameraFlash();
     void toggleRecentApps();
     void toggleSplitScreen();

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.internal.util.evolution;
+package com.android.internal.util.sigma;
 
 import android.annotation.Nullable;
 import android.util.Log;

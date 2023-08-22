@@ -19,7 +19,7 @@ package com.android.internal.lineage.hardware;
 
 import android.util.Log;
 
-import com.android.internal.util.evolution.FileUtils;
+import com.android.internal.util.sigma.FileUtils;
 
 /**
  * Facemelt mode!

@@ -102,7 +102,7 @@ public class NavigationBarInflaterView extends FrameLayout
     private static final String ABSOLUTE_SUFFIX = "A";
     private static final String ABSOLUTE_VERTICAL_CENTERED_SUFFIX = "C";
 
-    private static final String OVERLAY_NAVIGATION_FULL_SCREEN = "com.evolution.overlay.immnav.gestural";
+    private static final String OVERLAY_NAVIGATION_FULL_SCREEN = "com.sigma.overlay.immnav.gestural";
 
     private static final String KEY_NAVIGATION_SPACE =
             "system:" + Settings.System.NAVIGATION_BAR_IME_SPACE;

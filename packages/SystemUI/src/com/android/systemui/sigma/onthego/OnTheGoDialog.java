@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.systemui.evolution.onthego;
+package com.android.systemui.sigma.onthego;
 
 import android.app.Dialog;
 import android.content.ContentResolver;
@@ -33,7 +33,7 @@ import android.widget.Switch;
 
 import com.android.systemui.R;
 
-import com.android.internal.util.evolution.OnTheGoUtils;
+import com.android.internal.util.sigma.OnTheGoUtils;
 
 public class OnTheGoDialog extends Dialog {
 

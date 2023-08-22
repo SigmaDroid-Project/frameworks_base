@@ -40,7 +40,7 @@ import androidx.annotation.IntDef;
 import androidx.annotation.Nullable;
 import androidx.asynclayoutinflater.view.AsyncLayoutInflater;
 
-import com.android.internal.util.evolution.EvolutionUtils;
+import com.android.internal.util.sigma.SigmaUtils;
 import com.android.settingslib.Utils;
 import com.android.systemui.R;
 import com.android.systemui.animation.Interpolators;
@@ -96,8 +96,8 @@ public class UdfpsKeyguardView extends UdfpsAnimationView {
         mMaxBurnInOffsetY = context.getResources()
             .getDimensionPixelSize(R.dimen.udfps_burn_in_offset_y);
 
-        mPackageInstalled = com.android.internal.util.evolution.EvolutionUtils.isPackageInstalled(
-                mContext, "com.evolution.udfps.resources");
+        mPackageInstalled = com.android.internal.util.sigma.SigmaUtils.isPackageInstalled(
+                mContext, "com.sigma.udfps.resources");
     }
 
     @Override
@@ -167,7 +167,7 @@ public class UdfpsKeyguardView extends UdfpsAnimationView {
             mLockScreenFp.setTranslationY(mBurnInOffsetY);
             mBgProtection.setAlpha(1f - mInterpolatedDarkAmount);
             mLockScreenFp.setAlpha(mCustomUdfpsIcon ||
-                  (!TextUtils.isEmpty(customIconURI) && mCustomFpIconEnabled)? 0.0f 
+                  (!TextUtils.isEmpty(customIconURI) && mCustomFpIconEnabled)? 0.0f
                 : (1f - mInterpolatedDarkAmount));
         } else if (darkAmountForAnimation == 0f) {
             mLockScreenFp.setTranslationX(0);

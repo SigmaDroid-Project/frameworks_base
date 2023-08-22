@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.android.internal.util.evolution;
+package com.android.internal.util.sigma;
 
 import android.app.ActivityTaskManager;
 import android.app.Application;

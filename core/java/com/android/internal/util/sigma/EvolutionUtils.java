@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.internal.util.evolution;
+package com.android.internal.util.sigma;
 
 import static android.provider.Settings.Global.ZEN_MODE_OFF;
 import static android.provider.Settings.Global.ZEN_MODE_IMPORTANT_INTERRUPTIONS;
@@ -91,8 +91,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class EvolutionUtils {
-    private static final String TAG = "EvolutionUtils";
+public class SigmaUtils {
+    private static final String TAG = "SigmaUtils";
 
     private static final boolean DEBUG = false;
 
@@ -529,7 +529,7 @@ public class EvolutionUtils {
             return null;
         }
     }
-  
+
        public static class SleepModeController {
         private final Resources mResources;
         private final Context mUiContext;

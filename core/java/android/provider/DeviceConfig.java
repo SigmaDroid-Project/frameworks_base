@@ -48,7 +48,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Executor;
 
-import com.android.internal.util.evolution.DeviceConfigUtils;
+import com.android.internal.util.sigma.DeviceConfigUtils;
 
 /**
  * Device level configuration parameters which can be tuned by a separate configuration service.

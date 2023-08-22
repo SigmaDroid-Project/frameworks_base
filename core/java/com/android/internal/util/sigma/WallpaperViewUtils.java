@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.android.internal.util.evolution;
+package com.android.internal.util.sigma;
 
 import android.app.WallpaperManager;
 import android.annotation.Nullable;
@@ -81,4 +81,3 @@ public class WallpaperViewUtils extends ImageView {
         super.onSizeChanged(w, h, oldw, oldh);
     }
 }
-

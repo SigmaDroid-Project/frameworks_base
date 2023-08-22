@@ -48,7 +48,7 @@ import android.view.Display;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.android.internal.util.evolution.ImageHelper;
+import com.android.internal.util.sigma.ImageHelper;
 import com.android.systemui.Dependency;
 import com.android.systemui.Dumpable;
 import com.android.systemui.R;

@@ -17,7 +17,7 @@
 * limitations under the License.
 */
 
-package com.android.internal.util.evolution;
+package com.android.internal.util.sigma;
 
 import java.io.File;
 import java.io.FileDescriptor;

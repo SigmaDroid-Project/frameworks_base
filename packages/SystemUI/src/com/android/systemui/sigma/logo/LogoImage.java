@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.android.systemui.evolution.logo;
+package com.android.systemui.sigma.logo;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -130,7 +130,7 @@ public abstract class LogoImage extends ImageView {
         switch (mLogoStyle) {
             case 0:
             default:
-                drawable = mContext.getResources().getDrawable(R.drawable.ic_evolution_logo);
+                drawable = mContext.getResources().getDrawable(R.drawable.ic_sigma_logo);
                 break;
             case 1:
                 drawable = mContext.getResources().getDrawable(R.drawable.ic_adidas);

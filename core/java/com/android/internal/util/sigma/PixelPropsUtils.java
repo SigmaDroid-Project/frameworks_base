@@ -3,6 +3,7 @@
  *               2022 StatiXOS
  *               2021-2022 crDroid Android Project
  *               2019-2023 Evolution X
+ *               2023 SigmaDroid
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +18,7 @@
  * limitations under the License.
  */
 
-package com.android.internal.util.evolution;
+package com.android.internal.util.sigma;
 
 import android.app.Application;
 import android.content.Context;

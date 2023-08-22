@@ -67,7 +67,7 @@ import android.window.BackEvent;
 
 import com.android.internal.config.sysui.SystemUiDeviceConfigFlags;
 import com.android.internal.policy.GestureNavigationSettingsObserver;
-import com.android.internal.util.evolution.EvolutionUtils;
+import com.android.internal.util.sigma.SigmaUtils;
 import com.android.internal.util.hwkeys.ActionHandler;
 import com.android.internal.util.hwkeys.ActionUtils;
 import com.android.systemui.R;
@@ -1160,7 +1160,7 @@ public class EdgeBackGestureHandler implements PluginListener<NavigationEdgeBack
                 ActionUtils.switchScreenOff(mContext);
                 break;
             case 7: // Screenshot
-                EvolutionUtils.takeScreenshot(true);
+                SigmaUtils.takeScreenshot(true);
                 break;
             case 8: // Notification panel
                 ActionUtils.toggleNotifications();
@@ -1175,22 +1175,22 @@ public class EdgeBackGestureHandler implements PluginListener<NavigationEdgeBack
                 ActionUtils.toggleRingerModes(mContext);
                 break;
             case 12: // Kill app
-                EvolutionUtils.killForegroundApp();
+                SigmaUtils.killForegroundApp();
                 break;
             case 13: // Switch recent app
                 ActionUtils.switchToLastApp(mContext);
                 break;
             case 14: // Skip song
-                EvolutionUtils.sendSystemKeyToStatusBar(KeyEvent.KEYCODE_MEDIA_NEXT);
+                SigmaUtils.sendSystemKeyToStatusBar(KeyEvent.KEYCODE_MEDIA_NEXT);
                 break;
             case 15: // Previous song
-                EvolutionUtils.sendSystemKeyToStatusBar(KeyEvent.KEYCODE_MEDIA_PREVIOUS);
+                SigmaUtils.sendSystemKeyToStatusBar(KeyEvent.KEYCODE_MEDIA_PREVIOUS);
                 break;
             case 16: // Powermenu
-                EvolutionUtils.showPowerMenu();
+                SigmaUtils.showPowerMenu();
                 break;
             case 17: // Partial Screenshot
-                EvolutionUtils.takeScreenshot(false);
+                SigmaUtils.takeScreenshot(false);
                 break;
             case 18: // Hush Mute
                 ActionUtils.triggerHushMute(mContext);

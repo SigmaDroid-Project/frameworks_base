@@ -41,7 +41,7 @@ import android.util.PathParser;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.android.internal.util.evolution.EvolutionUtils;
+import com.android.internal.util.sigma.SigmaUtils;
 import com.android.systemui.Dependency;
 import com.android.systemui.R;
 import com.android.systemui.tuner.TunerService;
@@ -63,7 +63,7 @@ public abstract class UdfpsDrawable extends Drawable {
     static final float DEFAULT_STROKE_WIDTH = 3f;
     static final String UDFPS_ICON = "system:" + Settings.System.UDFPS_ICON;
 
-    String udfpsResourcesPackage = "com.evolution.udfps.resources";
+    String udfpsResourcesPackage = "com.sigma.udfps.resources";
 
     @NonNull final Context mContext;
     @NonNull final ShapeDrawable mFingerprintDrawable;
@@ -94,7 +94,7 @@ public abstract class UdfpsDrawable extends Drawable {
     }
 
 /**    void init() {
-        if (EvolutionUtils.isPackageInstalled(mContext, udfpsResourcesPackage)) {
+        if (SigmaUtils.isPackageInstalled(mContext, udfpsResourcesPackage)) {
             try {
                 PackageManager pm = mContext.getPackageManager();
                 udfpsRes = pm.getResourcesForApplication(udfpsResourcesPackage);
@@ -126,7 +126,7 @@ public abstract class UdfpsDrawable extends Drawable {
                 Settings.System.OMNI_CUSTOM_FP_ICON,
                 UserHandle.USER_CURRENT);
 
-        if (EvolutionUtils.isPackageInstalled(mContext, udfpsResourcesPackage)) {
+        if (SigmaUtils.isPackageInstalled(mContext, udfpsResourcesPackage)) {
             try {
                 PackageManager pm = mContext.getPackageManager();
                 udfpsRes = pm.getResourcesForApplication(udfpsResourcesPackage);

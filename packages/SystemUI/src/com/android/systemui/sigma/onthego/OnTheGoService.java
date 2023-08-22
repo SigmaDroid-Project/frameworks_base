@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.systemui.evolution.onthego;
+package com.android.systemui.sigma.onthego;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -42,7 +42,7 @@ import android.widget.FrameLayout;
 
 import com.android.systemui.R;
 
-import com.android.internal.util.evolution.OnTheGoUtils;
+import com.android.internal.util.sigma.OnTheGoUtils;
 
 import java.io.IOException;
 

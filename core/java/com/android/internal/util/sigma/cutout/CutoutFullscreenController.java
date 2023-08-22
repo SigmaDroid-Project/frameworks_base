@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.android.internal.util.evolution.cutout;
+package com.android.internal.util.sigma.cutout;
 
 import android.content.ContentResolver;
 import android.content.Context;

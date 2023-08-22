@@ -465,7 +465,7 @@
         </service>
 
         <!-- started from PhoneWindowManager -->
-        <service android:name=".evolution.onthego.OnTheGoService"
+        <service android:name=".sigma.onthego.OnTheGoService"
             android:process=":onthego"
             android:exported="true" />
 
@@ -530,7 +530,7 @@
                   android:label="@string/status_bar_items_title"
                   android:theme="@style/Theme.SubSettingsBase"
                   android:process=":tuner"
-                  android:parentActivityName="com.evolution.settings.fragments.StatusbarSettings"
+                  android:parentActivityName="com.sigma.settings.fragments.StatusbarSettings"
                   android:exported="true">
         </activity>
 

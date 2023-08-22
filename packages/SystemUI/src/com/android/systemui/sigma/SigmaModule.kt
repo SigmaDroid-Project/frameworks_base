@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.systemui.evolution
+package com.android.systemui.sigma
 
 import com.android.systemui.qs.tileimpl.QSTileImpl
 import com.android.systemui.qs.tiles.AmbientDisplayTile
@@ -53,7 +53,7 @@ import dagger.multibindings.IntoMap
 import dagger.multibindings.StringKey
 
 @Module
-interface EvolutionModule {
+interface SigmaModule {
     /** Inject AmbientDisplayTile into tileMap in QSModule */
     @Binds
     @IntoMap
@@ -121,13 +121,13 @@ interface EvolutionModule {
     fun bindLiveDisplayTile(liveDisplayTile: LiveDisplayTile): QSTileImpl<*>
 
     /** Inject LocaleTile into tileMap in QSModule */
-    @Binds  
+    @Binds
     @IntoMap
     @StringKey(LocaleTile.TILE_SPEC)
     fun bindLocaleTile(localeTile: LocaleTile): QSTileImpl<*>
 
     /** Inject OnTheGoTile into tileMap in QSModule */
-    @Binds  
+    @Binds
     @IntoMap
     @StringKey(OnTheGoTile.TILE_SPEC)
     fun bindOnTheGoTile(onTheGoTile: OnTheGoTile): QSTileImpl<*>
@@ -163,19 +163,19 @@ interface EvolutionModule {
     fun bindRefreshRateTile(refreshRateTile: RefreshRateTile): QSTileImpl<*>
 
     /** Inject ScreenshotTile into tileMap in QSModule */
-    @Binds  
+    @Binds
     @IntoMap
     @StringKey(ScreenshotTile.TILE_SPEC)
     fun bindScreenshotTile(screenshotTile: ScreenshotTile): QSTileImpl<*>
 
     /** Inject SleepModeTile into tileMap in QSModule */
-    @Binds  
+    @Binds
     @IntoMap
     @StringKey(SleepModeTile.TILE_SPEC)
     fun bindSleepModeTile(sleepModeTile: SleepModeTile): QSTileImpl<*>
 
     /** Inject SmartPixelsTile into tileMap in QSModule */
-    @Binds  
+    @Binds
     @IntoMap
     @StringKey(SmartPixelsTile.TILE_SPEC)
     fun bindSmartPixelsTile(smartPixelsTile: SmartPixelsTile): QSTileImpl<*>
@@ -205,19 +205,19 @@ interface EvolutionModule {
     fun bindUsbTetherTile(usbTetherTile: UsbTetherTile): QSTileImpl<*>
 
     /** Inject VPNTetheringTile into tileMap in QSModule */
-    @Binds  
+    @Binds
     @IntoMap
     @StringKey(VPNTetheringTile.TILE_SPEC)
     fun bindVPNTetheringTile(vPNTetheringTile: VPNTetheringTile): QSTileImpl<*>
 
     /** Inject VpnTile into tileMap in QSModule */
-    @Binds  
+    @Binds
     @IntoMap
     @StringKey(VpnTile.TILE_SPEC)
     fun bindVpnTile(vpnTile: VpnTile): QSTileImpl<*>
 
     /** Inject VolumeTile into tileMap in QSModule */
-    @Binds  
+    @Binds
     @IntoMap
     @StringKey(VolumeTile.TILE_SPEC)
     fun bindVolumeTile(volumeTile: VolumeTile): QSTileImpl<*>

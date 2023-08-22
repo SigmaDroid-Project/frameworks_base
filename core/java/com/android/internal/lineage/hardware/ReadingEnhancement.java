@@ -16,7 +16,7 @@
 
 package com.android.internal.lineage.hardware;
 
-import com.android.internal.util.evolution.FileUtils;
+import com.android.internal.util.sigma.FileUtils;
 
 /**
  * Reader mode

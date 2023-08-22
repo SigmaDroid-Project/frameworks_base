@@ -1298,7 +1298,7 @@ public class GlobalActionsDialogLite implements DialogInterface.OnDismissListene
         @Override
         public void onPress() {
             ComponentName cn = new ComponentName("com.android.systemui",
-                    "com.android.systemui.evolution.onthego.OnTheGoService");
+                    "com.android.systemui.sigma.onthego.OnTheGoService");
             Intent onTheGoIntent = new Intent();
             onTheGoIntent.setComponent(cn);
             onTheGoIntent.setAction("start");

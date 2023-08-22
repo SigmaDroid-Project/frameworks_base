@@ -235,7 +235,7 @@ import com.android.server.wm.WindowManagerService;
 
 import dalvik.system.PathClassLoader;
 
-import com.android.internal.util.evolution.EvolutionUtils;
+import com.android.internal.util.sigma.SigmaUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -2641,12 +2641,12 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         if (mTorchActionMode == 2 && longpress) {
             performHapticFeedback(HapticFeedbackConstants.LONG_PRESS, false,
                     "Power - Long Press - Torch");
-            EvolutionUtils.toggleCameraFlash();
+            SigmaUtils.toggleCameraFlash();
             return true;
         } else if (mTorchActionMode == 1 && !longpress) {
             performHapticFeedback(HapticFeedbackConstants.LONG_PRESS, false,
                       "Power - Double Press - Torch");
-            EvolutionUtils.toggleCameraFlash();
+            SigmaUtils.toggleCameraFlash();
             return true;
         }
         return false;
@@ -6342,7 +6342,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     public void sendCustomAction(Intent intent) {
         String action = intent.getAction();
         if (action != null) {
-            if (EvolutionUtils.INTENT_SCREENSHOT.equals(action)) {
+            if (SigmaUtils.INTENT_SCREENSHOT.equals(action)) {
                 mContext.enforceCallingOrSelfPermission(Manifest.permission.ACCESS_SURFACE_FLINGER,
                         TAG + "sendCustomAction permission denied");
                 interceptScreenshotChord(

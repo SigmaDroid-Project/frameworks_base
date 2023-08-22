@@ -347,7 +347,7 @@ oneway interface IStatusBar
      */
     void showMediaOutputSwitcher(String packageName);
 
-    /** Evolution X additions. */
+    /** SigmaDroid additions. */
     void toggleCameraFlash();
     void killForegroundApp();
 

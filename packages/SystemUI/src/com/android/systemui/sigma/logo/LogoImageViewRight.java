@@ -15,28 +15,28 @@
  * limitations under the License.
  */
 
-package com.android.systemui.evolution.logo;
+package com.android.systemui.sigma.logo;
 
 import android.content.Context;
 import android.util.AttributeSet;
 
-public class LogoImageView extends LogoImage {
+public class LogoImageViewRight extends LogoImage {
 
-    public LogoImageView(Context context) {
+    public LogoImageViewRight(Context context) {
         this(context, null);
     }
 
-    public LogoImageView(Context context, AttributeSet attrs) {
+    public LogoImageViewRight(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public LogoImageView(Context context, AttributeSet attrs, int defStyle) {
+    public LogoImageViewRight(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
 
     @Override
     protected boolean isLogoVisible() {
-        if (mLogoPosition == 0) {
+        if (mLogoPosition == 1) {
             return true;
         }
         return false;
