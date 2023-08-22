@@ -906,7 +906,7 @@ final class DefaultPermissionGrantPolicy {
         }
 
         // Updater app
-        grantSystemFixedPermissionsToSystemPackage(pm, "org.evolution.ota", userId, NOTIFICATION_PERMISSIONS);
+        grantSystemFixedPermissionsToSystemPackage(pm, "org.sigma.ota", userId, NOTIFICATION_PERMISSIONS);
 
         // There is no real "marker" interface to identify the shared storage backup, it is
         // hardcoded in BackupManagerService.SHARED_BACKUP_AGENT_PACKAGE.

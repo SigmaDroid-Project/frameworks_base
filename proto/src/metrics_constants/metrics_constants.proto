@@ -7444,6 +7444,9 @@ message MetricsEvent {
     EVO_SETTINGS = 2774;
     EVO_QS_TILES = 2775;
 
+    // SigmaDroid Metrics
+    SIGMA = 2776;
+
     // Panel for Mobile Data
     PANEL_MOBILE_DATA = 2004;
   }

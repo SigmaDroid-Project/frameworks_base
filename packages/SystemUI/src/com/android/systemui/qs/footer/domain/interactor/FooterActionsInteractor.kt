@@ -193,7 +193,7 @@ constructor(
 
         metricsLogger.action(MetricsProto.MetricsEvent.ACTION_QS_EXPANDED_SETTINGS_LAUNCH)
         activityStarter.startActivity(
-            Intent("com.evolution.settings.EvolutionSettings"),
+            Intent("com.sigma.settings.SigmaSettings"),
             true /* dismissShade */,
             expandable.activityLaunchController(
                 InteractionJankMonitor.CUJ_SHADE_APP_LAUNCH_FROM_SETTINGS_BUTTON

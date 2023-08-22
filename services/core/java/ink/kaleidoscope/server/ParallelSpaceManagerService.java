@@ -123,9 +123,9 @@ public final class ParallelSpaceManagerService extends SystemService {
         "com.google.android.setupwizard",
         "com.google.android.wallpaper",
         "com.motorola.dolby.dolbyui",
-        "org.evolution.oneplus.DeviceExtras",
-        "org.evolution.oplus.OPlusExtras",
-        "org.evolution.ota",
+        "org.sigma.oneplus.DeviceExtras",
+        "org.sigma.oplus.OPlusExtras",
+        "org.sigma.ota",
         "org.lineageos.device.DeviceSettings",
         "org.lineageos.settings.device"
     );

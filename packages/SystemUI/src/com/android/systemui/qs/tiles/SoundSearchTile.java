@@ -33,7 +33,7 @@ import androidx.annotation.Nullable;
 
 import com.android.internal.logging.MetricsLogger;
 import com.android.internal.logging.nano.MetricsProto.MetricsEvent;
-import com.android.internal.util.evolution.EvolutionUtils;
+import com.android.internal.util.sigma.SigmaUtils;
 import com.android.systemui.Dependency;
 import com.android.systemui.R;
 import com.android.systemui.dagger.qualifiers.Background;
@@ -77,13 +77,13 @@ public class SoundSearchTile extends QSTileImpl<BooleanState> {
     protected void handleClick(@Nullable View view) {
         mHost.collapsePanels();
         // Soundhound
-        if (EvolutionUtils.isPackageInstalled(mContext, "com.melodis.midomiMusicIdentifier.freemium") || EvolutionUtils.isPackageInstalled(mContext, "com.melodis.midomiMusicIdentifier")) {
+        if (SigmaUtils.isPackageInstalled(mContext, "com.melodis.midomiMusicIdentifier.freemium") || SigmaUtils.isPackageInstalled(mContext, "com.melodis.midomiMusicIdentifier")) {
             Intent intent = new Intent(Intent.ACTION_MAIN);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             intent.setAction("com.soundhound.android.ID_NOW_EXTERNAL");
             mContext.startActivity(intent);
         // Google Search Music
-        } else if (EvolutionUtils.isPackageInstalled(mContext, "com.google.android.googlequicksearchbox")) {
+        } else if (SigmaUtils.isPackageInstalled(mContext, "com.google.android.googlequicksearchbox")) {
             Intent intent = new Intent(Intent.ACTION_MAIN);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             intent.setAction("com.google.android.googlequicksearchbox.MUSIC_SEARCH");

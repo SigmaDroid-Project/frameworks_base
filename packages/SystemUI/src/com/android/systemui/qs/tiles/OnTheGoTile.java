@@ -29,7 +29,7 @@ import com.android.systemui.R;
 import com.android.systemui.R.drawable;
 import com.android.systemui.dagger.qualifiers.Background;
 import com.android.systemui.dagger.qualifiers.Main;
-import com.android.systemui.evolution.onthego.OnTheGoService;
+import com.android.systemui.sigma.onthego.OnTheGoService;
 import com.android.systemui.plugins.ActivityStarter;
 import com.android.systemui.plugins.FalsingManager;
 import com.android.systemui.plugins.qs.QSTile.BooleanState;
@@ -40,7 +40,7 @@ import com.android.systemui.qs.tileimpl.QSTileImpl;
 
 import com.android.internal.logging.MetricsLogger;
 import com.android.internal.logging.nano.MetricsProto.MetricsEvent;
-import com.android.internal.util.evolution.OnTheGoUtils;
+import com.android.internal.util.sigma.OnTheGoUtils;
 
 import javax.inject.Inject;
 
@@ -88,7 +88,7 @@ public class OnTheGoTile extends QSTileImpl<BooleanState> {
     @Override
     protected void handleClick(@Nullable View view) {
         ComponentName cn = new ComponentName("com.android.systemui",
-                "com.android.systemui.evolution.onthego.OnTheGoService");
+                "com.android.systemui.sigma.onthego.OnTheGoService");
         Intent startIntent = new Intent();
         startIntent.setComponent(cn);
         if (isOnTheGoEnabled()) {
