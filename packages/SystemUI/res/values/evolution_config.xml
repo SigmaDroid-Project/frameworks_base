@@ -109,4 +109,7 @@
 
     <!-- Update battery info every second when device is charging -->
     <bool name="config_alternateFastchargeInfoUpdate">false</bool>
+
+    <!-- Whether to call onFingerDown with regular action down events -->
+    <bool name="config_onFingerDownWithActionDown">true</bool>
 </resources>

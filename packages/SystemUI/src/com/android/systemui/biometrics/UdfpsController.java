@@ -617,12 +617,14 @@ public class UdfpsController implements DozeReceiver, Dumpable {
                     // We need to persist its ID to track it during ACTION_MOVE that could include
                     // data for many other pointers because of multi-touch support.
                     mActivePointerId = event.getPointerId(0);
-                    final int idx = mActivePointerId == -1
-                            ? event.getPointerId(0)
-                            : event.findPointerIndex(mActivePointerId);
                     mVelocityTracker.addMovement(event);
-                    onFingerDown(requestId, (int) event.getRawX(), (int) event.getRawY(),
-                            (int) event.getTouchMinor(idx), (int) event.getTouchMajor(idx));
+                    if (shouldTriggerOnFingerDownWithActionDown()) {
+                        final int idx = mActivePointerId == -1
+                                ? event.getPointerId(0)
+                                : event.findPointerIndex(mActivePointerId);
+                        onFingerDown(requestId, (int) event.getRawX(), (int) event.getRawY(),
+                                (int) event.getTouchMinor(idx), (int) event.getTouchMajor(idx));
+                    }
                     handled = true;
                     mAcquiredReceived = false;
                 }
@@ -731,6 +733,11 @@ public class UdfpsController implements DozeReceiver, Dumpable {
                 // Do nothing.
         }
         return handled;
+    }
+
+    private boolean shouldTriggerOnFingerDownWithActionDown() {
+        return mContext.getResources().getBoolean(
+                R.bool.config_onFingerDownWithActionDown);
     }
 
     private boolean shouldTryToDismissKeyguard() {
