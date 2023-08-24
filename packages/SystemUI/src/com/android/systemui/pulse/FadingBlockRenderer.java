@@ -108,8 +108,7 @@ public class FadingBlockRenderer extends Renderer {
         } else {
             mFFTAverage = null;
         }
-            int i = 0;
-        ;
+        int i = 0;
         for (; i < (mCenterMirrored ? (divisionLength / 2) : divisionLength); i++) {
             if (mVertical) {
                 mFFTPoints[i * 4 + 1] = i * 4 * mDivisions;

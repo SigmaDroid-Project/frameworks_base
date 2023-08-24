@@ -190,8 +190,7 @@ public class SolidLineRenderer extends Renderer {
             return;
         }
         int fudgeFactor = mKeyguardShowing ? mDbFuzzFactor * 4 : mDbFuzzFactor;
-        int i = 0;
-        for (; i < (mCenterMirrored ? (mUnits / 4) : mUnits); i++) {
+        for (int i = 0; i < (mCenterMirrored ? (mUnits / 4) : mUnits) && i * 2 + 3 < fft.length; i++) {
             if (mValueAnimators[i] == null) continue;
             mValueAnimators[i].cancel();
             rfk = fft[i * 2 + 2];
@@ -224,7 +223,7 @@ public class SolidLineRenderer extends Renderer {
             mValueAnimators[i].start();
         }
         if (mCenterMirrored) {
-            for (; i < mUnits; i++) {
+            for (int i = (mUnits / 4); i < mUnits && (mUnits - (i + 1)) * 2 + 3 < fft.length; i++) {
                 int j = mUnits - (i + 1);
                 if (mValueAnimators[i] == null) continue;
                 mValueAnimators[i].cancel();
