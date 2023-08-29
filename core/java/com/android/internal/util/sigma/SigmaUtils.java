@@ -103,6 +103,52 @@ public class SigmaUtils {
     public static final String INTENT_SCREENSHOT = "action_take_screenshot";
     public static final String INTENT_REGION_SCREENSHOT = "action_take_region_screenshot";
 
+    public static void showSettingsRestartDialog(Context context) {
+        new AlertDialog.Builder(context)
+                //.setTitle(R.string.settings_restart_title)
+                //.setMessage(R.string.settings_restart_message)
+                .setTitle("Settings restart required")
+                .setMessage("For all changes to take effect, a Settings restart is required. Restart Settings now?")
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        restartSettings(context);
+                    }
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
+    }
+
+    public static void restartSettings(Context context) {
+        new restartSettingsTask(context).execute();
+    }
+
+    private static class restartSettingsTask extends AsyncTask<Void, Void, Void> {
+        private Context mContext;
+
+        public restartSettingsTask(Context context) {
+            super();
+            mContext = context;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            try {
+                ActivityManager am =
+                        (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
+                IActivityManager ams = ActivityManager.getService();
+                for (ActivityManager.RunningAppProcessInfo app: am.getRunningAppProcesses()) {
+                    if ("com.android.settings".equals(app.processName)) {
+                    	ams.killApplicationProcess(app.processName, app.uid);
+                        break;
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+    }
+
     public static boolean isChineseLanguage() {
        return Resources.getSystem().getConfiguration().locale.getLanguage().startsWith(
                Locale.CHINESE.getLanguage());
