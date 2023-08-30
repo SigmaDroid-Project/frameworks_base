@@ -6665,6 +6665,12 @@ public final class Settings {
         public static final String RETICKER_LANDSCAPE_ONLY = "reticker_landscape_only";
 
         /**
+         * Haptic feedback on volume panel
+         * @hide
+         */ 
+        public static final String VOLUME_PANEL_HAPTIC_FEEDBACK = "volume_panel_haptic_feedback";
+
+        /**
          * Battery style
          * @hide
          */
