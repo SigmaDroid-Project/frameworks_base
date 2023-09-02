@@ -20,10 +20,12 @@ import android.animation.AnimatorSet
 import android.animation.ArgbEvaluator
 import android.animation.PropertyValuesHolder
 import android.animation.ValueAnimator
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.content.res.Resources.ID_NULL
+import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.LayerDrawable
 import android.graphics.drawable.RippleDrawable
@@ -48,6 +50,7 @@ import android.widget.LinearLayout
 import android.widget.Switch
 import android.widget.TextView
 import androidx.annotation.VisibleForTesting
+import androidx.core.content.ContextCompat
 import com.android.settingslib.Utils
 import com.android.systemui.FontSizeUtils
 import com.android.systemui.R
@@ -63,6 +66,7 @@ import com.android.systemui.qs.logging.QSLogger
 import com.android.systemui.qs.tileimpl.QSIconViewImpl.QS_ANIM_LENGTH
 import java.util.Objects
 import android.provider.Settings.System
+import java.util.Random
 
 private const val TAG = "QSTileViewImpl"
 open class QSTileViewImpl @JvmOverloads constructor(
@@ -78,6 +82,8 @@ open class QSTileViewImpl @JvmOverloads constructor(
         private const val SECONDARY_LABEL_NAME = "secondaryLabel"
         private const val CHEVRON_NAME = "chevron"
         const val UNAVAILABLE_ALPHA = 0.3f
+        const val INACTIVE_ALPHA = 0.8f
+        const val TILE_ALPHA = 0.2f
         @VisibleForTesting
         internal const val TILE_STATE_RES_PREFIX = "tile_states_"
     }
@@ -102,49 +108,41 @@ open class QSTileViewImpl @JvmOverloads constructor(
             updateHeight()
         }
 
-    private val colorActive = Utils.getColorStateListDefaultColor(
-            context, R.color.qs_color_accent_primary)
-    private val colorInactive = Utils.getColorStateListDefaultColor(context,
-            R.color.qs_color_inactive)
-    private val colorUnavailable = Utils.applyAlpha(UNAVAILABLE_ALPHA, colorInactive)
-
     private val isA11Style: Boolean = System.getIntForUser(
             context.contentResolver,
             System.QS_UI_STYLE, 0, UserHandle.USER_CURRENT
         ) == 1
 
-    private val tintAlpha: Boolean = qsPanelStyle == 1 || qsPanelStyle == 2 || qsPanelStyle == 10
-
     private val colorActive = Utils.getColorAttrDefaultColor(context,
             com.android.internal.R.attr.colorAccentPrimary)
     private val colorOffstate = Utils.getColorAttrDefaultColor(context, R.attr.offStateColor)
     private val colorInactive = if (isA11Style) Utils.applyAlpha(INACTIVE_ALPHA, colorOffstate) else Utils.getColorAttrDefaultColor(context, R.attr.offStateColor)
-    private val offStateAlpha = ContextCompat.getColorStateList(context, R.drawable.color_alpha_offstate)?.defaultColor ?: colorOffstate
+  //  private val offStateAlpha = ContextCompat.getColorStateList(context, R.drawable.color_alpha_offstate)?.defaultColor ?: colorOffstate
     private val colorUnavailable = Utils.applyAlpha(UNAVAILABLE_ALPHA, colorOffstate)
 
     private val colorLabelActive =
-            Utils.getColorAttrDefaultColor(context, if (isA11Style) com.android.internal.R.attr.textColorPrimary else R.color.qs_color_text_active)
+            Utils.getColorAttrDefaultColor(context, if (isA11Style) com.android.internal.R.attr.textColorPrimary else com.android.internal.R.attr.textColorOnAccent)
     private val colorLabelInactive =
-            Utils.getColorAttrDefaultColor(context, if (isA11Style) android.R.attr.textColorSecondary else R.color.qs_color_text_inactive)
+            Utils.getColorAttrDefaultColor(context, if (isA11Style) android.R.attr.textColorSecondary else android.R.attr.textColorPrimary)
     private val colorLabelUnavailable =
-        Utils.getColorAttrDefaultColor(context, R.color.qs_color_text_unavailable))
+        Utils.getColorAttrDefaultColor(context, com.android.internal.R.attr.textColorTertiary)
 
     private val colorSecondaryLabelActive =
-        Utils.getColorAttrDefaultColor(context, if (isA11Style) android.R.attr.textColorSecondary else R.color.qs_color_text_active);
+            Utils.getColorAttrDefaultColor(context, if (isA11Style) android.R.attr.textColorSecondary else android.R.attr.textColorSecondaryInverse)
     private val colorSecondaryLabelInactive =
-        Utils.getColorAttrDefaultColor(context, if (isA11Style) com.android.internal.R.attr.textColorTertiary else android.R.attr.textColorSecondary)
+            Utils.getColorAttrDefaultColor(context, if (isA11Style) com.android.internal.R.attr.textColorTertiary else android.R.attr.textColorSecondary)
     private val colorSecondaryLabelUnavailable =
         Utils.getColorAttrDefaultColor(context, com.android.internal.R.attr.textColorTertiary)
 
     // QS Style 2
-    private val colorActiveAlpha = ContextCompat.getColorStateList(context, R.drawable.color_accent_alpha)?.defaultColor ?: Utils.applyAlpha(TILE_ALPHA, Utils.getColorAttrDefaultColor(context, android.R.attr.colorAccent))
-    private val colorInactiveAlpha = offStateAlpha
+    //private val colorActiveAlpha = ContextCompat.getColorStateList(context, R.drawable.color_accent_alpha)?.defaultColor ?: Utils.applyAlpha(TILE_ALPHA, Utils.getColorAttrDefaultColor(context, android.R.attr.colorAccent))
+    //private val colorInactiveAlpha = offStateAlpha
 
     // QS Style 3
     private var randomColor: Random = Random()
 
     // QS Style 8
-    private val colorActiveSurround = resources.getColor(R.color.qs_white_bg)
+   // private val colorActiveSurround = resources.getColor(R.color.qs_white_bg)
 
     @SuppressLint("NewApi")
     private var randomTint: Int = Color.rgb(
@@ -215,9 +213,8 @@ open class QSTileViewImpl @JvmOverloads constructor(
     private var vertical = false
     private val forceHideCheveron = true
     private var labelHide = false
-   private var labelSize = 15f
-   private var secondaryLabelSize = 13f
-
+    private var labelSize = 15f
+    private var secondaryLabelSize = 13f
     private var shouldVibrateOnTouch = false;
 
     init {
@@ -291,8 +288,8 @@ open class QSTileViewImpl @JvmOverloads constructor(
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER
         } else {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER_VERTICAL or Gravity.START
+            orientation = if (vertical) LinearLayout.VERTICAL else LinearLayout.HORIZONTAL
+            gravity = if (vertical) Gravity.CENTER_HORIZONTAL or Gravity.CENTER_VERTICAL else Gravity.CENTER_VERTICAL or Gravity.START
         }
 
         if (labelSize == 0f && secondaryLabelSize == 0f) {
@@ -365,7 +362,7 @@ open class QSTileViewImpl @JvmOverloads constructor(
             height = iconContainerSize
             width = iconContainerSize
         }
-        val padding = resources.getDimensionPixelSize(R.dimen.qs_tile_padding)
+        val padding = context.resources.getDimensionPixelSize(R.dimen.qs_tile_padding)
         val iconSize = context.resources.getDimensionPixelSize(R.dimen.qs_icon_size)
         _icon.layoutParams.apply {
             height = iconSize

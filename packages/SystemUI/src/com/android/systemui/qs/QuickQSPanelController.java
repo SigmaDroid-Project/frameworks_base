@@ -199,13 +199,13 @@ public class QuickQSPanelController extends QSPanelControllerBase<QuickQSPanel>
         super.setTiles(tiles, /* collapsedView */ true);
     }
 
-    private void updateConfig() {
-        int maxTiles = getResources().getInteger(R.integer.quick_qs_panel_max_tiles);
-        int columns = getResources().getInteger(R.integer.quick_settings_num_columns);
-        columns = TileUtils.getQSColumnsCount(getContext(), columns);
-        mView.setMaxTiles(Math.max(columns, maxTiles));
-        setTiles();
-    }
+    // private void updateConfig() {
+    //     int maxTiles = getResources().getInteger(R.integer.quick_qs_panel_max_tiles);
+    //     int columns = getResources().getInteger(R.integer.quick_settings_num_columns);
+    //     columns = TileUtils.getQSColumnsCount(getContext(), columns);
+    //     mView.setMaxTiles(Math.max(columns, maxTiles));
+    //     setTiles();
+    // }
 
     public void setContentMargins(int marginStart, int marginEnd) {
         mView.setContentMargins(marginStart, marginEnd, mMediaHost.getHostView());
