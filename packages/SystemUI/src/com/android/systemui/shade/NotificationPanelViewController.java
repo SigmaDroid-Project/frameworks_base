@@ -325,6 +325,8 @@ public final class NotificationPanelViewController implements Dumpable {
             "system:" + Settings.System.RETICKER_COLORED;
     private static final String NOTIFICATION_MATERIAL_DISMISS =
             "system:" + Settings.System.NOTIFICATION_MATERIAL_DISMISS;
+    private static final String QS_UI_STYLE =
+            "system:" + Settings.System.QS_UI_STYLE;
 
     private static final Rect M_DUMMY_DIRTY_RECT = new Rect(0, 0, 1, 1);
     private static final Rect EMPTY_RECT = new Rect();
@@ -670,6 +672,8 @@ public final class NotificationPanelViewController implements Dumpable {
     private boolean mBlockedGesturalNavigation = false;
 
     private boolean mShowDimissButton;
+
+    private boolean mIsA11Style;
 
     private final Runnable mFlingCollapseRunnable = () -> fling(0, false /* expand */,
             mNextCollapseSpeedUpFactor, false /* expandBecauseOfFalsing */);
@@ -4661,6 +4665,7 @@ public final class NotificationPanelViewController implements Dumpable {
             mTunerService.addTunable(this, RETICKER_STATUS);
             mTunerService.addTunable(this, RETICKER_COLORED);
             mTunerService.addTunable(this, NOTIFICATION_MATERIAL_DISMISS);
+            mTunerService.addTunable(this, QS_UI_STYLE);
             // Theme might have changed between inflating this view and attaching it to the
             // window, so
             // force a call to onThemeChanged
@@ -4704,6 +4709,9 @@ public final class NotificationPanelViewController implements Dumpable {
                     mShowDimissButton =
                             TunerService.parseIntegerSwitch(newValue, false);
                     updateDismissAllVisibility();
+                    break;
+                case QS_UI_STYLE:
+                    mIsA11Style = TunerService.parseInteger(newValue, 0) == 1;
                     break;
                 default:
                     break;

@@ -6185,6 +6185,16 @@ public final class Settings {
         /**
          * @hide
          */
+        public static final String QS_LAYOUT = "qs_layout";
+
+        /**
+         * @hide
+         */
+        public static final String QQS_LAYOUT = "qqs_layout";
+
+        /**
+         * @hide
+         */
         public static final String VOLUME_MEDIA_OUTPUT_TOGGLE = "volume_media_output_toggle";
 
         /**
@@ -6193,6 +6203,11 @@ public final class Settings {
          */
         public static final String LOCKSCREEN_QUICK_UNLOCK_CONTROL =
                 "lockscreen_quick_unlock_control";
+
+        /**
+         * @hide
+         */
+        public static final String QS_UI_STYLE = "qs_ui_style";
 
         /**
          * Adaptive playback
