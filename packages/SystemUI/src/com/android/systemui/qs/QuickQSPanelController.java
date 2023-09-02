@@ -88,6 +88,7 @@ public class QuickQSPanelController extends QSPanelControllerBase<QuickQSPanel>
     protected void onInit() {
         super.onInit();
         updateMediaExpansion();
+        mView.updateColumns();
         mMediaHost.setShowsOnlyActiveMedia(true);
         mMediaHost.init(MediaHierarchyManager.LOCATION_QQS);
         mBrightnessSliderController.init();
@@ -125,6 +126,7 @@ public class QuickQSPanelController extends QSPanelControllerBase<QuickQSPanel>
             updateBrightnessMirror();
         });
 
+        mView.updateColumns();
         updateConfig();
         mBrightnessMirrorHandler.onQsPanelAttached();
     }
@@ -141,7 +143,9 @@ public class QuickQSPanelController extends QSPanelControllerBase<QuickQSPanel>
         int maxTiles = getResources().getInteger(R.integer.quick_qs_panel_max_tiles);
         int columns = getResources().getInteger(R.integer.quick_settings_num_columns);
         columns = TileUtils.getQSColumnsCount(getContext(), columns);
+        if (mView == null) return;
         mView.setMaxTiles(Math.max(columns, maxTiles));
+        mView.updateColumns();
         setTiles();
     }
 
