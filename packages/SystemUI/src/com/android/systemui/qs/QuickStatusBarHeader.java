@@ -107,6 +107,8 @@ public class QuickStatusBarHeader extends FrameLayout implements TunerService.Tu
     private int mColorAccent;
     private int mColorTextPrimary;
     private int mColorTextPrimaryInverse;
+    private View mStatusIconsView;
+    private View mDatePrivacyView;
 
     public QuickStatusBarHeader(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -182,6 +184,16 @@ public class QuickStatusBarHeader extends FrameLayout implements TunerService.Tu
             default:
                 break;
         }
+    }
+
+    /**
+     * Scroll the headers away.
+     *
+     * @param scrollY the scroll of the QSPanel container
+     */
+    public void setExpandedScrollAmount(int scrollY) {
+        mStatusIconsView.setScrollY(scrollY);
+        mDatePrivacyView.setScrollY(scrollY);
     }
 
     private void updateQSHeaderImage() {

@@ -89,6 +89,7 @@ public class QuickQSPanelController extends QSPanelControllerBase<QuickQSPanel>
         super.onInit();
         updateConfig();
         updateMediaExpansion();
+        mView.updateColumns();
         mMediaHost.setShowsOnlyActiveMedia(true);
         mMediaHost.init(MediaHierarchyManager.LOCATION_QQS);
         mBrightnessSliderController.init();
@@ -129,6 +130,8 @@ public class QuickQSPanelController extends QSPanelControllerBase<QuickQSPanel>
             updateBrightnessMirror();
         });
 
+        mView.updateColumns();
+
         mBrightnessMirrorHandler.onQsPanelAttached();
     }
 
@@ -161,6 +164,13 @@ public class QuickQSPanelController extends QSPanelControllerBase<QuickQSPanel>
 
     public boolean isListening() {
         return mView.isListening();
+    }
+
+    private void setMaxTiles(int parseNumTiles) {
+    	if (mView == null) return;
+        mView.setMaxTiles(parseNumTiles);
+        mView.updateColumns();
+        setTiles();
     }
 
     @Override

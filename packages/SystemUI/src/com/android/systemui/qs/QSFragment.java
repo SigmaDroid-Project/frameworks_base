@@ -93,6 +93,8 @@ public class QSFragment extends LifecycleFragment implements QS, CommandQueue.Ca
 
     private static final String QS_TRANSPARENCY =
             "system:" + Settings.System.QS_TRANSPARENCY;
+    private static final String QS_UI_STYLE =
+            "system:" + Settings.System.QS_UI_STYLE;
 
     private final Rect mQsBounds = new Rect();
     private final SysuiStatusBarStateController mStatusBarStateController;
@@ -115,6 +117,8 @@ public class QSFragment extends LifecycleFragment implements QS, CommandQueue.Ca
     private float mSquishinessFraction = 1;
     private boolean mQsDisabled;
     private int[] mLocationTemp = new int[2];
+    private int mQSPanelScrollY = 0;
+    private boolean isA11Style;
 
     private final RemoteInputQuickSettingsDisabler mRemoteInputQuickSettingsDisabler;
     private final MediaHost mQsMediaHost;
@@ -246,6 +250,9 @@ public class QSFragment extends LifecycleFragment implements QS, CommandQueue.Ca
         mQSPanelScrollView.setOnScrollChangeListener(
                 (v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
                     // Lazily update animators whenever the scrolling changes
+                    if (isA11Style) {
+                        mQSPanelScrollY = scrollY;
+                    }
                     mQSAnimator.requestAnimatorUpdate();
                     if (mScrollListener != null) {
                         mScrollListener.onQsPanelScrollChanged(scrollY);
@@ -295,6 +302,7 @@ public class QSFragment extends LifecycleFragment implements QS, CommandQueue.Ca
                 });
 
         mTunerService.addTunable(this, QS_TRANSPARENCY);
+        mTunerService.addTunable(this, QS_UI_STYLE);
     }
 
     private void bindFooterActionsView(View root) {
@@ -407,6 +415,9 @@ public class QSFragment extends LifecycleFragment implements QS, CommandQueue.Ca
             }
         }
         updateQsState();
+	if (isA11Style) {
+            mHeader.setExpandedScrollAmount(Math.max(mQSPanelScrollY, mQSPanelScrollView.getScrollY()));
+        }
     }
 
     @Override
@@ -432,6 +443,9 @@ public class QSFragment extends LifecycleFragment implements QS, CommandQueue.Ca
             case QS_TRANSPARENCY:
                 mCustomAlpha =
                         TunerService.parseInteger(newValue, 100) / 100f;
+                break;
+            case QS_UI_STYLE:
+                isA11Style = TunerService.parseInteger(newValue, 0) == 1;
                 break;
             default:
                 break;

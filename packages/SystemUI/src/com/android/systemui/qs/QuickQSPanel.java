@@ -44,6 +44,14 @@ public class QuickQSPanel extends QSPanel implements TunerService.Tunable {
 
     private static final int NUM_COLUMNS_ID = R.integer.quick_settings_num_columns;
 
+    // Tile Columns on normal conditions
+    public int mMaxColumnsLandscape = 6;
+    public int mMaxColumnsPortrait = 6;
+    // Tile Columns when media player is visible
+    public int mMaxColumnsMediaPlayer = 4;
+    // Tile Rows for portrait mode on normal conditions
+    public int mMaxRowsPortrait = 2;
+
     private boolean mDisabledByPolicy;
     private int mMaxTiles;
     private int mColumns;
@@ -51,6 +59,10 @@ public class QuickQSPanel extends QSPanel implements TunerService.Tunable {
     public QuickQSPanel(Context context, AttributeSet attrs) {
         super(context, attrs);
         mMaxTiles = getResources().getInteger(R.integer.quick_qs_panel_max_tiles);
+        mMaxColumnsLandscape = getResources().getInteger(R.integer.quick_qs_panel_num_columns_landscape);
+        mMaxColumnsMediaPlayer = getResources().getInteger(R.integer.quick_qs_panel_num_columns_media);
+        mMaxColumnsPortrait = getResources().getInteger(R.integer.quick_settings_num_columns_custom);
+        mMaxRowsPortrait = getResources().getInteger(R.integer.quick_settings_max_rows_custom);
         setMaxTiles(mMaxTiles);
     }
 
@@ -58,6 +70,7 @@ public class QuickQSPanel extends QSPanel implements TunerService.Tunable {
     protected void setHorizontalContentContainerClipping() {
         mHorizontalContentContainer.setClipToPadding(false);
         mHorizontalContentContainer.setClipChildren(false);
+        updateColumns();
     }
 
 
@@ -152,6 +165,19 @@ public class QuickQSPanel extends QSPanel implements TunerService.Tunable {
             state = copy;
         }
         super.drawTile(r, state);
+    }
+
+    public void updateColumns() {
+    	boolean isLandscape = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
+
+        int mColumnsMediaPlayer = mUsingHorizontalLayout ?
+            mMaxColumnsMediaPlayer :
+            mMaxColumnsLandscape;
+
+        int mRowsMediaPlayer = mUsingHorizontalLayout ? 2 : 1;
+
+	mTileLayout.setMinRows(isLandscape ? mRowsMediaPlayer : mMaxRowsPortrait);
+        mTileLayout.setMaxColumns(isLandscape ? mColumnsMediaPlayer : mMaxColumnsPortrait);
     }
 
     public void setMaxTiles(int maxTiles) {
