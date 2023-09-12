@@ -129,27 +129,6 @@ open class QSTileViewImpl @JvmOverloads constructor(
     private val colorSecondaryLabelUnavailable =
         Utils.getColorAttrDefaultColor(context, com.android.internal.R.attr.textColorTertiary)
 
-    // QS Style 2
-    private val colorActiveAlpha = ContextCompat.getColorStateList(context, R.drawable.color_accent_alpha)?.defaultColor ?: Utils.applyAlpha(TILE_ALPHA, Utils.getColorAttrDefaultColor(context, android.R.attr.colorAccent))
-    private val colorInactiveAlpha = offStateAlpha
-
-    // QS Style 3
-    private var randomColor: Random = Random()
-
-    // QS Style 8
-    private val colorActiveSurround = resources.getColor(R.color.qs_white_bg)
-
-    @SuppressLint("NewApi")
-    private var randomTint: Int = Color.rgb(
-        (randomColor.nextInt(256) / 2f + 0.5).toFloat(),
-        randomColor.nextInt(256).toFloat(),
-        randomColor.nextInt(256).toFloat()
-    )
-
-    private val colorActiveRandom = Utils.applyAlpha(TILE_ALPHA, randomTint)
-    private val colorLabelActiveRandom = randomTint
-    private val colorSecondaryLabelActiveRandom = randomTint
-
     private lateinit var label: TextView
     protected lateinit var secondaryLabel: TextView
     private lateinit var labelContainer: IgnorableChildLinearLayout
@@ -692,17 +671,12 @@ open class QSTileViewImpl @JvmOverloads constructor(
         return locInScreen.get(1) >= -height
     }
 
-    private fun getBackgroundColorForState(state: Int, disabledByPolicy: Boolean = false): Int {
+        private fun getBackgroundColorForState(state: Int, disabledByPolicy: Boolean = false): Int {
         currentState = state
         return when {
             state == Tile.STATE_UNAVAILABLE || disabledByPolicy -> colorUnavailable
-            state == Tile.STATE_ACTIVE ->
-                if(qsPanelStyle == 2 || qsPanelStyle == 10)
-                    colorActiveAlpha
-                else if(qsPanelStyle == 3)
-                    colorActiveRandom
-                else colorActive
-            state == Tile.STATE_INACTIVE -> if(qsPanelStyle >= 1) colorInactiveAlpha else colorInactive
+            state == Tile.STATE_ACTIVE -> colorActive
+            state == Tile.STATE_INACTIVE -> colorInactive
             else -> {
                 Log.e(TAG, "Invalid state $state")
                 0
@@ -713,14 +687,7 @@ open class QSTileViewImpl @JvmOverloads constructor(
     private fun getLabelColorForState(state: Int, disabledByPolicy: Boolean = false): Int {
         return when {
             state == Tile.STATE_UNAVAILABLE || disabledByPolicy -> colorLabelUnavailable
-            state == Tile.STATE_ACTIVE ->
-                if(qsPanelStyle == 1 || qsPanelStyle == 2 || qsPanelStyle == 10)
-                    colorActive
-                else if(qsPanelStyle == 3)
-                    colorLabelActiveRandom
-                else if(qsPanelStyle == 4 || qsPanelStyle == 6 || qsPanelStyle == 8 || qsPanelStyle == 9)
-                    colorActiveSurround
-                else colorLabelActive
+            state == Tile.STATE_ACTIVE -> colorLabelActive
             state == Tile.STATE_INACTIVE -> colorLabelInactive
             else -> {
                 Log.e(TAG, "Invalid state $state")
@@ -732,14 +699,7 @@ open class QSTileViewImpl @JvmOverloads constructor(
     private fun getSecondaryLabelColorForState(state: Int, disabledByPolicy: Boolean = false): Int {
         return when {
             state == Tile.STATE_UNAVAILABLE || disabledByPolicy -> colorSecondaryLabelUnavailable
-            state == Tile.STATE_ACTIVE ->
-                if(qsPanelStyle == 1 || qsPanelStyle == 2 || qsPanelStyle == 10)
-                    colorActive
-                else if(qsPanelStyle == 3)
-                    colorSecondaryLabelActiveRandom
-                else if(qsPanelStyle == 4 || qsPanelStyle == 6 || qsPanelStyle == 8 || qsPanelStyle == 9)
-                    colorActiveSurround
-                else colorSecondaryLabelActive
+            state == Tile.STATE_ACTIVE -> colorSecondaryLabelActive
             state == Tile.STATE_INACTIVE -> colorSecondaryLabelInactive
             else -> {
                 Log.e(TAG, "Invalid state $state")
