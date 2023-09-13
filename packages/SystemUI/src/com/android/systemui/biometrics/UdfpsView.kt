@@ -62,6 +62,8 @@ class UdfpsView(
         }
 
     private var ghbmView: UdfpsSurfaceView? = null
+    private val needsIlluminationDot =
+            context.resources.getBoolean(R.bool.config_udfpsNeedsIlluminationDot)
 
     /** View controller (can be different for enrollment, BiometricPrompt, Keyguard, etc.). */
     var animationViewController: UdfpsAnimationViewController<*>? = null
@@ -91,6 +93,10 @@ class UdfpsView(
 
     override fun onFinishInflate() {
         ghbmView = findViewById(R.id.hbm_view)
+        if (!needsIlluminationDot) {
+            val view = ghbmView
+            view?.visibility = GONE
+        }
     }
 
     override fun dozeTimeTick() {
@@ -156,13 +162,18 @@ class UdfpsView(
     fun configureDisplay(onDisplayConfigured: Runnable) {
         isDisplayConfigured = true
         animationViewController?.onDisplayConfiguring()
-        val gView = ghbmView
-        if (gView != null) {
-            gView.setGhbmIlluminationListener(this::doIlluminate)
-            gView.visibility = VISIBLE
-            gView.startGhbmIllumination(onDisplayConfigured)
-        } else {
-            doIlluminate(null /* surface */, onDisplayConfigured)
+        if (needsIlluminationDot) {
+            val gView = ghbmView
+            if (gView != null) {
+                gView.setGhbmIlluminationListener(this::doIlluminate)
+                gView.visibility = VISIBLE
+                gView.startGhbmIllumination(onDisplayConfigured)
+            } else {
+                doIlluminate(null /* surface */, onDisplayConfigured)
+            }
+        }
+        else {
+            mUdfpsDisplayMode?.enable(onDisplayConfigured)
         }
     }
 
@@ -180,9 +191,11 @@ class UdfpsView(
     fun unconfigureDisplay() {
         isDisplayConfigured = false
         animationViewController?.onDisplayUnconfigured()
-        ghbmView?.let { view ->
-            view.setGhbmIlluminationListener(null)
-            view.visibility = INVISIBLE
+        if (needsIlluminationDot) {
+            ghbmView?.let { view ->
+                view.setGhbmIlluminationListener(null)
+                view.visibility = INVISIBLE
+            }
         }
         mUdfpsDisplayMode?.disable(null /* onDisabled */)
     }

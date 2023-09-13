@@ -5,4 +5,7 @@
     <!-- Whether to trigger OnFingerDown with regular action down events -->
     <bool name="config_udfpsNeedsFingerDownOnActionDown">true</bool>
 
+    <!-- Whether the device needs illumination dot for global HBM -->
+    <bool name="config_udfpsNeedsIlluminationDot">true</bool>
+
 </resources>
