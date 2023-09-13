@@ -250,6 +250,7 @@ public class UdfpsController implements DozeReceiver, Dumpable {
     private int mFrameworkDimmingDelay;
 
     private UdfpsAnimation mUdfpsAnimation;
+    private boolean mNeedsFingerDownOnActionDown;
 
     @VisibleForTesting
     public static final VibrationAttributes UDFPS_VIBRATION_ATTRIBUTES =
@@ -1028,6 +1029,8 @@ public class UdfpsController implements DozeReceiver, Dumpable {
         if (com.android.internal.util.crdroid.Utils.isPackageInstalled(mContext, "com.crdroid.udfps.animations")) {
             mUdfpsAnimation = new UdfpsAnimation(mContext, mWindowManager, mSensorProps);
         }
+        mNeedsFingerDownOnActionDown = mContext.getResources().getBoolean(
+                R.bool.config_udfpsNeedsFingerDownOnActionDown);
     }
 
     private void updateScreenOffFodState() {
