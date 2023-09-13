@@ -2,4 +2,7 @@
 
 <resources>
 
+    <!-- Whether to trigger OnFingerDown with regular action down events -->
+    <bool name="config_udfpsNeedsFingerDownOnActionDown">true</bool>
+
 </resources>
