@@ -20,6 +20,7 @@ import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Point
+import android.os.AsyncTask
 import android.os.Handler
 import android.os.SystemClock
 import android.os.VibrationEffect
@@ -35,6 +36,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.core.os.postDelayed
 import androidx.core.view.isVisible
 import androidx.dynamicanimation.animation.DynamicAnimation
+import com.android.internal.policy.GestureNavigationSettingsObserver
 import com.android.internal.util.LatencyTracker
 import com.android.systemui.dagger.qualifiers.Main
 import com.android.systemui.plugins.NavigationEdgeBackPlugin
@@ -64,10 +66,13 @@ private const val FAILSAFE_DELAY_MS = 350L
 private const val POP_ON_FLING_DELAY = 140L
 
 internal val VIBRATE_ACTIVATED_EFFECT =
-        VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK)
+        VibrationEffect.createPredefined(VibrationEffect.EFFECT_TICK)
 
 internal val VIBRATE_DEACTIVATED_EFFECT =
         VibrationEffect.createPredefined(VibrationEffect.EFFECT_TICK)
+
+internal val VIBRATE_ACTIVATED_LONG_SWIPE_EFFECT =
+        VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK)
 
 private const val DEBUG = false
 
@@ -156,6 +161,7 @@ class BackPanelController internal constructor(
         get() = SystemClock.uptimeMillis() - gestureEntryTime
 
     private var mBackArrowVisibility = true
+    private var mHapticFeedbackEnabled = false;
 
     private var mIsLongSwipe = false
     private var mLongSwipeEnabled = false
@@ -168,6 +174,9 @@ class BackPanelController internal constructor(
     private var hasPassedDragSlop = false
 
     private val failsafeRunnable = Runnable { onFailsafe() }
+
+    private val hapticFeedbackRunnable = Runnable { onHapticFeedbackChanged() }
+    private lateinit var mGestureNavigationSettingsObserver : GestureNavigationSettingsObserver
 
     internal enum class GestureState {
         /* Arrow is off the screen and invisible */
@@ -262,6 +271,7 @@ class BackPanelController internal constructor(
         updateArrowState(GestureState.GONE, force = true)
         updateRestingArrowDimens()
         configurationController.addCallback(configurationListener)
+        mGestureNavigationSettingsObserver.register()
     }
 
     /** Update the arrow direction. The arrow should point the same way for both panels. */
@@ -271,6 +281,7 @@ class BackPanelController internal constructor(
 
     override fun onViewDetached() {
         configurationController.removeCallback(configurationListener)
+        mGestureNavigationSettingsObserver.unregister()
     }
 
     override fun onMotionEvent(event: MotionEvent) {
@@ -631,8 +642,12 @@ class BackPanelController internal constructor(
 
     private fun triggerVibration(longswipe: Boolean) {
         vibratorHelper?.takeIf { longswipe }?.let {
-            val effect = VibrationEffect.createPredefined(VibrationEffect.EFFECT_DOUBLE_CLICK)
-            AsyncTask.execute { it.vibrate(effect) }
+            if (mHapticFeedbackEnabled) {
+                AsyncTask.execute {
+                    it.vibrate(VIBRATE_ACTIVATED_LONG_SWIPE_EFFECT)
+
+                }
+            }
         }
     }
 
@@ -888,9 +903,11 @@ class BackPanelController internal constructor(
 
                 updateRestingArrowDimens()
 
-                vibratorHelper.cancel()
-                mainHandler.postDelayed(10L) {
-                    vibratorHelper.vibrate(VIBRATE_ACTIVATED_EFFECT)
+                if (mHapticFeedbackEnabled) {
+                    vibratorHelper.cancel()
+                    mainHandler.postDelayed(10L) {
+                        vibratorHelper.vibrate(VIBRATE_ACTIVATED_EFFECT)
+                    }
                 }
 
                 val startingVelocity = convertVelocityToSpringStartingVelocity(
@@ -926,7 +943,9 @@ class BackPanelController internal constructor(
                 )
                 mView.popOffEdge(startingVelocity)
 
-                vibratorHelper.vibrate(VIBRATE_DEACTIVATED_EFFECT)
+                if (mHapticFeedbackEnabled) {
+                    vibratorHelper.vibrate(VIBRATE_DEACTIVATED_EFFECT)
+                }
                 updateRestingArrowDimens()
             }
             GestureState.FLUNG -> {
@@ -958,6 +977,10 @@ class BackPanelController internal constructor(
 
     override fun setBackArrowVisibility(backArrowVisibility : Boolean) {
         mBackArrowVisibility = backArrowVisibility;
+    }
+
+    private fun onHapticFeedbackChanged() {
+        mHapticFeedbackEnabled = mGestureNavigationSettingsObserver.getEdgeHapticEnabled()
     }
 
     private fun convertVelocityToSpringStartingVelocity(
@@ -996,6 +1019,9 @@ class BackPanelController internal constructor(
     }
 
     init {
+        mGestureNavigationSettingsObserver = GestureNavigationSettingsObserver(
+                mainHandler, context, hapticFeedbackRunnable)
+
         if (DEBUG) mView.drawDebugInfo = { canvas ->
             val debugStrings = listOf(
                     "$currentState",
