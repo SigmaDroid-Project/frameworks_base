@@ -436,9 +436,9 @@ class BackPanelController internal constructor(
         // occurs between the screen edge and the touch start.
         val xTranslation = max(0f, if (mView.isLeftPanel) x - startX else startX - x)
 
-        val MIN_SWIPE_DURATION = 700
+        val MIN_LONG_SWIPE_DURATION = 1000
         val swipeDuration = System.currentTimeMillis() - mSwipeStartTime
-        mIsLongSwipe = MathUtils.abs(xTranslation) > mLongSwipeThreshold && swipeDuration > MIN_SWIPE_DURATION
+        mIsLongSwipe = MathUtils.abs(xTranslation) > mLongSwipeThreshold && swipeDuration > MIN_LONG_SWIPE_DURATION
 
         // Compared to last time, how far we moved in the x direction. If <0, we are moving closer
         // to the edge. If >0, we are moving further from the edge
@@ -633,20 +633,19 @@ class BackPanelController internal constructor(
     private fun setTriggerLongSwipe(triggerLongSwipe: Boolean) {
         if (mTriggerLongSwipe == triggerLongSwipe) return
         mTriggerLongSwipe = triggerLongSwipe
-        triggerVibration(mTriggerLongSwipe)
+        if (triggerLongSwipe) {
+            triggerVibration(VIBRATE_ACTIVATED_LONG_SWIPE_EFFECT)
+        }
         cancelFailsafe()
         mView.cancelAnimations()
         updateConfiguration()
         backCallback.setTriggerLongSwipe(mTriggerLongSwipe)
     }
 
-    private fun triggerVibration(longswipe: Boolean) {
-        vibratorHelper?.takeIf { longswipe }?.let {
-            if (mHapticFeedbackEnabled) {
-                AsyncTask.execute {
-                    it.vibrate(VIBRATE_ACTIVATED_LONG_SWIPE_EFFECT)
-
-                }
+    private fun triggerVibration(effect: VibrationEffect) {
+        if (mHapticFeedbackEnabled) {
+            AsyncTask.execute {
+                vibratorHelper?.vibrate(effect)
             }
         }
     }
@@ -905,9 +904,7 @@ class BackPanelController internal constructor(
 
                 if (mHapticFeedbackEnabled) {
                     vibratorHelper.cancel()
-                    mainHandler.postDelayed(10L) {
-                        vibratorHelper.vibrate(VIBRATE_ACTIVATED_EFFECT)
-                    }
+                    triggerVibration(VIBRATE_ACTIVATED_EFFECT)
                 }
 
                 val startingVelocity = convertVelocityToSpringStartingVelocity(
@@ -944,7 +941,7 @@ class BackPanelController internal constructor(
                 mView.popOffEdge(startingVelocity)
 
                 if (mHapticFeedbackEnabled) {
-                    vibratorHelper.vibrate(VIBRATE_DEACTIVATED_EFFECT)
+                    triggerVibration(VIBRATE_DEACTIVATED_EFFECT)
                 }
                 updateRestingArrowDimens()
             }
