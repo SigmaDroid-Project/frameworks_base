@@ -6481,6 +6481,12 @@ public final class Settings {
          */
         public static final String STATUSBAR_TOP_PADDING = "statusbar_top_padding";
 
+        /**
+         * Whether to show/hide text percentage view on brightness bar
+         * @hide
+         */
+         public static final String SHOW_BRIGHTNESS_BAR_PERCENTAGE = "show_brightness_bar_percentage";
+
 
         /**
          * @hide
@@ -6607,6 +6613,7 @@ public final class Settings {
             PRIVATE_SETTINGS.add(QS_HEADER_IMAGE_PADDING_SIDE);
             PRIVATE_SETTINGS.add(QS_HEADER_IMAGE_PADDING_TOP);
             PRIVATE_SETTINGS.add(QS_HEADER_IMAGE_URI);
+            PRIVATE_SETTINGS.add(SHOW_BRIGHTNESS_BAR_PERCENTAGE);
         }
 
         /**

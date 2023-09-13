@@ -98,6 +98,7 @@ public class SystemSettings {
         Settings.System.QS_HEADER_IMAGE_LANDSCAPE_ENABLED,
         Settings.System.QS_HEADER_IMAGE_PADDING_SIDE,
         Settings.System.QS_HEADER_IMAGE_PADDING_TOP,
-        Settings.System.QS_HEADER_IMAGE_URI
+        Settings.System.QS_HEADER_IMAGE_URI,
+        Settings.System.SHOW_BRIGHTNESS_BAR_PERCENTAGE
     };
 }

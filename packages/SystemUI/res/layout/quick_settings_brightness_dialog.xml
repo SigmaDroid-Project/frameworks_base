@@ -38,12 +38,25 @@
             android:splitTrack="false"
         />
 
+        <TextView
+            android:id="@+id/brightness_percentage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/bb_percentage_margin_left"
+            android:layout_gravity="center_vertical"
+            android:gravity="center"
+            android:text="Text"
+            android:textSize="13.5sp"
+            android:textColor="@color/qs_color_button_brightness"
+            android:background="@drawable/brightness_bg"
+        />
+
         <ImageButton
             android:id="@+id/brightness_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginStart="20.0dip"
+            android:layout_marginStart="@dimen/bb_percentage_margin_left"
             android:background="@drawable/brightness_bg"
             android:src="@drawable/ic_qs_brightness_auto_off"
             android:tint="@color/qs_color_button_brightness"

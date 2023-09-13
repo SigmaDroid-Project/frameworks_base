@@ -29,4 +29,8 @@
     <!-- FPSInfo view -->
     <dimen name="fps_info_margin_top">120dp</dimen>
 
+    <!-- Brightness bar percentage  -->
+    <dimen name="bb_percentage_margin_left">8dp</dimen>
+    <dimen name="bb_percentage_margin_right">0dp</dimen>
+
 </resources>
