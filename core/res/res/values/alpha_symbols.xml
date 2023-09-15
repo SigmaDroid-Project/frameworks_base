@@ -90,4 +90,7 @@
     <!-- Boost framework flag -->
     <java-symbol type="bool" name="config_supportsBoostFramework" />
 
+    <!-- Smart 5G -->
+    <java-symbol type="bool" name="config_supportSmart5G" />
+
 </resources>

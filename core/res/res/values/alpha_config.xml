@@ -156,4 +156,7 @@
     <!-- Boost Framework -->
     <bool name="config_supportsBoostFramework">false</bool>
 
+    <!-- Smart 5G -->
+    <bool name="config_supportSmart5G">false</bool>
+
 </resources>
