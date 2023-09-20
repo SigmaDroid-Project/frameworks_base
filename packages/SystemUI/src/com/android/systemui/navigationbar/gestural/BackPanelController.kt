@@ -169,6 +169,16 @@ class BackPanelController internal constructor(
     private var mSwipeStartTime: Long = 0
     private var mTriggerLongSwipe = false
 
+    private val vibrationEffectsMap = mapOf(
+        1 to VibrationEffect.createPredefined(VibrationEffect.EFFECT_TEXTURE_TICK),
+        2 to VibrationEffect.createPredefined(VibrationEffect.EFFECT_TICK),
+        3 to VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK),
+        4 to VibrationEffect.createPredefined(VibrationEffect.EFFECT_DOUBLE_CLICK),
+        5 to VibrationEffect.createPredefined(VibrationEffect.EFFECT_HEAVY_CLICK)
+    )
+
+    private val fallbackVibEffect = VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK);
+
     // Whether the current gesture has moved a sufficiently large amount,
     // so that we can unambiguously start showing the ENTRY animation
     private var hasPassedDragSlop = false
@@ -969,6 +979,17 @@ class BackPanelController internal constructor(
 
     override fun setBackArrowVisibility(backArrowVisibility : Boolean) {
         mBackArrowVisibility = backArrowVisibility;
+    }
+
+    private fun triggerVibration() {
+        if (vibratorHelper == null || mEdgeHapticIntensity == 0) {
+            return
+        }
+
+        val effect = vibrationEffectsMap[mEdgeHapticIntensity]
+            ?: fallbackVibEffect
+
+        AsyncTask.execute { vibratorHelper.vibrate(effect) }
     }
 
     private fun onHapticFeedbackChanged() {
