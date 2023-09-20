@@ -161,7 +161,7 @@ class BackPanelController internal constructor(
         get() = SystemClock.uptimeMillis() - gestureEntryTime
 
     private var mBackArrowVisibility = true
-    private var mHapticFeedbackEnabled = false;
+    private var mHapticFeedbackEnabled = true;
 
     private var mIsLongSwipe = false
     private var mLongSwipeEnabled = false
@@ -271,6 +271,8 @@ class BackPanelController internal constructor(
         updateArrowState(GestureState.GONE, force = true)
         updateRestingArrowDimens()
         configurationController.addCallback(configurationListener)
+        mGestureNavigationSettingsObserver = GestureNavigationSettingsObserver(
+                mainHandler, context, hapticFeedbackRunnable)
         mGestureNavigationSettingsObserver.register()
     }
 
@@ -1016,9 +1018,6 @@ class BackPanelController internal constructor(
     }
 
     init {
-        mGestureNavigationSettingsObserver = GestureNavigationSettingsObserver(
-                mainHandler, context, hapticFeedbackRunnable)
-
         if (DEBUG) mView.drawDebugInfo = { canvas ->
             val debugStrings = listOf(
                     "$currentState",
