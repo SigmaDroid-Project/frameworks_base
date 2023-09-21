@@ -55,13 +55,12 @@ class BurnInProtectionController @Inject constructor(
 
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
 
-    private val shiftEnabled = context.resources.getBoolean(com.android.internal.R.bool.config_enableBurnInProtection)
-
     private var navigationMode: Int = navigationModeController.addListener(this)
 
     private var centralSurfaces: CentralSurfaces? = null
     private var phoneStatusBarView: PhoneStatusBarView? = null
 
+    private var shiftEnabled = false
     private var shiftJob: Job? = null
 
     private var maxStatusBarOffsetX = 0
@@ -82,6 +81,7 @@ class BurnInProtectionController @Inject constructor(
 
     private fun loadResources()  {
         with(context.resources) {
+            shiftEnabled = getBoolean(com.android.internal.R.bool.config_enableBurnInProtection)
             maxStatusBarOffsetX = minOf(
                 getDimensionPixelSize(R.dimen.status_bar_padding_start),
                 getDimensionPixelSize(R.dimen.status_bar_padding_end)
@@ -123,27 +123,28 @@ class BurnInProtectionController @Inject constructor(
     }
 
     fun startShiftTimer() {
-        if (!shiftEnabled || (shiftJob?.isActive == true)) return
-        shiftJob = coroutineScope.launch {
-            while (isActive) {
-                val sbOffset = Offset(
-                    getBurnInOffsetX(maxStatusBarOffsetX),
-                    getBurnInOffsetY(maxStatusBarOffsetY)
-                )
-                val nbOffset = if (isGesturalMode()) {
-                    Offset(0, getBurnInOffsetY(maxNavBarShiftY))
-                } else {
-                    Offset(getBurnInOffsetX(maxNavBarShiftX), getBurnInOffsetY(maxNavBarShiftY))
+        if (shiftEnabled == true && (shiftJob?.isActive != true)) {
+            shiftJob = coroutineScope.launch {
+                while (isActive) {
+                    val sbOffset = Offset(
+                        getBurnInOffsetX(maxStatusBarOffsetX),
+                        getBurnInOffsetY(maxStatusBarOffsetY)
+                    )
+                    val nbOffset = if (isGesturalMode()) {
+                        Offset(0, getBurnInOffsetY(maxNavBarShiftY))
+                    } else {
+                        Offset(getBurnInOffsetX(maxNavBarShiftX), getBurnInOffsetY(maxNavBarShiftY))
+                    }
+                    logD {
+                        "new offsets: sbOffset = $sbOffset, nbOffset = $nbOffset"
+                    }
+                    updateViews(sbOffset, nbOffset)
+                    delay(UPDATE_INTERVAL)
                 }
-                logD {
-                    "new offsets: sbOffset = $sbOffset, nbOffset = $nbOffset"
-                }
-                updateViews(sbOffset, nbOffset)
-                delay(UPDATE_INTERVAL)
             }
-        }
-        logD {
-            "Started shift job"
+            logD {
+                "Started shift job"
+            }
         }
     }
 
@@ -165,15 +166,16 @@ class BurnInProtectionController @Inject constructor(
     }
 
     fun stopShiftTimer() {
-        if (!shiftEnabled || (shiftJob?.isActive != true)) return
-        logD {
-            "Cancelling shift job"
-        }
-        coroutineScope.launch {
-            shiftJob?.cancelAndJoin()
-            updateViews(Offset.Zero, Offset.Zero)
+        if (shiftEnabled == true && (shiftJob?.isActive == true)) {
             logD {
-                "Cancelled shift job"
+                "Cancelling shift job"
+            }
+            coroutineScope.launch {
+                shiftJob?.cancelAndJoin()
+                updateViews(Offset.Zero, Offset.Zero)
+                logD {
+                    "Cancelled shift job"
+                }
             }
         }
     }
