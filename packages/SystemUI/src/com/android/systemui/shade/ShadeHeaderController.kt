@@ -567,6 +567,7 @@ constructor(
             date.setTextColor(textColorPrimary)
             qsCarrierGroup.updateColors(textColorPrimary, colorStateList)
             batteryIcon.updateColors(textColorPrimary, textColorSecondary, textColorPrimary)
+            clock.updateClockSize()
         }
     }
 

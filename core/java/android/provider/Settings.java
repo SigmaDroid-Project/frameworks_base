@@ -3285,7 +3285,10 @@ public final class Settings {
         public ArrayMap<String, String> getStringsForPrefix(ContentResolver cr, String prefix,
                 List<String> names) {
             String namespace = prefix.substring(0, prefix.length() - 1);
-            DeviceConfig.enforceReadPermission(ActivityThread.currentApplication(), namespace);
+            String currentPackageName = cr.getPackageName();
+            if (currentPackageName != null && !currentPackageName.startsWith("com.google.android.")) {
+                DeviceConfig.enforceReadPermission(ActivityThread.currentApplication(), namespace);
+            }
             ArrayMap<String, String> keyValues = new ArrayMap<>();
             int currentGeneration = -1;
 
@@ -5744,6 +5747,18 @@ public final class Settings {
         public static final String ROAMING_INDICATOR_ICON = "roaming_indicator_icon";
 
         /**
+         * Clock font color
+         * @hide
+         */
+        public static final String STATUS_BAR_CLOCK_COLOR = "status_bar_clock_color";
+
+        /**
+         * Clock font style
+         * @hide
+         */
+        public static final String STATUS_BAR_CLOCK_FONT_STYLE = "status_bar_clock_font_style";
+
+        /**
          * Whether to display 4G icon instead LTE
          * @hide
          */
@@ -6439,6 +6454,12 @@ public final class Settings {
         public static final String QS_HEADER_IMAGE_URI = "qs_header_image_uri";
 
         /**
+         * Use doubletap as doze pulse triggers
+         * @hide
+         */
+        public static final String DOZE_TRIGGER_DOUBLETAP = "doze_trigger_doubletap";
+
+        /**
          * Keys we no longer back up under the current schema, but want to continue to
          * process when restoring historical backup datasets.
          *
@@ -6457,6 +6478,24 @@ public final class Settings {
         public static final String CUSTOM_TRANSITIONS_KEY = "custom_transitions_page_tile";
 
         /**
+         * Whether to enable smart 5G mode
+         * @hide
+         */
+        public static final String SMART_5G = "smart_5g";
+
+        /**
+         * Clock font size
+         * @hide
+         */
+        public static final String STATUS_BAR_CLOCK_SIZE = "status_bar_clock_size";
+
+        /**
+         * Clock font size QS
+         * @hide
+         */
+        public static final String QS_HEADER_CLOCK_SIZE = "qs_header_clock_size";
+
+       /**
          * These are all public system settings
          *
          * @hide
@@ -6480,6 +6519,12 @@ public final class Settings {
          * @hide
          */
         public static final String STATUSBAR_TOP_PADDING = "statusbar_top_padding";
+
+        /**
+         * Whether to show/hide text percentage view on brightness bar
+         * @hide
+         */
+         public static final String SHOW_BRIGHTNESS_BAR_PERCENTAGE = "show_brightness_bar_percentage";
 
 
         /**
@@ -6607,6 +6652,7 @@ public final class Settings {
             PRIVATE_SETTINGS.add(QS_HEADER_IMAGE_PADDING_SIDE);
             PRIVATE_SETTINGS.add(QS_HEADER_IMAGE_PADDING_TOP);
             PRIVATE_SETTINGS.add(QS_HEADER_IMAGE_URI);
+            PRIVATE_SETTINGS.add(SHOW_BRIGHTNESS_BAR_PERCENTAGE);
         }
 
         /**
@@ -9917,6 +9963,28 @@ public final class Settings {
         public static final String DOZE_ALWAYS_ON = "doze_always_on";
 
         /**
+         * Indicates whether doze turns on automatically
+         * 0 = disabled (default)
+         * 1 = from sunset to sunrise
+         * 2 = custom time
+         * 3 = from sunset till a time
+         * 4 = from a time till sunrise
+         * @hide
+         */
+        @Readable
+        public static final String DOZE_ALWAYS_ON_AUTO_MODE = "doze_always_on_auto_mode";
+
+        /**
+         * The custom time {@link DOZE_ALWAYS_ON} should be on at
+         * Only relevant when {@link DOZE_ALWAYS_ON_AUTO_MODE} is set to 2 and above
+         * 0 = Disabled (default)
+         * format: HH:mm,HH:mm (since,till)
+         * @hide
+         */
+        @Readable
+        public static final String DOZE_ALWAYS_ON_AUTO_TIME = "doze_always_on_auto_time";
+
+        /**
          * Whether the device should pulse on pick up gesture.
          * @hide
          */
@@ -12373,6 +12441,37 @@ public final class Settings {
          */
         @Readable
         public static final String WINDOW_IGNORE_SECURE = "window_ignore_secure";
+
+        /**
+         * Whether to show ambient instead of waking for the dt2w gesture
+         * @hide
+         */
+        public static final String DOZE_DOUBLE_TAP_GESTURE_AMBIENT = "doze_double_tap_gesture_ambient";
+
+        /**
+         * Whether to show ambient instead of waking for the pickup gesture
+         * Do note quick pickup (device sensor) is already configured to do that
+         * @hide
+         */
+        public static final String DOZE_PICK_UP_GESTURE_AMBIENT = "doze_pick_up_gesture_ambient";
+
+       /**
+         * Whether to show ambient instead of waking for the tap gesture
+         * @hide
+         */
+        public static final String DOZE_SINGLE_TAP_GESTURE_AMBIENT = "doze_single_tap_gesture_ambient";
+
+        /**
+         * Whether to trigger doze for new notifications
+         * @hide
+         */
+        public static final String DOZE_FOR_NOTIFICATIONS = "doze_for_notifications";
+
+        /**
+         * Whether to always show the time on media controls
+         * @hide
+         */
+        public static final String MEDIA_CONTROLS_ALWAYS_SHOW_TIME = "media_controls_always_show_time";
 
         /**
          * These entries are considered common between the personal and the managed profile,
@@ -19243,7 +19342,7 @@ public final class Settings {
          * @hide
          */
         @RequiresPermission(Manifest.permission.WRITE_DEVICE_CONFIG)
-        static boolean putString(@NonNull ContentResolver resolver, @NonNull String namespace,
+        public static boolean putString(@NonNull ContentResolver resolver, @NonNull String namespace,
                 @NonNull String name, @Nullable String value, boolean makeDefault) {
             return sNameValueCache.putStringForUser(resolver, createCompositeName(namespace, name),
                     value, null, makeDefault, resolver.getUserId(),

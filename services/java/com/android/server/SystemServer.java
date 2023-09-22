@@ -125,6 +125,7 @@ import com.android.server.contentcapture.ContentCaptureManagerInternal;
 import com.android.server.coverage.CoverageService;
 import com.android.server.devicepolicy.DevicePolicyManagerService;
 import com.android.server.devicestate.DeviceStateManagerService;
+import com.android.server.display.AutoAODService;
 import com.android.server.display.DisplayManagerService;
 import com.android.server.display.color.ColorDisplayService;
 import com.android.server.dreams.DreamManagerService;
@@ -209,6 +210,7 @@ import com.android.server.twilight.TwilightService;
 import com.android.server.uri.UriGrantsManagerService;
 import com.android.server.usage.UsageStatsService;
 import com.android.server.utils.TimingsTraceAndSlog;
+import com.android.server.custom.CustomDeviceConfigService;
 import com.android.server.vibrator.LinearmotorVibratorService;
 import com.android.server.vibrator.VibratorManagerService;
 import com.android.server.vr.VrManagerService;
@@ -1683,6 +1685,18 @@ public final class SystemServer implements Dumpable {
             mSystemServiceManager.startService(LogcatManagerService.class);
             t.traceEnd();
 
+            if (context.getResources().getBoolean(R.bool.config_supportSmart5G)) {
+                t.traceBegin("StartSmart5gService");
+                mSystemServiceManager.startService(Smart5gService.class);
+                t.traceEnd();
+            }
+
+            if (context.getResources().getBoolean(R.bool.config_dozeAlwaysOnDisplayAvailable)) {
+                t.traceBegin("AutoAODService");
+                mSystemServiceManager.startService(AutoAODService.class);
+                t.traceEnd();
+            }
+
         } catch (Throwable e) {
             Slog.e("System", "******************************************");
             Slog.e("System", "************ Failure starting core service");
@@ -2242,7 +2256,7 @@ public final class SystemServer implements Dumpable {
                 Slog.e(TAG, "Failure starting HardwarePropertiesManagerService", e);
             }
             t.traceEnd();
-          
+
             if (!isWatch) {
                 t.traceBegin("StartTwilightService");
                 mSystemServiceManager.startService(TwilightService.class);
@@ -2549,6 +2563,11 @@ public final class SystemServer implements Dumpable {
 
             t.traceBegin("StartMediaMetricsManager");
             mSystemServiceManager.startService(MediaMetricsManagerService.class);
+            t.traceEnd();
+
+            // CustomDeviceConfigService
+            t.traceBegin("StartCustomDeviceConfigService");
+            mSystemServiceManager.startService(CustomDeviceConfigService.class);
             t.traceEnd();
 
             if (context.getResources().getBoolean(

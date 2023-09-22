@@ -32,7 +32,6 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.os.VibrationEffect;
-import android.os.Vibrator;
 import android.util.Log;
 import android.util.MathUtils;
 import android.view.ContextThemeWrapper;
@@ -139,7 +138,8 @@ public class NavigationBarEdgePanel extends View implements NavigationEdgeBackPl
             = new PathInterpolator(1.0f / RUBBER_BAND_AMOUNT_APPEAR, 1.0f, 1.0f, 1.0f);
 
     private final WindowManager mWindowManager;
-    //private final VibratorHelper mVibratorHelper;
+    private final VibratorHelper mVibratorHelper;
+    private boolean mEdgeHapticEnabled;
 
     /**
      * The paint the arrow is drawn with
@@ -237,8 +237,6 @@ public class NavigationBarEdgePanel extends View implements NavigationEdgeBackPl
 
     private boolean mIsLongSwipeEnabled;
     private boolean mBackArrowVisibility;
-    private boolean mEdgeHapticEnabled;
-    private final Vibrator mVibrator;
 
     private DynamicAnimation.OnAnimationEndListener mSetGoneEndListener
             = new DynamicAnimation.OnAnimationEndListener() {
@@ -302,7 +300,7 @@ public class NavigationBarEdgePanel extends View implements NavigationEdgeBackPl
         super(context);
 
         mWindowManager = context.getSystemService(WindowManager.class);
-        //mVibratorHelper = vibratorHelper;
+        mVibratorHelper = vibratorHelper;
 
         mDensity = context.getResources().getDisplayMetrics().density;
 
@@ -395,7 +393,6 @@ public class NavigationBarEdgePanel extends View implements NavigationEdgeBackPl
         mRegionSamplingHelper.setWindowVisible(true);
         mShowProtection = !isPrimaryDisplay;
         mLatencyTracker = latencyTracker;
-        mVibrator = context.getSystemService(Vibrator.class);
     }
 
     @Override
@@ -678,12 +675,6 @@ public class NavigationBarEdgePanel extends View implements NavigationEdgeBackPl
             mVelocityTracker = VelocityTracker.obtain();
         }
         mVelocityTracker.computeCurrentVelocity(1000);
-        // Only do the extra translation if we're not already flinging
-        boolean isSlow = Math.abs(mVelocityTracker.getXVelocity()) < 500;
-        if (mEdgeHapticEnabled && (isSlow
-                || SystemClock.uptimeMillis() - mVibrationTime >= GESTURE_DURATION_FOR_CLICK_MS)) {
-            triggerHapticFeedback(triggerLongSwipe);
-        }
 
         // Let's also snap the angle a bit
         if (mAngleOffset > -4) {
@@ -777,8 +768,10 @@ public class NavigationBarEdgePanel extends View implements NavigationEdgeBackPl
         mPreviousTouchTranslation = touchTranslation;
         boolean isLongSwipe = touchTranslation > mLongSwipeThreshold;
 
+        // Apply a haptic on drag slop passed
         if (!mDragSlopPassed && touchTranslation > mSwipeTriggerThreshold) {
             mDragSlopPassed = true;
+            triggerVibration(0);
 
             // Let's show the arrow and animate it in!
             mDisappearAmount = 0.0f;
@@ -919,34 +912,40 @@ public class NavigationBarEdgePanel extends View implements NavigationEdgeBackPl
     }
 
     private void setTriggerBack(boolean triggerBack, boolean animated) {
-        if (mTriggerBack != triggerBack) {
-            mTriggerBack = triggerBack;
-            mAngleAnimation.cancel();
-            updateAngle(animated);
-            // Whenever the trigger back state changes the existing translation animation should be
-            // cancelled
-            mTranslationAnimation.cancel();
-            mBackCallback.setTriggerBack(mTriggerBack);
+        if (mTriggerBack == triggerBack) {
+            return;
         }
+        mTriggerBack = triggerBack;
+        mAngleAnimation.cancel();
+        updateAngle(animated);
+        // Whenever the trigger back state changes the existing translation animation should be
+        // cancelled
+        mTranslationAnimation.cancel();
+        mBackCallback.setTriggerBack(mTriggerBack);
     }
 
     private void setTriggerLongSwipe(boolean triggerLongSwipe, boolean animated) {
-        if (mTriggerLongSwipe != triggerLongSwipe) {
-            mTriggerLongSwipe = triggerLongSwipe;
-            mAngleAnimation.cancel();
-            updateAngle(animated);
-            // Whenever the trigger back state changes the existing translation animation should be
-            // cancelled
-            mTranslationAnimation.cancel();
-            mBackCallback.setTriggerLongSwipe(mTriggerLongSwipe);
+        if (mTriggerLongSwipe == triggerLongSwipe) {
+            return;
         }
+        mTriggerLongSwipe = triggerLongSwipe;
+        triggerVibration(1);
+        mAngleAnimation.cancel();
+        updateAngle(animated);
+        // Whenever the trigger back state changes the existing translation animation should be
+        // cancelled
+        mTranslationAnimation.cancel();
+        mBackCallback.setTriggerLongSwipe(mTriggerLongSwipe);
     }
 
+    private void triggerVibration(int effect) {
+        if (mVibratorHelper == null || !mEdgeHapticEnabled) {
+            return;
+        }
+        int vibEffect = effect == 1 ? VibrationEffect.EFFECT_CLICK : VibrationEffect.EFFECT_TICK;
+        AsyncTask.execute(
+                    () -> mVibratorHelper.vibrate(vibEffect));
 
-    private void triggerHapticFeedback(boolean longSwipe) {
-        AsyncTask.execute(() ->
-                mVibrator.vibrate(VibrationEffect.get(longSwipe ?
-                        VibrationEffect.EFFECT_DOUBLE_CLICK : VibrationEffect.EFFECT_CLICK)));
     }
 
     private void updateAngle(boolean animated) {

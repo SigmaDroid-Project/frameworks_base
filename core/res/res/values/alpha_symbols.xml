@@ -84,10 +84,36 @@
     <java-symbol type="string" name="config_batterymeterLandBoltPathiOS16" />
     <java-symbol type="string" name="config_batterymeterLandPowersavePathiOS16" />
     <java-symbol type="string" name="config_batterymeterLandErrorPerimeterPathiOS16" />
+    <java-symbol type="string" name="config_batterymeterLandPerimeterPathOrigami" />
+    <java-symbol type="string" name="config_batterymeterLandFillMaskOrigami" />
+    <java-symbol type="string" name="config_batterymeterLandBoltPathOrigami" />
+    <java-symbol type="string" name="config_batterymeterLandPowersavePathOrigami" />
+    <java-symbol type="string" name="config_batterymeterLandErrorPerimeterPathOrigami" />
+    <java-symbol type="string" name="config_batterymeterLandPerimeterPathMiUIPill" />
+    <java-symbol type="string" name="config_batterymeterLandFillMaskMiUIPill" />
+    <java-symbol type="string" name="config_batterymeterLandBoltPathMiUIPill" />
+    <java-symbol type="string" name="config_batterymeterLandPowersavePathMiUIPill" />
+    <java-symbol type="string" name="config_batterymeterLandErrorPerimeterPathMiUIPill" />
 
     <java-symbol type="id" name="qs_state_layer" />
 
     <!-- Boost framework flag -->
     <java-symbol type="bool" name="config_supportsBoostFramework" />
+
+    <!-- Smart 5G -->
+    <java-symbol type="bool" name="config_supportSmart5G" />
+
+    <!-- Define device configs on boot -->
+    <java-symbol type="array" name="global_device_configs_override" />
+    <java-symbol type="array" name="device_configs_override" />
+
+    <!-- Fingerprint from a certified device against current platform SPL level -->
+    <java-symbol type="string" name="config_certifiedFingerprint" />
+
+    <!-- Fingerprint from stock ROM -->
+    <java-symbol type="string" name="config_stockFingerprint" />
+
+    <!-- Whether to use Richtap vibration -->
+    <java-symbol type="bool" name="config_usesRichtapVibration" />
 
 </resources>

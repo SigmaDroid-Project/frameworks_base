@@ -57,7 +57,8 @@ public class AmbientDisplayConfiguration {
             Settings.Secure.DOZE_WAKE_LOCK_SCREEN_GESTURE,
             Settings.Secure.DOZE_WAKE_DISPLAY_GESTURE,
             Settings.Secure.DOZE_TAP_SCREEN_GESTURE,
-            Settings.Secure.DOZE_ON_CHARGE
+            Settings.Secure.DOZE_ON_CHARGE,
+            Settings.Secure.DOZE_FOR_NOTIFICATIONS
     };
 
     /** Non-user configurable doze settings */
@@ -82,6 +83,7 @@ public class AmbientDisplayConfiguration {
     public boolean enabled(int user) {
         return pulseOnNotificationEnabled(user)
                 || pulseOnLongPressEnabled(user)
+                || pulseOnCustomDozeEventEnabled(user)
                 || alwaysOnEnabled(user)
                 || isAmbientTickerEnabled(user)
                 || wakeLockScreenGestureEnabled(user)
@@ -107,6 +109,12 @@ public class AmbientDisplayConfiguration {
         return mContext.getResources().getBoolean(R.bool.config_pulseOnNotificationsAvailable)
                 && ambientDisplayAvailable();
     }
+    
+    /** @hide */
+    public boolean userPulseOnNotificationEnabled(int user) {
+        return boolSettingDefaultOn(Settings.Secure.DOZE_FOR_NOTIFICATIONS, user)
+                && pulseOnNotificationEnabled(user);
+    }
 
     /** @hide */
     public boolean isAmbientTickerEnabled(int user) {
@@ -114,10 +122,22 @@ public class AmbientDisplayConfiguration {
     }
 
     /** @hide */
+    private boolean pulseOnCustomDozeEventEnabled(int user) {
+        return (Settings.System.getInt(mContext.getContentResolver(), Settings.System.DOZE_TRIGGER_DOUBLETAP, 0) != 0)
+                && pulseOnNotificationAvailable();
+    }
+
+    /** @hide */
     public boolean pickupGestureEnabled(int user) {
         return boolSetting(Settings.Secure.DOZE_PICK_UP_GESTURE, user,
                 mPickupGestureEnabledByDefault ? 1 : 0)
                 && dozePickupSensorAvailable();
+    }
+
+    /** @hide */
+    public boolean pickupGestureAmbient(int user) {
+        return boolSettingDefaultOff(Settings.Secure.DOZE_PICK_UP_GESTURE_AMBIENT, user)
+                && pickupGestureEnabled(user) && pulseOnNotificationEnabled(user);
     }
 
     /** @hide */
@@ -160,6 +180,12 @@ public class AmbientDisplayConfiguration {
     }
 
     /** @hide */
+    public boolean singleTapGestureAmbient(int user) {
+        return boolSettingDefaultOff(Settings.Secure.DOZE_SINGLE_TAP_GESTURE_AMBIENT, user)
+                && tapGestureEnabled(user) && pulseOnNotificationEnabled(user);
+    }
+
+    /** @hide */
     public boolean tapSensorAvailable() {
         for (String tapType : tapSensorTypeMapping()) {
             if (!TextUtils.isEmpty(tapType)) {
@@ -178,6 +204,12 @@ public class AmbientDisplayConfiguration {
     /** @hide */
     public boolean doubleTapSensorAvailable() {
         return !TextUtils.isEmpty(doubleTapSensorType());
+    }
+
+    /** @hide */
+    public boolean doubleTapGestureAmbient(int user) {
+        return boolSettingDefaultOff(Settings.Secure.DOZE_DOUBLE_TAP_GESTURE_AMBIENT, user)
+                && doubleTapGestureEnabled(user) && pulseOnNotificationEnabled(user);
     }
 
     /** @hide */

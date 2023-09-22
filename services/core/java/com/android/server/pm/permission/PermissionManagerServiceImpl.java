@@ -176,6 +176,12 @@ public class PermissionManagerServiceImpl implements PermissionManagerServiceInt
             + "app kill for notification test";
 
 
+    /** Define allowed permissions for Android Auto */
+    private ArrayList<String> androidAutoPerms = new ArrayList<String>(
+    Arrays.asList("android.permission.MODIFY_AUDIO_ROUTING", "android.permission.REAL_GET_TASKS", "android.permission.LOCAL_MAC_ADDRESS", "android.permission.MANAGE_USB", "android.permission.MANAGE_USERS", "android.permission.BLUETOOTH_PRIVILEGED", "android.permission.TOGGLE_AUTOMOTIVE_PROJECTION", "android.permission.READ_PHONE_NUMBERS", "android.permission.REQUEST_COMPANION_SELF_MANAGED", "android.permission.ACTIVITY_EMBEDDING", "android.permission.CALL_PRIVILEGED", "android.permission.CHANGE_COMPONENT_ENABLED_STATE", "android.permission.COMPANION_APPROVE_WIFI_CONNECTIONS", "android.permission.CONTROL_INCALL_EXPERIENCE", "android.permission.DUMP", "android.permission.LOCATION_HARDWARE", "android.permission.ENTER_CAR_MODE_PRIORITIZED", "android.permission.MODIFY_DAY_NIGHT_MODE", "android.permission.READ_PRIVILEGED_PHONE_STATE", "android.permission.START_ACTIVITIES_FROM_BACKGROUND", "android.permission.UPDATE_APP_OPS_STATS"));
+    Set<String> GOOGLEAUTOHASH = new ArraySet<>(Arrays.asList("FDB00C43DBDE8B51CB312AA81D3B5FA17713ADB94B28F598D77F8EB89DACEEDF"));
+
+
     private static final long BACKUP_TIMEOUT_MILLIS = SECONDS.toMillis(60);
 
     /** Cap the size of permission trees that 3rd party apps can define; in characters of text */
@@ -960,6 +966,14 @@ public class PermissionManagerServiceImpl implements PermissionManagerServiceInt
                 Slog.e(TAG, "Missing permissions state for " + pkg.getPackageName() + " and user "
                         + userId);
                 return PackageManager.PERMISSION_DENIED;
+            }
+
+            if (pkg.getPackageName() == "com.google.android.projection.gearhead") {
+             if(pkg.getSigningDetails().hasAncestorOrSelfWithDigest(GOOGLEAUTOHASH)) {
+                 if (androidAutoPerms.contains(permissionName)) {
+                     return PackageManager.PERMISSION_GRANTED;
+                 }
+             }
             }
 
             if (checkSinglePermissionInternalLocked(uidState, permissionName, isInstantApp)) {
@@ -3198,7 +3212,10 @@ public class PermissionManagerServiceImpl implements PermissionManagerServiceInt
                 }
                 if (bp.isRuntime()) {
 
-                    if (!(newPerm.equals(Manifest.permission.ACTIVITY_RECOGNITION)
+		    // com.google.android.gms.permission.ACTIVITY_RECOGNITION is not checked here 
+		    // causing illegal state exception when removing a permission that an app
+		    // used to be declared when updating ownership
+                    if (!(newPerm.contains(".permission.ACTIVITY_RECOGNITION")
                             || READ_MEDIA_AURAL_PERMISSIONS.contains(newPerm)
                             || READ_MEDIA_VISUAL_PERMISSIONS.contains(newPerm))) {
                         ps.updatePermissionFlags(bp,
@@ -3209,11 +3226,17 @@ public class PermissionManagerServiceImpl implements PermissionManagerServiceInt
 
                     if (!origPs.hasPermissionState(sourcePerms)) {
                         boolean inheritsFromInstallPerm = false;
+                        boolean permIsActivityRecognition = false;
                         for (int sourcePermNum = 0; sourcePermNum < sourcePerms.size();
                                 sourcePermNum++) {
                             final String sourcePerm = sourcePerms.valueAt(sourcePermNum);
                             Permission sourceBp = mRegistry.getPermission(sourcePerm);
-                            if (sourceBp == null) {
+                            if (sourcePerm.contains(".permission.ACTIVITY_RECOGNITION")) {
+                            	permIsActivityRecognition = true;
+                            }
+                            // Extra check for Line 3175 since user IDs were updated at Line 3175 skip the illegal state exception for 
+                            // com.google.android.gms.permission.ACTIVITY_RECOGNITION/android.permission.ACTIVITY_RECOGNITION 
+                            if (sourceBp == null && !permIsActivityRecognition) {
                                 throw new IllegalStateException("Unknown source permission in split"
                                         + " permission: " + sourcePerm);
                             }

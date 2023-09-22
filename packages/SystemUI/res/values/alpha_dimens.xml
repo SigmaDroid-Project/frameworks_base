@@ -12,6 +12,8 @@
     <dimen name="status_bar_battery_icon_width_landscape_buddy">22.0dip</dimen>
     <dimen name="status_bar_battery_icon_width_landscape_ios15">24.0dip</dimen>
     <dimen name="status_bar_battery_icon_width_landscape_ios16">24.0dip</dimen>
+    <dimen name="status_bar_battery_icon_width_landscape_origami">20.0dip</dimen>
+    <dimen name="status_bar_battery_icon_width_landscape_miui_pill">24.0dip</dimen>
 
     <dimen name="status_bar_battery_icon_height_landscape_signal">21.0dip</dimen>
     <dimen name="status_bar_battery_icon_height_landscape_line">28.0dip</dimen>
@@ -19,11 +21,20 @@
     <dimen name="status_bar_battery_icon_height_landscape_buddy">28.0dip</dimen>
     <dimen name="status_bar_battery_icon_height_landscape_ios15">12.0dip</dimen>
     <dimen name="status_bar_battery_icon_height_landscape_ios16">12.0dip</dimen>
+    <dimen name="status_bar_battery_icon_height_landscape_origami">12.0dip</dimen>
+    <dimen name="status_bar_battery_icon_height_landscape_miui_pill">12.0dip</dimen>
 
     <!-- QS header image -->
     <dimen name="qs_header_image_side_margin">0dp</dimen>
     <dimen name="qs_header_image_top_margin">0dp</dimen>
     <dimen name="qs_header_image_bottom_margin">0dp</dimen>
     <dimen name="qs_header_image_min_height">50dp</dimen>
+
+    <!-- FPSInfo view -->
+    <dimen name="fps_info_margin_top">114dp</dimen>
+
+    <!-- Brightness bar percentage  -->
+    <dimen name="bb_percentage_margin_left">8dp</dimen>
+    <dimen name="bb_percentage_margin_right">0dp</dimen>
 
 </resources>

@@ -20,12 +20,14 @@ import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Point
+import android.os.AsyncTask
 import android.os.Handler
 import android.os.SystemClock
 import android.os.VibrationEffect
 import android.util.Log
 import android.util.MathUtils
 import android.view.Gravity
+import android.view.View
 import android.view.MotionEvent
 import android.view.VelocityTracker
 import android.view.ViewConfiguration
@@ -34,6 +36,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.core.os.postDelayed
 import androidx.core.view.isVisible
 import androidx.dynamicanimation.animation.DynamicAnimation
+import com.android.internal.policy.GestureNavigationSettingsObserver
 import com.android.internal.util.LatencyTracker
 import com.android.systemui.dagger.qualifiers.Main
 import com.android.systemui.plugins.NavigationEdgeBackPlugin
@@ -63,10 +66,13 @@ private const val FAILSAFE_DELAY_MS = 350L
 private const val POP_ON_FLING_DELAY = 140L
 
 internal val VIBRATE_ACTIVATED_EFFECT =
-        VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK)
+        VibrationEffect.createPredefined(VibrationEffect.EFFECT_TICK)
 
 internal val VIBRATE_DEACTIVATED_EFFECT =
         VibrationEffect.createPredefined(VibrationEffect.EFFECT_TICK)
+
+internal val VIBRATE_ACTIVATED_LONG_SWIPE_EFFECT =
+        VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK)
 
 private const val DEBUG = false
 
@@ -154,15 +160,20 @@ class BackPanelController internal constructor(
     private val elapsedTimeSinceEntry
         get() = SystemClock.uptimeMillis() - gestureEntryTime
 
+    private var mBackArrowVisibility = true
+    private var mHapticFeedbackEnabled = true;
+
+    private var mIsLongSwipe = false
+    private var mLongSwipeEnabled = false
+    private var mLongSwipeThreshold = 0f
+    private var mSwipeStartTime: Long = 0
+    private var mTriggerLongSwipe = false
+
     // Whether the current gesture has moved a sufficiently large amount,
     // so that we can unambiguously start showing the ENTRY animation
     private var hasPassedDragSlop = false
 
     private val failsafeRunnable = Runnable { onFailsafe() }
-
-    private var mLongSwipeThreshold = 0f
-    private var mTriggerLongSwipe = false
-    private var mIsLongSwipeEnabled = false
 
     internal enum class GestureState {
         /* Arrow is off the screen and invisible */
@@ -257,6 +268,9 @@ class BackPanelController internal constructor(
         updateArrowState(GestureState.GONE, force = true)
         updateRestingArrowDimens()
         configurationController.addCallback(configurationListener)
+        mGestureNavigationSettingsObserver = GestureNavigationSettingsObserver(
+                mainHandler, context, hapticFeedbackRunnable)
+        mGestureNavigationSettingsObserver.register()
     }
 
     /** Update the arrow direction. The arrow should point the same way for both panels. */
@@ -266,6 +280,7 @@ class BackPanelController internal constructor(
 
     override fun onViewDetached() {
         configurationController.removeCallback(configurationListener)
+        mGestureNavigationSettingsObserver.unregister()
     }
 
     override fun onMotionEvent(event: MotionEvent) {
@@ -424,8 +439,6 @@ class BackPanelController internal constructor(
         // occurs between the screen edge and the touch start.
         val xTranslation = max(0f, if (mView.isLeftPanel) x - startX else startX - x)
 
-        val isLongSwipe = MathUtils.abs(xTranslation) > mLongSwipeThreshold;
-
         // Compared to last time, how far we moved in the x direction. If <0, we are moving closer
         // to the edge. If >0, we are moving further from the edge
         val xDelta = xTranslation - previousXTranslation
@@ -448,7 +461,11 @@ class BackPanelController internal constructor(
         }
 
         updateArrowStateOnMove(yTranslation, xTranslation)
-
+        if (mBackArrowVisibility) {
+           mView.setVisibility(View.VISIBLE)
+        } else {
+           mView.setVisibility(View.INVISIBLE)
+        }
         val gestureProgress = when (currentState) {
             GestureState.ACTIVE -> fullScreenProgress(xTranslation)
             GestureState.ENTRY -> staticThresholdProgress(xTranslation)
@@ -464,8 +481,6 @@ class BackPanelController internal constructor(
                 else -> {}
             }
         }
-
-        if (mIsLongSwipeEnabled) setTriggerLongSwipe(isLongSwipe)
 
         setArrowStrokeAlpha(gestureProgress)
         setVerticalTranslation(yOffset)
@@ -606,6 +621,30 @@ class BackPanelController internal constructor(
         backCallback = callback
     }
 
+    override fun setLongSwipeEnabled(enabled: Boolean) {
+        mLongSwipeEnabled = enabled
+    }
+
+    private fun setTriggerLongSwipe(triggerLongSwipe: Boolean) {
+        if (mTriggerLongSwipe == triggerLongSwipe) return
+        mTriggerLongSwipe = triggerLongSwipe
+        if (triggerLongSwipe) {
+            triggerVibration(VIBRATE_ACTIVATED_LONG_SWIPE_EFFECT)
+        }
+        cancelFailsafe()
+        mView.cancelAnimations()
+        updateConfiguration()
+        backCallback.setTriggerLongSwipe(mTriggerLongSwipe)
+    }
+
+    private fun triggerVibration(effect: VibrationEffect) {
+        if (mHapticFeedbackEnabled) {
+            AsyncTask.execute {
+                vibratorHelper?.vibrate(effect)
+            }
+        }
+    }
+
     override fun setLayoutParams(layoutParams: WindowManager.LayoutParams) {
         this.layoutParams = layoutParams
         windowManager.addView(mView, layoutParams)
@@ -686,6 +725,7 @@ class BackPanelController internal constructor(
     override fun setDisplaySize(displaySize: Point) {
         this.displaySize.set(displaySize.x, displaySize.y)
         fullyStretchedThreshold = min(displaySize.x.toFloat(), params.swipeProgressThreshold)
+        mLongSwipeThreshold = Math.min(displaySize.x * 0.5f, layoutParams.width * 2.5f)
     }
 
     /**
@@ -849,14 +889,10 @@ class BackPanelController internal constructor(
             GestureState.INACTIVE -> {
                 setTriggerLongSwipe(false)
                 backCallback.setTriggerBack(false)
+                setTriggerLongSwipe(false)
             }
             GestureState.ACTIVE -> {
-                if (mTriggerLongSwipe) {
-                    backCallback.triggerBack(false)
-                    backCallback.setTriggerBack(true)
-                } else {
-                    backCallback.setTriggerBack(true)
-                }
+                backCallback.setTriggerBack(true)
             }
             GestureState.GONE -> { }
         }
@@ -880,9 +916,9 @@ class BackPanelController internal constructor(
 
                 updateRestingArrowDimens()
 
-                vibratorHelper.cancel()
-                mainHandler.postDelayed(10L) {
-                    vibratorHelper.vibrate(VIBRATE_ACTIVATED_EFFECT)
+                if (mHapticFeedbackEnabled) {
+                    vibratorHelper.cancel()
+                    triggerVibration(VIBRATE_ACTIVATED_EFFECT)
                 }
 
                 val startingVelocity = convertVelocityToSpringStartingVelocity(
@@ -918,7 +954,9 @@ class BackPanelController internal constructor(
                 )
                 mView.popOffEdge(startingVelocity)
 
-                vibratorHelper.vibrate(VIBRATE_DEACTIVATED_EFFECT)
+                if (mHapticFeedbackEnabled) {
+                    triggerVibration(VIBRATE_DEACTIVATED_EFFECT)
+                }
                 updateRestingArrowDimens()
             }
             GestureState.FLUNG -> {
@@ -946,6 +984,14 @@ class BackPanelController internal constructor(
                 mainHandler.postDelayed(10L) { vibratorHelper.cancel() }
             }
         }
+    }
+
+    override fun setBackArrowVisibility(backArrowVisibility : Boolean) {
+        mBackArrowVisibility = backArrowVisibility;
+    }
+
+    private fun onHapticFeedbackChanged() {
+        mHapticFeedbackEnabled = mGestureNavigationSettingsObserver.getEdgeHapticEnabled()
     }
 
     private fun convertVelocityToSpringStartingVelocity(

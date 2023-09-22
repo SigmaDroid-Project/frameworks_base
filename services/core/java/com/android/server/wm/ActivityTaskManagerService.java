@@ -248,6 +248,7 @@ import com.android.internal.util.ArrayUtils;
 import com.android.internal.util.FastPrintWriter;
 import com.android.internal.util.FrameworkStatsLog;
 import com.android.internal.util.crdroid.cutout.CutoutFullscreenController;
+import com.android.internal.util.PropImitationHooks;
 import com.android.internal.util.function.pooled.PooledLambda;
 import com.android.server.LocalManagerRegistry;
 import com.android.server.LocalServices;
@@ -910,7 +911,7 @@ public class ActivityTaskManagerService extends IActivityTaskManager.Stub {
         final boolean freeformWindowManagement =
                 mContext.getPackageManager().hasSystemFeature(FEATURE_FREEFORM_WINDOW_MANAGEMENT)
                         || Settings.Global.getInt(
-                        resolver, DEVELOPMENT_ENABLE_FREEFORM_WINDOWS_SUPPORT, 0) != 0;
+                        resolver, DEVELOPMENT_ENABLE_FREEFORM_WINDOWS_SUPPORT, 1) != 0;
 
         final boolean supportsMultiWindow = ActivityTaskManager.supportsMultiWindow(mContext);
         final boolean supportsPictureInPicture = supportsMultiWindow &&
@@ -924,9 +925,9 @@ public class ActivityTaskManagerService extends IActivityTaskManager.Stub {
                 .hasSystemFeature(FEATURE_ACTIVITIES_ON_SECONDARY_DISPLAYS);
         final boolean forceRtl = Settings.Global.getInt(resolver, DEVELOPMENT_FORCE_RTL, 0) != 0;
         final boolean forceResizable = Settings.Global.getInt(
-                resolver, DEVELOPMENT_FORCE_RESIZABLE_ACTIVITIES, 0) != 0;
+                resolver, DEVELOPMENT_FORCE_RESIZABLE_ACTIVITIES, 1) != 0;
         final boolean devEnableNonResizableMultiWindow = Settings.Global.getInt(
-                resolver, DEVELOPMENT_ENABLE_NON_RESIZABLE_MULTI_WINDOW, 0) != 0;
+                resolver, DEVELOPMENT_ENABLE_NON_RESIZABLE_MULTI_WINDOW, 1) != 0;
         final int supportsNonResizableMultiWindow = mContext.getResources().getInteger(
                 com.android.internal.R.integer.config_supportsNonResizableMultiWindow);
         final int respectsActivityMinWidthHeightMultiWindow = mContext.getResources().getInteger(
@@ -1992,7 +1993,7 @@ public class ActivityTaskManagerService extends IActivityTaskManager.Stub {
 
     @Override
     public RootTaskInfo getFocusedRootTaskInfo() throws RemoteException {
-        if (!AttestationHooks.shouldBypassTaskPermission(mContext)) {
+        if (!PropImitationHooks.shouldBypassTaskPermission(mContext)) {
             enforceTaskPermission("getFocusedRootTaskInfo()");
         }
         final long ident = Binder.clearCallingIdentity();
@@ -3024,10 +3025,10 @@ public class ActivityTaskManagerService extends IActivityTaskManager.Stub {
     /** Sets the task stack listener that gets callbacks when a task stack changes. */
     @Override
     public void registerTaskStackListener(ITaskStackListener listener) {
-        if (!AttestationHooks.shouldBypassTaskPermission(mContext)) {
+        if (!PropImitationHooks.shouldBypassTaskPermission(mContext)) {
             enforceTaskPermission("registerTaskStackListener()");
         }
-mTaskChangeNotificationController.registerTaskStackListener(listener);
+        mTaskChangeNotificationController.registerTaskStackListener(listener);
     }
 
     /** Unregister a task stack listener so that it stops receiving callbacks. */
