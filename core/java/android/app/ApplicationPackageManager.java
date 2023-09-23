@@ -863,10 +863,6 @@ public class ApplicationPackageManager extends PackageManager {
 
     @Override
     public boolean hasSystemFeature(String name, int version) {
-        if (name != null && Arrays.asList(featuresTensor).contains(name) &&
-                !Arrays.asList(pTensorCodenames).contains(SystemProperties.get("ro.product.device"))) {
-            return false;
-        }
         String packageName = ActivityThread.currentPackageName();
         if (packageName != null &&
                 packageName.equals("com.google.android.apps.photos") &&

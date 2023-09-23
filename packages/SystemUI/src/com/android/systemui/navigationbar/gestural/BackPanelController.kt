@@ -175,6 +175,9 @@ class BackPanelController internal constructor(
 
     private val failsafeRunnable = Runnable { onFailsafe() }
 
+    private val hapticFeedbackRunnable = Runnable { onHapticFeedbackChanged() }
+    private lateinit var mGestureNavigationSettingsObserver : GestureNavigationSettingsObserver
+
     internal enum class GestureState {
         /* Arrow is off the screen and invisible */
         GONE,
@@ -648,28 +651,6 @@ class BackPanelController internal constructor(
     override fun setLayoutParams(layoutParams: WindowManager.LayoutParams) {
         this.layoutParams = layoutParams
         windowManager.addView(mView, layoutParams)
-    }
-
-    override fun setLongSwipeEnabled(enabled: Boolean) {
-        mLongSwipeThreshold = if (enabled) MathUtils.min(
-                displaySize.x * 0.5f, layoutParams.width * 2.5f) else 0.0f
-        mIsLongSwipeEnabled = mLongSwipeThreshold > 0
-        setTriggerLongSwipe(mIsLongSwipeEnabled && mTriggerLongSwipe)
-    }
-
-    private fun setTriggerLongSwipe(triggerLongSwipe: Boolean) {
-        if (mTriggerLongSwipe != triggerLongSwipe) {
-            mTriggerLongSwipe = triggerLongSwipe
-            vibratorHelper.vibrate(VIBRATE_ACTIVATED_EFFECT)
-            updateRestingArrowDimens()
-            // Whenever the trigger back state changes
-            // the existing translation animation should be cancelled
-            cancelFailsafe()
-            mView.cancelAnimations()
-            mView.setTriggerLongSwipe(mTriggerLongSwipe)
-            updateConfiguration()
-            backCallback.setTriggerLongSwipe(mTriggerLongSwipe);
-        }
     }
 
     private fun isDragAwayFromEdge(velocityPxPerSecThreshold: Int = 0) = velocityTracker!!.run {
