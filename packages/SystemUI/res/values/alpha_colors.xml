@@ -33,4 +33,9 @@
     <color name="qs_color_accent_secondary">@*android:color/qs_color_accent_secondary</color>
     <color name="qs_color_accent_custom_primary">@*android:color/qs_color_accent_custom_primary</color>
     <color name="qs_color_accent_custom_secondary">@*android:color/qs_color_accent_custom_secondary</color>
+
+    <!-- chip styles -->
+    <color name="rippleDark">#1A000000</color>
+    <color name="neumorph_outline_start">#FFBDBDBD</color>
+    <color name="neumorph_outline_end">#FFF0F0F0</color>
 </resources>

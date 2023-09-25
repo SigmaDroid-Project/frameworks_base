@@ -4,14 +4,14 @@
         <shape>
             <gradient
                 android:angle="0.0"
-                android:endColor="@color/holo_green_light"
-                android:startColor="@color/holo_blue_light" />
+                android:endColor="@color/qs_color_accent_secondary"
+                android:startColor="@color/qs_color_accent_primary" />
             <corners android:radius="24.0dp" />
         </shape>
     </item>
     <item>
-        <shape>
-            <solid android:color="#40000000" />
+        <shape android:tintMode="multiply">
+            <solid android:color="#10FFFFFF" />
             <corners android:radius="24.0dp" />
         </shape>
     </item>
@@ -20,11 +20,11 @@
         android:end="2.0dp"
         android:start="2.0dp"
         android:top="2.0dp">
-        <shape>
+        <shape android:tintMode="multiply">
             <gradient
                 android:angle="0.0"
-                android:endColor="@color/holo_green_light"
-                android:startColor="@color/holo_blue_light" />
+                android:endColor="@color/qs_color_accent_secondary"
+                android:startColor="@color/qs_color_accent_primary" />
             <corners android:radius="22.0dp" />
         </shape>
     </item>
