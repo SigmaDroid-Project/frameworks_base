@@ -191,7 +191,7 @@ constructor(
 
         val intent = Intent()
         intent.setClassName("com.android.settings",
-                "com.android.settings.Settings\$AlphaSettingsActivity")
+                "com.android.settings.Settings\$SigmaSettingsActivity")
         activityStarter.startActivity(
             intent,
             true /* dismissShade */,
