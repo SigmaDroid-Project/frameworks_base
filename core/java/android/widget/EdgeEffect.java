@@ -222,7 +222,7 @@ public class EdgeEffect {
     private float mBaseGlowScale;
     private float mDisplacement = 0.5f;
     private float mTargetDisplacement = 0.5f;
-    
+
     private boolean callerHasVibratePermission;
     private Vibrator vibrator;
     private int vibrateIntensity;
@@ -245,8 +245,8 @@ public class EdgeEffect {
         callerHasVibratePermission = context.checkCallingOrSelfPermission(
                     android.Manifest.permission.VIBRATE) == PackageManager.PERMISSION_GRANTED;
         vibrator = context.getSystemService(Vibrator.class);
-        vibrateIntensity = Settings.System.getInt(context.getContentResolver(),
-                Settings.System.EDGE_SCROLLING_HAPTICS_INTENSITY, 3);
+        vibrateIntensity = Settings.Secure.getInt(context.getContentResolver(),
+                Settings.Secure.EDGE_SCROLLING_HAPTICS_INTENSITY, 3);
     }
 
     /**
@@ -270,8 +270,8 @@ public class EdgeEffect {
         callerHasVibratePermission = context.checkCallingOrSelfPermission(
                     android.Manifest.permission.VIBRATE) == PackageManager.PERMISSION_GRANTED;
         vibrator = context.getSystemService(Vibrator.class);
-        vibrateIntensity = Settings.System.getInt(context.getContentResolver(),
-                Settings.System.EDGE_SCROLLING_HAPTICS_INTENSITY, 3);
+        vibrateIntensity = Settings.Secure.getInt(context.getContentResolver(),
+                Settings.Secure.EDGE_SCROLLING_HAPTICS_INTENSITY, 3);
     }
 
     @EdgeEffectType

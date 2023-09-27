@@ -163,6 +163,8 @@ class BackPanelController internal constructor(
     private var mBackArrowVisibility = true
     private var mHapticFeedbackEnabled = true;
 
+    private var mEdgeHapticIntensity = 0
+
     private var mIsLongSwipe = false
     private var mLongSwipeEnabled = false
     private var mLongSwipeThreshold = 0f
@@ -979,6 +981,10 @@ class BackPanelController internal constructor(
 
     override fun setBackArrowVisibility(backArrowVisibility : Boolean) {
         mBackArrowVisibility = backArrowVisibility;
+    }
+
+    override fun setEdgeHapticIntensity(edgeHapticIntensity: Int) {
+        mEdgeHapticIntensity = edgeHapticIntensity
     }
 
     private fun triggerVibration() {
