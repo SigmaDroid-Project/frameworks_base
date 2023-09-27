@@ -12232,6 +12232,7 @@ public final class Settings {
          */
         public static final String GAME_OVERLAY = "game_overlay";
 
+        /**
          * Edge scrolling haptics intensity
          * @hide
          */
@@ -12251,12 +12252,6 @@ public final class Settings {
          */
         @Readable
         public static final String VOLUME_SLIDER_HAPTICS_INTENSITY = "volume_slider_haptics_intensity";
-
-        /**
-         * Back gesture haptics intensity
-         * @hide
-         */
-        public static final String BACK_GESTURE_HAPTIC_INTENSITY = "back_gesture_haptic_intensity";
 
         /**
          * Keys we no longer back up under the current schema, but want to continue to
