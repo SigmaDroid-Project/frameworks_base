@@ -159,7 +159,7 @@ open class QSTileViewImpl @JvmOverloads constructor(
     private var lastDisabledByPolicy = false
 
     private val locInScreen = IntArray(2)
-    private var vertical = false
+    private var vertical = true
     private val forceHideCheveron = true
     private var labelHide = false
    private var labelSize = 15f

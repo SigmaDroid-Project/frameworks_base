@@ -62,6 +62,6 @@ public class TileUtils {
     public static boolean getQSTileVerticalLayout(Context context, int defaultValue) {
         return Settings.System.getIntForUser(context.getContentResolver(),
                 Settings.System.QS_TILE_VERTICAL_LAYOUT,
-                defaultValue, UserHandle.USER_CURRENT) != 0;
+                defaultValue, UserHandle.USER_CURRENT) == 1;
     }
 }
