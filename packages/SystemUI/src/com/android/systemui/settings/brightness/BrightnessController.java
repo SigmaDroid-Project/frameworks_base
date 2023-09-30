@@ -196,7 +196,7 @@ public class BrightnessController implements ToggleSlider.Listener, MirroredBrig
             mUpdateSliderRunnable.run();
 
             mBrightnessSliderHaptic = Settings.System.getIntForUser(mContext.getContentResolver(),
-                Settings.System.QS_BRIGHTNESS_SLIDER_HAPTIC, 0, UserHandle.USER_CURRENT) == 1;
+                Settings.System.QS_BRIGHTNESS_SLIDER_HAPTIC, 1, UserHandle.USER_CURRENT) == 1;
 
             mHandler.sendEmptyMessage(MSG_ATTACH_LISTENER);
         }
@@ -350,7 +350,7 @@ public class BrightnessController implements ToggleSlider.Listener, MirroredBrig
                 UserHandle.USER_CURRENT));
 
         mBrightnessSliderHaptic = Settings.System.getIntForUser(mContext.getContentResolver(),
-            Settings.System.QS_BRIGHTNESS_SLIDER_HAPTIC, 0, UserHandle.USER_CURRENT) == 1;
+            Settings.System.QS_BRIGHTNESS_SLIDER_HAPTIC, 1, UserHandle.USER_CURRENT) == 1;
     }
 
     public void registerCallbacks() {
