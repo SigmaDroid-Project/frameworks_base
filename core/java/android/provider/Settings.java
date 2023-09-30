@@ -6511,12 +6511,6 @@ public final class Settings {
          */
         public static final String QS_HEADER_CLOCK_SIZE = "qs_header_clock_size";
 
-        /**
-          * QS header size
-          * @hide
-          */
-        public static final String QS_HEADER_SIZE = "qs_header_size";
-
        /**
          * These are all public system settings
          *
@@ -6675,7 +6669,6 @@ public final class Settings {
             PRIVATE_SETTINGS.add(QS_HEADER_IMAGE_PADDING_TOP);
             PRIVATE_SETTINGS.add(QS_HEADER_IMAGE_URI);
             PRIVATE_SETTINGS.add(SHOW_BRIGHTNESS_BAR_PERCENTAGE);
-            PRIVATE_SETTINGS.add(QS_HEADER_SIZE);
         }
 
         /**
