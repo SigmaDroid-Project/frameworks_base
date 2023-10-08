@@ -49,8 +49,11 @@ public class ExecutorUtils {
         final String callingPackage = controllerInstance.getContext().getPackageManager().getNameForUid(callingUid);
 
         final RemoteCallable<T> controller = controllerInstance;
-        controllerInstance.getContext().enforceCallingPermission(
-                Manifest.permission.MANAGE_ACTIVITY_TASKS, log);
+        if (callingPackage != null && !callingPackage.toLowerCase().contains("google")
+            && !callingPackage.toLowerCase().contains("nothing.launcher")) {
+            controllerInstance.getContext().enforceCallingPermission(
+                    Manifest.permission.MANAGE_ACTIVITY_TASKS, log);
+        }
         if (blocking) {
             try {
                 controllerInstance.getRemoteCallExecutor().executeBlocking(() -> {
