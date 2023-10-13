@@ -7449,5 +7449,8 @@ message MetricsEvent {
 
     // Panel for Mobile Data
     PANEL_MOBILE_DATA = 4002;
+
+    // SigmaSettings
+    SIGMA = 4003;
   }
 }
