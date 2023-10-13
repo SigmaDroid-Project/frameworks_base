@@ -81,6 +81,8 @@ public class UdfpsAnimation extends ImageView {
 
         final float scaleFactor = DisplayUtils.getScaleFactor(mContext);
 
+        mEnabled = true; // enable by default
+        mSelectedAnim = 0;  // Set default animation style
         mMaxBurnInOffsetX = (int) (context.getResources()
             .getDimensionPixelSize(R.dimen.udfps_burn_in_offset_x) * scaleFactor);
         mMaxBurnInOffsetY = (int) (context.getResources()
@@ -117,7 +119,7 @@ public class UdfpsAnimation extends ImageView {
         TunerService.Tunable tunable = (key, newValue) -> {
             switch (key) {
                 case UDFPS_ANIM:
-                    mEnabled = TunerService.parseIntegerSwitch(newValue, false);
+                    mEnabled = TunerService.parseIntegerSwitch(newValue, true);
                     break;
                 case UDFPS_ANIM_STYLE:
                     mSelectedAnim = newValue == null ? 0 : Integer.parseInt(newValue);
