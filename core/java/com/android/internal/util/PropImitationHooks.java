@@ -42,7 +42,7 @@ import java.util.Set;
 public class PropImitationHooks {
 
     private static final String TAG = "PropImitationHooks";
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
 
     private static final String PRODUCT_DEVICE = "ro.product.device";
 
@@ -118,12 +118,12 @@ public class PropImitationHooks {
             return;
         }
 
-        boolean isPackageGms = packageName.toLowerCase().contains(ANDROIDX_TEST) 
-        	    || packageName.equals(PACKAGE_GMS_RESTORE) 
+        boolean isPackageGms = packageName.toLowerCase().contains(ANDROIDX_TEST)
+        	    || packageName.equals(PACKAGE_GMS_RESTORE)
         	    || packageName.equals(PACKAGE_GMS);
         sProcessName = processName;
-        sIsGms = isPackageGms && processName.toLowerCase().contains(PROCESS_GMS_UNSTABLE) 
-                || processName.toLowerCase().contains(PROCESS_GMS_PERSISTENT) 
+        sIsGms = isPackageGms && processName.toLowerCase().contains(PROCESS_GMS_UNSTABLE)
+                || processName.toLowerCase().contains(PROCESS_GMS_PERSISTENT)
                 || processName.toLowerCase().contains(PROCESS_GMS_PIXEL_MIGRATE)
                 || processName.toLowerCase().contains(PROCESS_INSTRUMENTATION);
         sIsFinsky = packageName.equals(PACKAGE_FINSKY);
@@ -158,6 +158,9 @@ public class PropImitationHooks {
                 case PACKAGE_EMOJI_WALLPAPER:
                 case PACKAGE_GASSIST:
                 case PACKAGE_GBOARD:
+                    dlog("Spoofing as Pixel 7 Pro for: " + packageName);
+                    sP7Props.forEach((k, v) -> setPropValue(k, v));
+                    break;
                 case PACKAGE_GMS:
                 case PACKAGE_SETUPWIZARD:
                 case PACKAGE_TURBO:
