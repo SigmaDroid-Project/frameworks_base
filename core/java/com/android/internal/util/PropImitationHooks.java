@@ -128,6 +128,7 @@ public class PropImitationHooks {
         sProcessName = processName;
         sIsGms = packageName.equals(PACKAGE_GMS) && processName.equals(PROCESS_GMS_UNSTABLE);
         sIsFinsky = packageName.equals(PACKAGE_FINSKY);
+
         if (sIsGms) {
             dlog("Setting Pixel 2 fingerprint for: " + packageName);
             setCertifiedPropsForGms();
@@ -149,6 +150,7 @@ public class PropImitationHooks {
                     }
                     dlog("Spoofing as Pixel 8 Pro for: " + packageName);
                     sMainSpoofProps.forEach((k, v) -> setPropValue(k, v));
+                    setPropValue("TIME", System.currentTimeMillis());
                     break;
                 case PACKAGE_ARCORE:
                     dlog("Setting stock fingerprint for: " + packageName);
