@@ -69,7 +69,10 @@ public class PropImitationHooks {
     private static final String PACKAGE_VELVET = "com.google.android.googlequicksearchbox";
     private static final String PACKAGE_GBOARD = "com.google.android.inputmethod.latin";
     private static final String PACKAGE_SETUPWIZARD = "com.google.android.setupwizard";
-    
+    private static final String PACKAGE_EMOJI_WALLPAPER = "com.google.android.apps.emojiwallpaper";
+    private static final String PACKAGE_CINEMATIC_PHOTOS = "com.google.android.wallpaper.effects";
+    private static final String PACKAGE_GOOGLE_WALLPAPERS = "com.google.android.wallpaper";
+
     private static final ComponentName GMS_ADD_ACCOUNT_ACTIVITY = ComponentName.unflattenFromString(
             "com.google.android.gms/.auth.uiflows.minutemaid.MinuteMaidActivity");
 
@@ -130,11 +133,8 @@ public class PropImitationHooks {
         sIsFinsky = packageName.equals(PACKAGE_FINSKY);
 
         if (sIsGms) {
-            dlog("Setting Pixel 2 fingerprint for: " + packageName);
+            dlog("Setting spoofed fingerprint for: " + packageName);
             setCertifiedPropsForGms();
-        } else if (sIsFinsky) {
-            dlog("Setting certified fingerprint for: " + packageName);
-            setPropValue("FINGERPRINT", sMainFP);
         } else {
             switch (packageName) {
                 case PACKAGE_SUBSCRIPTION_RED:
@@ -144,11 +144,14 @@ public class PropImitationHooks {
                 case PACKAGE_SETUPWIZARD:
                 case PACKAGE_GMS:
                 case PACKAGE_GCAM:
+                case PACKAGE_CINEMATIC_PHOTOS:
+                case PACKAGE_GOOGLE_WALLPAPERS:
+                case PACKAGE_EMOJI_WALLPAPER:
                     if (packageName.equals(PACKAGE_GCAM) && !SystemProperties.getBoolean("persist.sys.pixelprops.gcam", false)) {
-                        dlog("Not spoofing as Pixel 8 Pro for: " + packageName);
+                        dlog("Not spoofing as " + sMainModel + " for: " + packageName);
                         break;
                     }
-                    dlog("Spoofing as Pixel 8 Pro for: " + packageName);
+                    dlog("Spoofing as " + sMainModel + " for: " + packageName);
                     sMainSpoofProps.forEach((k, v) -> setPropValue(k, v));
                     setPropValue("TIME", System.currentTimeMillis());
                     break;
