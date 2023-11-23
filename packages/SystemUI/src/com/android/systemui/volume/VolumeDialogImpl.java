@@ -148,6 +148,7 @@ import com.android.systemui.statusbar.policy.DeviceProvisionedController;
 import com.android.systemui.tuner.TunerService;
 import com.android.systemui.util.AlphaTintDrawableWrapper;
 import com.android.systemui.util.RoundedCornerProgressDrawable;
+import com.android.systemui.tuner.TunerService;
 
 import lineageos.providers.LineageSettings;
 
@@ -155,6 +156,8 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+
+import com.android.internal.util.crdroid.ThemeUtils;
 
 /**
  * Visual presentation of the volume dialog.
@@ -166,6 +169,10 @@ import java.util.function.Consumer;
 public class VolumeDialogImpl implements VolumeDialog, Dumpable,
         ConfigurationController.ConfigurationListener,
         ViewTreeObserver.OnComputeInternalInsetsListener {
+
+    public static final String CUSTOM_VOLUME_STYLES =
+            "system:" + "custom_volume_styles";
+
     private static final String TAG = Util.logTag(VolumeDialogImpl.class);
 
     private static final String VOLUME_PANEL_ON_LEFT =
@@ -333,6 +340,9 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
     // Number of animating rows
     private int mAnimatingRows = 0;
 
+    private int customVolumeStyles = 0;
+    private ThemeUtils mThemeUtils;
+
     @VisibleForTesting
     final int mVolumeRingerIconDrawableId = R.drawable.ic_speaker_on;
     @VisibleForTesting
@@ -426,6 +436,9 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
         } else {
             mDevicePostureControllerCallback = null;
         }
+
+        Dependency.get(TunerService.class).addTunable(mTunable, CUSTOM_VOLUME_STYLES);
+        mThemeUtils = new ThemeUtils(mContext);
     }
 
     /**
@@ -876,11 +889,28 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
                     mTimeOutDesired = TunerService.parseInteger(newValue, 3);
                     mTimeOut = mTimeOutDesired * 1000;
                     break;
+                case CUSTOM_VOLUME_STYLES:
+                    final int selectedVolStyle = TunerService.parseInteger(newValue, 2);
+                    if (customVolumeStyles != selectedVolStyle) {
+                        customVolumeStyles = selectedVolStyle;
+                        mHandler.post(() -> {
+                            if (customVolumeStyles > 2 || customVolumeStyles == 0) {
+                                setVolumeStyle("com.android.system.volume.style"+ customVolumeStyles, "android.theme.customization.volume_panel");
+                            } else {
+                                setVolumeStyle("com.android.systemui", "android.theme.customization.volume_panel");
+                            }
+                        });
+                    }
+                    break;
                 default:
                     break;
              }
         }
     };
+
+    private void setVolumeStyle(String pkgName, String category) {
+        mThemeUtils.setOverlayEnabled(category, pkgName, "com.android.systemui");
+    }
 
     protected ViewGroup getDialogView() {
         return mDialogView;
@@ -997,7 +1027,13 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
         row.iconMuteRes = iconMuteRes;
         row.important = important;
         row.defaultStream = defaultStream;
-        row.view = mDialog.getLayoutInflater().inflate(R.layout.volume_dialog_row, null);
+        if (customVolumeStyles == 1) {
+           row.view = mDialog.getLayoutInflater().inflate(R.layout.volume_dialog_row_rui, null);
+        } else if (customVolumeStyles == 2) {
+           row.view = mDialog.getLayoutInflater().inflate(R.layout.volume_dialog_row, null);
+        } else {
+            row.view = mDialog.getLayoutInflater().inflate(R.layout.volume_dialog_row_aosp, null);
+        }
         row.view.setId(row.stream);
         row.view.setTag(row);
         row.header = row.view.findViewById(R.id.volume_row_header);
@@ -1012,8 +1048,20 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
 
         row.anim = null;
 
+        int[] drawables = {
+            R.drawable.volume_row_seekbar_aosp,
+            R.drawable.volume_row_seekbar_rui,
+            R.drawable.volume_row_seekbar,
+            R.drawable.volume_row_seekbar_double_layer,
+            R.drawable.volume_row_seekbar_gradient,
+            R.drawable.volume_row_seekbar_neumorph,
+            R.drawable.volume_row_seekbar_neumorph_outline,
+            R.drawable.volume_row_seekbar_outline,
+            R.drawable.volume_row_seekbar_shaded_layer
+        };
+
         final LayerDrawable seekbarDrawable =
-                (LayerDrawable) mContext.getDrawable(R.drawable.volume_row_seekbar);
+                (LayerDrawable) mContext.getDrawable(drawables[customVolumeStyles]);
 
         final LayerDrawable seekbarProgressDrawable = (LayerDrawable)
                 ((RoundedCornerProgressDrawable) seekbarDrawable.findDrawableByLayerId(
