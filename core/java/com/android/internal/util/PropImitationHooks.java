@@ -25,6 +25,7 @@ import android.app.Application;
 import android.app.TaskStackListener;
 import android.content.Context;
 import android.content.ComponentName;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.Build;
 import android.os.Binder;
@@ -34,6 +35,7 @@ import android.os.SystemProperties;
 import android.util.Log;
 
 import com.android.internal.R;
+import com.android.internal.util.pixeldust.PixeldustUtils;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -42,6 +44,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import java.util.Random;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
@@ -122,7 +125,7 @@ public class PropImitationHooks {
     private static volatile boolean sIsGms, sIsFinsky, sIsSetupWizard;
     private static volatile String sProcessName;
 
-    public static void setProps(Application app) {
+    public static void setProps(Context context, Application app) {
         final String packageName = app.getPackageName();
         final String processName = app.getProcessName();
         if (app == null || packageName == null || processName == null) {
@@ -136,7 +139,7 @@ public class PropImitationHooks {
         if (sIsGms) {
             if (shouldTryToCertifyDevice()) {
                 dlog("Spoofing build for GMS");
-                spoofBuildGms();
+                spoofBuildGms(context);
             }
         } else {
             switch (packageName) {
@@ -164,7 +167,7 @@ public class PropImitationHooks {
                     break;
                 case PACKAGE_SNAPCHAT:
                     dlog("Spoofing build for: " + packageName);
-                    spoofBuildGms();
+                    spoofBuildGms(context);
                     break;
                 case PACKAGE_GPHOTOS:
                     if (SystemProperties.getBoolean("persist.sys.pixelprops.gphotos", true)) {
@@ -244,19 +247,47 @@ public class PropImitationHooks {
         }
     }
 
-    private static void spoofBuildGms() {
-        // Alter most build properties for cts profile match checks
-        setPropValue("BRAND", "google");
-        setPropValue("PRODUCT", "walleye");
-        setPropValue("MODEL", "Pixel 2");
-    	setPropValue("MANUFACTURER", "Google");
-        setPropValue("DEVICE", "walleye");
-        setPropValue("FINGERPRINT", "google/walleye/walleye:8.1.0/OPM1.171019.011/4448085:user/release-keys");
-        setPropValue("ID", "OPM1.171019.011");
-        setPropValue("TYPE", "user");
-        setPropValue("TAGS", "release-keys");
-        setVersionField("DEVICE_INITIAL_SDK_INT", Build.VERSION_CODES.O_MR1);
-        setVersionFieldString("SECURITY_PATCH", "2017-12-05");
+    private static void spoofBuildGms(Context context) {
+        String packageName = "org.evolution.pif";
+
+        if (!PixeldustUtils.isPackageInstalled(context, packageName)) {
+            Log.e(TAG, "'" + packageName + "' is not installed.");
+            return;
+        }
+
+        PackageManager pm = context.getPackageManager();
+
+        try {
+            Resources resources = pm.getResourcesForApplication(packageName);
+
+            int resourceId = resources.getIdentifier("device_arrays", "array", packageName);
+            if (resourceId != 0) {
+                String[] deviceArrays = resources.getStringArray(resourceId);
+
+                if (deviceArrays.length > 0) {
+                    int randomIndex = new Random().nextInt(deviceArrays.length);
+                    int selectedArrayResId = resources.getIdentifier(deviceArrays[randomIndex], "array", packageName);
+                    String[] selectedDeviceProps = resources.getStringArray(selectedArrayResId);
+
+                    setPropValue("BRAND", selectedDeviceProps[0]);
+                    setPropValue("MANUFACTURER", selectedDeviceProps[1]);
+                    setPropValue("ID", selectedDeviceProps[2].isEmpty() ? getBuildID(selectedDeviceProps[6]) : selectedDeviceProps[2]);
+                    setPropValue("DEVICE", selectedDeviceProps[3].isEmpty() ? getDeviceName(selectedDeviceProps[6]) : selectedDeviceProps[3]);
+                    setPropValue("PRODUCT", selectedDeviceProps[4].isEmpty() ? getDeviceName(selectedDeviceProps[6]) : selectedDeviceProps[4]);
+                    setPropValue("MODEL", selectedDeviceProps[5]);
+                    setPropValue("FINGERPRINT", selectedDeviceProps[6]);
+                    setPropValue("TYPE", selectedDeviceProps[7].isEmpty() ? "user" : selectedDeviceProps[7]);
+                    setPropValue("TAGS", selectedDeviceProps[8].isEmpty() ? "release-keys" : selectedDeviceProps[8]);
+                } else {
+                    Log.e(TAG, "No device arrays found.");
+                }
+            } else {
+                Log.e(TAG, "Resource 'device_arrays' not found.");
+            }
+
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.e(TAG, "Error getting resources for '" + packageName + "': " + e.getMessage());
+        }
     }
 
     private static void setVersionFieldString(String key, String value) {
