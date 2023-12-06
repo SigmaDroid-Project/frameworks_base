@@ -51,7 +51,7 @@ import java.util.regex.Matcher;
 public class PropImitationHooks {
 
     private static final String TAG = "PropImitationHooks";
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
     
     private static final String PRODUCT_DEVICE = "ro.product.device";
 
@@ -269,20 +269,41 @@ public class PropImitationHooks {
                     int selectedArrayResId = resources.getIdentifier(deviceArrays[randomIndex], "array", packageName);
                     String[] selectedDeviceProps = resources.getStringArray(selectedArrayResId);
 
+                    dlog("PRODUCT: " + selectedDeviceProps[0]);
                     setPropValue("PRODUCT", selectedDeviceProps[0]);
+
+                    dlog("DEVICE: " + (selectedDeviceProps[1].isEmpty() ? getDeviceName(selectedDeviceProps[5]) : selectedDeviceProps[1]));
                     setPropValue("DEVICE", selectedDeviceProps[1].isEmpty() ? getDeviceName(selectedDeviceProps[5]) : selectedDeviceProps[1]);
+
+                    dlog("MANUFACTURER: " + selectedDeviceProps[2]);
                     setPropValue("MANUFACTURER", selectedDeviceProps[2]);
+
+                    dlog("BRAND: " + selectedDeviceProps[3]);
                     setPropValue("BRAND", selectedDeviceProps[3]);
+
+                    dlog("MODEL: " + selectedDeviceProps[4]);
                     setPropValue("MODEL", selectedDeviceProps[4]);
+
+                    dlog("FINGERPRINT: " + selectedDeviceProps[5]);
                     setPropValue("FINGERPRINT", selectedDeviceProps[5]);
+
+                    dlog("SECURITY_PATCH: " + selectedDeviceProps[6]);
                     setVersionFieldString("SECURITY_PATCH", selectedDeviceProps[6]);
+
                     if (!selectedDeviceProps[7].isEmpty() && selectedDeviceProps[7].matches("2[3-6]")) {
+                        dlog("DEVICE_INITIAL_SDK_INT: " + selectedDeviceProps[7]);
                         setVersionFieldInt("DEVICE_INITIAL_SDK_INT", Integer.parseInt(selectedDeviceProps[7]));
                     } else {
                         Log.e(TAG, "Value for DEVICE_INITIAL_SDK_INT must be between 23-26!");
                     }
+
+                    dlog("ID: " + (selectedDeviceProps[8].isEmpty() ? getBuildID(selectedDeviceProps[5]) : selectedDeviceProps[8]));
                     setPropValue("ID", selectedDeviceProps[8].isEmpty() ? getBuildID(selectedDeviceProps[5]) : selectedDeviceProps[8]);
+
+                    dlog("TYPE: " + (selectedDeviceProps[9].isEmpty() ? "user" : selectedDeviceProps[9]));
                     setPropValue("TYPE", selectedDeviceProps[9].isEmpty() ? "user" : selectedDeviceProps[9]);
+
+                    dlog("TAGS: " + (selectedDeviceProps[10].isEmpty() ? "release-keys" : selectedDeviceProps[10]));
                     setPropValue("TAGS", selectedDeviceProps[10].isEmpty() ? "release-keys" : selectedDeviceProps[10]);
                 } else {
                     Log.e(TAG, "No device arrays found.");
