@@ -56,8 +56,8 @@ public class PropImitationHooks {
     
     private static final String PRODUCT_DEVICE = "ro.product.device";
 
-    private static final String sMainFP = "google/felix/felix:14/UP1A.231105.003/11010452:user/release-keys";
-    private static final String sMainModel = "Pixel Fold";
+    private static final String sMainFP = "google/husky/husky:14/UQ1A.231205.015/11084887:user/release-keys";
+    private static final String sMainModel = "Pixel 8 Pro";
     private static final String sStockFp = SystemProperties.get("ro.vendor.build.fingerprint");
 
     private static final String PACKAGE_ARCORE = "com.google.ar.core";
