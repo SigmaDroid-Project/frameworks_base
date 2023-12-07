@@ -6668,6 +6668,12 @@ public final class Settings {
          public static final String SETTINGS_DASHBOARD_STYLE = "settings_dashboard_style";
 
         /**
+         * Stores the array name of the values currently used for SpoofBuildGms
+         * @hide
+         */
+        public static final String PPU_SPOOF_BUILD_GMS_ARRAY = "ppu_spoof_build_gms_array";
+
+        /**
          * Which Vibration Pattern to use
          * 0: dzzz-dzzz
          * 1: dzzz-da
