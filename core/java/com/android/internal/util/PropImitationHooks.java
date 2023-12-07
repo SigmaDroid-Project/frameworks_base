@@ -32,6 +32,7 @@ import android.os.Binder;
 import android.os.Process;
 import android.os.Build.VERSION;
 import android.os.SystemProperties;
+import android.provider.Settings;
 import android.util.Log;
 
 import com.android.internal.R;
@@ -103,7 +104,7 @@ public class PropImitationHooks {
         return props;
     }
 
-    private static String getDeviceName(String fingerprint) {
+    public static String getDeviceName(String fingerprint) {
         String[] parts = fingerprint.split("/");
         if (parts.length >= 2) {
             return parts[1];
@@ -112,7 +113,7 @@ public class PropImitationHooks {
         }
     }
 
-    private static String getBuildID(String fingerprint) {
+    public static String getBuildID(String fingerprint) {
         Pattern pattern = Pattern.compile("([A-Za-z0-9]+\\.\\d+\\.\\d+\\.\\w+)");
         Matcher matcher = pattern.matcher(fingerprint);
 
@@ -267,6 +268,8 @@ public class PropImitationHooks {
                 if (deviceArrays.length > 0) {
                     int randomIndex = new Random().nextInt(deviceArrays.length);
                     int selectedArrayResId = resources.getIdentifier(deviceArrays[randomIndex], "array", packageName);
+                    String selectedArrayName = resources.getResourceEntryName(selectedArrayResId);
+
                     String[] selectedDeviceProps = resources.getStringArray(selectedArrayResId);
 
                     dlog("PRODUCT: " + selectedDeviceProps[0]);
@@ -305,6 +308,8 @@ public class PropImitationHooks {
 
                     dlog("TAGS: " + (selectedDeviceProps[10].isEmpty() ? "release-keys" : selectedDeviceProps[10]));
                     setPropValue("TAGS", selectedDeviceProps[10].isEmpty() ? "release-keys" : selectedDeviceProps[10]);
+
+                    Settings.System.putString(context.getContentResolver(), Settings.System.PPU_SPOOF_BUILD_GMS_ARRAY, selectedArrayName);
                 } else {
                     Log.e(TAG, "No device arrays found.");
                 }
