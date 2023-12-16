@@ -6651,6 +6651,11 @@ public final class Settings {
         public static final String AMBIENT_CUSTOM_IMAGE = "ambient_custom_image";
 
         /**
+         * @hide
+         */
+        public static final String SETTINGS_STYLE = "settings_style";
+
+        /**
          * Which Vibration Pattern to use
          * 0: dzzz-dzzz
          * 1: dzzz-da
