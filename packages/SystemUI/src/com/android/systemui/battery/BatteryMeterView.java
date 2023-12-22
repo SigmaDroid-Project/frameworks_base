@@ -144,6 +144,7 @@ public class BatteryMeterView extends LinearLayout implements DarkReceiver {
     private int mBatteryStyle = BATTERY_STYLE_PORTRAIT;
     private int mShowBatteryPercent;
     private boolean mBatteryPercentCharging;
+    private boolean mCharging;
 
     private DualToneHandler mDualToneHandler;
 
