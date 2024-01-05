@@ -7445,6 +7445,10 @@ message MetricsEvent {
     // Add new aosp constants above this line.
     // END OF AOSP CONSTANTS
 
+    // AlphaSettings
+    ALPHA = 3999;
+    // SigmaSettings
+    SIGMA= 4002;
     // crDroid Settings
     CRDROID_SETTINGS = 4000;
   }
