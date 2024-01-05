@@ -7015,6 +7015,11 @@ public final class Settings {
         @Readable
         public static final String DEFAULT_MAX_ALARM_VOLUME = "default_max_alarm_volume";
 
+         /**
+         * @hide
+         */
+         public static final String SETTINGS_DASHBOARD_STYLE = "settings_dashboard_style";
+
         /**
          * Which Vibration Pattern to use
          * 0: dzzz-dzzz
