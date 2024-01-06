@@ -249,33 +249,25 @@ public class PropImitationHooks {
     }
 
     private static void spoofBuildGms(Context context) {
-        String[] packages = {"com.goolag.pif", "org.evolution.pif"};
-        int pkgFound = -1;
+        String packageName = "com.goolag.pif";
 
-        for (int i = 0; i < packages.length; i++) {
-            if (PixeldustUtils.isPackageInstalled(context, packages[i])) {
-                pkgFound = i;
-                break;
-            }
-        }
-
-        if (pkgFound == -1) {
-            Log.e(TAG, "'PifResourcesPrebuilt.apk' is not installed.");
+        if (!PixeldustUtils.isPackageInstalled(context, packageName)) {
+            Log.e(TAG, "'" + packageName + "' is not installed.");
             return;
         }
 
         PackageManager pm = context.getPackageManager();
 
         try {
-            Resources resources = pm.getResourcesForApplication(packages[pkgFound]);
+            Resources resources = pm.getResourcesForApplication(packageName);
 
-            int resourceId = resources.getIdentifier("device_arrays", "array", packages[pkgFound]);
+            int resourceId = resources.getIdentifier("device_arrays", "array", packageName);
             if (resourceId != 0) {
                 String[] deviceArrays = resources.getStringArray(resourceId);
 
                 if (deviceArrays.length > 0) {
                     int randomIndex = new Random().nextInt(deviceArrays.length);
-                    int selectedArrayResId = resources.getIdentifier(deviceArrays[randomIndex], "array", packages[pkgFound]);
+                    int selectedArrayResId = resources.getIdentifier(deviceArrays[randomIndex], "array", packageName);
                     String selectedArrayName = resources.getResourceEntryName(selectedArrayResId);
 
                     String[] selectedDeviceProps = resources.getStringArray(selectedArrayResId);
@@ -326,7 +318,7 @@ public class PropImitationHooks {
             }
 
         } catch (PackageManager.NameNotFoundException e) {
-            Log.e(TAG, "Error getting resources for '" + packages[pkgFound] + "': " + e.getMessage());
+            Log.e(TAG, "Error getting resources for '" + packageName + "': " + e.getMessage());
         }
     }
 
