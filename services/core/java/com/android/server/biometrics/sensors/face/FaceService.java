@@ -699,12 +699,12 @@ public class FaceService extends SystemService {
 
             mRegistry.registerAll(() -> {
                 final List<ServiceProvider> providers = new ArrayList<>();
-                /*for (FaceSensorPropertiesInternal hidlSensor : hidlSensors) {
+                for (FaceSensorPropertiesInternal hidlSensor : hidlSensors) {
                     providers.add(
                             Face10.newInstance(getContext(), mBiometricStateCallback,
                                     hidlSensor, mLockoutResetDispatcher));
                 }
-                providers.addAll(getAidlProviders());*/
+                providers.addAll(getAidlProviders());
                 providers.addAll(getSenseProviders());
                 return providers;
             });
