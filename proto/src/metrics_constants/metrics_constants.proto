@@ -7441,7 +7441,7 @@ message MetricsEvent {
 
     // AlphaSettings
     ALPHA = 3999;
-    SIGMA= 4002;
+
     // crDroid Settings
     CRDROID_SETTINGS = 4000;
 
