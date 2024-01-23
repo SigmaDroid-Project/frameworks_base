@@ -99,7 +99,8 @@ public class PixelPropsUtils {
             "com.google.android.apps.tachyon",
             "com.google.android.apps.tycho",
             "com.google.android.setupwizard",
-            "com.google.oslo"
+            "com.google.oslo",
+            "com.google.android.apps.googleassistant"
     };
 
     // Packages to Spoof as ROG Phone 6
@@ -252,13 +253,23 @@ public class PixelPropsUtils {
                 return;
             }
 
+            if (Arrays.asList(packagesToKeep).contains(packageName) ||
+                    packageName.startsWith("com.google.android.apps.googleassistant")) {
+                return;
+            }
+
+            if (Arrays.asList(packagesToKeep).contains(packageName) ||
+                    packageName.startsWith("com.google.android.apps.pixel.health")) {
+                return;
+            }
+
             Map<String, Object> propsToChange = new HashMap<>();
 
             if (packageName.equals("com.google.android.apps.photos")) {
                 if (SystemProperties.getBoolean(SPOOF_PIXEL_GPHOTOS, true)) {
                     propsToChange.putAll(propsToChangePixelXL);
                 } else {
-                    propsToChange.putAll(propsToChangePixel5);
+                    propsToChange.putAll(propsToChangePixel8Pro);
                 }
             } else if (packageName.equals("com.netflix.mediaclient") && 
                         !SystemProperties.getBoolean(SPOOF_PIXEL_NETFLIX, false)) {
@@ -273,7 +284,7 @@ public class PixelPropsUtils {
                         Arrays.asList(extraPackagesToChange).contains(packageName)) {
                     propsToChange.putAll(propsToChangePixel8Pro);
                 } else {
-                    propsToChange.putAll(propsToChangePixel5);
+                    propsToChange.putAll(propsToChangePixel8Pro);
                 }
             }
 
