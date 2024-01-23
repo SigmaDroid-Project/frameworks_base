@@ -35,7 +35,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.android.internal.R;
-import com.android.internal.util.evolution.EvolutionUtils;
+import com.android.internal.util.crdroid.CustomUtils;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -123,7 +123,8 @@ public class PixelPropsUtils {
             "com.google.android.setupwizard",
             "com.google.android.youtube",
             "com.google.ar.core",
-            "com.google.oslo"
+            "com.google.oslo",
+            "com.google.android.inputmethod.latin"
     };
 
     // Packages to Spoof as Meizu
@@ -247,7 +248,7 @@ public class PixelPropsUtils {
     public static void spoofBuildGms(Context context) {
         String packageName = "com.goolag.pif";
 
-        if (!EvolutionUtils.isPackageInstalled(context, packageName)) {
+        if (!CustomUtils.isPackageInstalled(context, packageName)) {
             Log.e(TAG, "'" + packageName + "' is not installed.");
             return;
         }
