@@ -67,8 +67,6 @@ public class TileUtils {
         int labelSize = Settings.System.getIntForUser(context.getContentResolver(),
                 Settings.System.QS_TILE_LABEL_SIZE,
                 15, UserHandle.USER_CURRENT);
-                labelSize = labelSize - 2;
-        return (float) labelSize;
     }
 
     public static float getQSTileSecondaryLabelSize(Context context) {
