@@ -13,4 +13,6 @@
 -->
 <resources>
     <dimen name="chip_corner_radius">28dp</dimen>
+    <dimen name="custom_qs_panel_padding_top">136dp</dimen>
+    <dimen name="custom_notification_row_padding">16dp</dimen>
 </resources>

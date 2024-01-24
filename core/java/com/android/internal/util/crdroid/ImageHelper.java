@@ -58,6 +58,7 @@ import android.renderscript.Allocation;
 import android.renderscript.ScriptIntrinsicBlur;
 import android.renderscript.RenderScript;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.util.Xml;
