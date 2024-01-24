@@ -60,6 +60,7 @@ public class PixelPropsUtils {
     private static final String SPOOF_PIXEL_PROPS = "persist.sys.pixelprops";
     private static final String SPOOF_PIXEL_RECENT = "persist.sys.pixelprops.recent";
     private static final String SPOOF_PIXEL_RECENT_ALL = "persist.sys.pixelprops.recent.all";
+    private static final String PROP_FIRST_API_LEVEL = "persist.sys.pihooks.first_api_level";
 
     private static final String TAG = PixelPropsUtils.class.getSimpleName();
     private static final boolean DEBUG = true;
@@ -245,6 +246,15 @@ public class PixelPropsUtils {
         }
     }
 
+    private static void setSystemProperty(String name, String value) {
+        try {
+            SystemProperties.set(name, value);
+            Log.d(TAG, "Set system prop " + name + "=" + value);
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to set system prop " + name + "=" + value, e);
+        }
+    }
+
     public static void spoofBuildGms(Context context) {
         String packageName = "com.goolag.pif";
 
@@ -292,7 +302,8 @@ public class PixelPropsUtils {
 
                     if (!selectedDeviceProps[7].isEmpty() && selectedDeviceProps[7].matches("2[3-6]")) {
                         dlog("DEVICE_INITIAL_SDK_INT: " + selectedDeviceProps[7]);
-                        setVersionFieldInt("DEVICE_INITIAL_SDK_INT", Integer.parseInt(selectedDeviceProps[7]));
+                        //setVersionFieldInt("DEVICE_INITIAL_SDK_INT", Integer.parseInt(selectedDeviceProps[7]));
+                        setSystemProperty(PROP_FIRST_API_LEVEL, String.valueOf(Build.VERSION_CODES.S));
                     } else {
                         Log.e(TAG, "Value for DEVICE_INITIAL_SDK_INT must be between 23-26!");
                     }
