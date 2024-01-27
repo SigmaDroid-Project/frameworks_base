@@ -249,7 +249,6 @@ public class UdfpsController implements DozeReceiver, Dumpable {
     private int[][] mBrightnessAlphaArray;
     private int mFrameworkDimmingDelay;
 
-    private UdfpsAnimation mUdfpsAnimation;
     private boolean mNeedsFingerDownOnActionDown;
 
     @VisibleForTesting
