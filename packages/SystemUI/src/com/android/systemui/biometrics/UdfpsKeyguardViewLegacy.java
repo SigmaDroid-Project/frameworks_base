@@ -87,7 +87,7 @@ public class UdfpsKeyguardViewLegacy extends UdfpsAnimationView {
     private boolean mCustomUdfpsIcon;
     private boolean mPackageInstalled;
 
-    public UdfpsKeyguardView(Context context, @Nullable AttributeSet attrs) {
+    public UdfpsKeyguardViewLegacy(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         mFingerprintDrawable = new UdfpsFpDrawable(context);
 
