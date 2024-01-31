@@ -249,8 +249,6 @@ public class UdfpsController implements DozeReceiver, Dumpable {
     private int[][] mBrightnessAlphaArray;
     private int mFrameworkDimmingDelay;
 
-    private boolean mNeedsFingerDownOnActionDown;
-
     @VisibleForTesting
     public static final VibrationAttributes UDFPS_VIBRATION_ATTRIBUTES =
             new VibrationAttributes.Builder()
@@ -761,7 +759,7 @@ public class UdfpsController implements DozeReceiver, Dumpable {
                     // data for many other pointers because of multi-touch support.
                     mActivePointerId = event.getPointerId(0);
                     mVelocityTracker.addMovement(event);
-                    if (shouldTriggerOnFingerDownWithActionDown()) {
+                    if (NeedsFingerDownOnActionDown()) {
                         final int idx = mActivePointerId == -1
                                 ? event.getPointerId(0)
                                 : event.findPointerIndex(mActivePointerId);
@@ -870,9 +868,9 @@ public class UdfpsController implements DozeReceiver, Dumpable {
         return handled;
     }
 
-    private boolean shouldTriggerOnFingerDownWithActionDown() {
+    private boolean NeedsFingerDownOnActionDown() {
         return mContext.getResources().getBoolean(
-                R.bool.config_onFingerDownWithActionDown);
+                R.bool.config_udfpsNeedsFingerDownOnActionDown);
     }
 
     private boolean shouldTryToDismissKeyguard() {
@@ -1028,8 +1026,6 @@ public class UdfpsController implements DozeReceiver, Dumpable {
         if (com.android.internal.util.crdroid.Utils.isPackageInstalled(mContext, "com.crdroid.udfps.animations")) {
             mUdfpsAnimation = new UdfpsAnimation(mContext, mWindowManager, mSensorProps);
         }
-        mNeedsFingerDownOnActionDown = mContext.getResources().getBoolean(
-                R.bool.config_udfpsNeedsFingerDownOnActionDown);
     }
 
     private void updateScreenOffFodState() {
