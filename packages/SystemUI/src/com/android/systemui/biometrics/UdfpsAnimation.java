@@ -65,7 +65,7 @@ public class UdfpsAnimation extends ImageView {
 
     private String[] mStyleNames;
 
-    private static final String UDFPS_ANIMATIONS_PACKAGE = "com.crdroid.udfps.animations";
+    private static final String UDFPS_ANIMATIONS_PACKAGE = "com.alpha.udfps.animations";
 
     private Resources mApkResources;
 
