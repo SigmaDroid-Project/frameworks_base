@@ -1245,7 +1245,7 @@ jint android_os_Process_sendSignalToProcessGroup(JNIEnv* env, jobject clazz, jin
 
 void android_os_Process_removeAllProcessGroups(JNIEnv* env, jobject clazz)
 {
-    return removeAllEmptyProcessGroups();
+    return removeAllProcessGroups();
 }
 
 static jint android_os_Process_nativePidFdOpen(JNIEnv* env, jobject, jint pid, jint flags) {
