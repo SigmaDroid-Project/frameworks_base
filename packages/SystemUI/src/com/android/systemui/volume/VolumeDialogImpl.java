@@ -278,17 +278,14 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
     private ImageButton mRingerIcon;
     private ViewGroup mODICaptionsView;
     private CaptionsToggleImageButton mODICaptionsIcon;
-    private ViewGroup mSettingsView;
-    private RotateAnimation rotateAnimation;
+    private View mSettingsView;
     private ImageButton mSettingsIcon;
-    private ViewGroup mExpandRowsView;
+    private View mExpandRowsView;
     private ExpandableIndicator mExpandRows;
     private FrameLayout mZenIcon;
-    private ViewGroup mAppVolumeView;
+    private View mAppVolumeView;
     private ImageButton mAppVolumeIcon;
     private String mAppVolumeActivePackageName;
-    private ImageButton mExpandRows;
-    private FrameLayout mZenIcon;
     private final List<VolumeRow> mRows = new ArrayList<>();
     private ConfigurableTexts mConfigurableTexts;
     private final SparseBooleanArray mDynamic = new SparseBooleanArray();
@@ -474,12 +471,10 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
             mDialog.dismiss();
         }
         mContext.getTheme().applyStyle(mContext.getThemeResId(), true);
+        mConfigChanged = true;
     }
 
     public void init(int windowType, Callback callback) {
-        if (mDialog != null) {
-            mDialog.dismiss();
-        }
         initDialog(mActivityManager.getLockTaskModeState());
 
         mController.addCallback(mControllerCallbackH, mHandler);
@@ -607,6 +602,7 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
         Log.d(TAG, "initDialog: called!");
         if (mDialog != null) {
             mDialog.dismiss();
+            mDialog = null;
         }
         if (mConfigurableTexts != null) {
             mConfigurableTexts = null;
@@ -802,20 +798,6 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
         mAppVolumeIcon = mDialog.findViewById(R.id.app_volume);
 
         if (isWindowGravityLeft()) {
-            if (mVolumePanelOnLeft) {
-                if (mRingerAndDrawerContainer != null) {
-                    mRingerAndDrawerContainer.setLayoutDirection(LAYOUT_DIRECTION_RTL);
-            }
-
-            setGravity(mSettingsView, Gravity.LEFT);
-            setLayoutGravity(mSettingsView, Gravity.LEFT);
-
-            setGravity(mExpandRowsView, Gravity.LEFT);
-            setLayoutGravity(mExpandRowsView, Gravity.LEFT);
-
-            setGravity(mAppVolumeView, Gravity.LEFT);
-            setLayoutGravity(mAppVolumeView, Gravity.LEFT);
-
             ViewGroup container = mDialog.findViewById(R.id.volume_dialog_container);
             setGravity(container, Gravity.LEFT);
 
@@ -2563,8 +2545,8 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
                 ? Utils.getColorAttr(mContext, android.R.attr.colorBackgroundFloating)
                 : Utils.getColorAttr(mContext, com.android.internal.R.attr.textColorOnAccent);
 
-        final ColorStateList colorAccent = Utils.getColorAttr(
-                mContext, com.android.internal.R.attr.colorAccent);
+        final ColorStateList inverseTextTint = Utils.getColorAttr(
+                mContext, com.android.internal.R.attr.textColorOnAccent);
 
         row.sliderProgressSolid.setTintList(colorTint);
         if (row.sliderProgressIcon != null) {
@@ -2887,7 +2869,6 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
 
         @Override
         public void onLayoutDirectionChanged(int layoutDirection) {
-            onConfigurationChanged();
         }
 
         @Override
