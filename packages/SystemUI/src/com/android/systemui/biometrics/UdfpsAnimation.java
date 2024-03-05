@@ -22,10 +22,13 @@ import static com.android.systemui.doze.util.BurnInHelperKt.getBurnInProgressOff
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.database.ContentObserver;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.Drawable;
 import android.hardware.fingerprint.FingerprintSensorPropertiesInternal;
+import android.net.Uri;
+import android.os.UserHandle;
 import android.provider.Settings;
 import android.util.AttributeSet;
 import android.util.DisplayUtils;
@@ -75,8 +78,6 @@ public class UdfpsAnimation extends ImageView {
 
         final float scaleFactor = DisplayUtils.getScaleFactor(mContext);
 
-        mEnabled = true; // enable by default
-        mSelectedAnim = 0;  // Set default animation style
         mMaxBurnInOffsetX = (int) (context.getResources()
             .getDimensionPixelSize(R.dimen.udfps_burn_in_offset_x) * scaleFactor);
         mMaxBurnInOffsetY = (int) (context.getResources()
@@ -93,7 +94,7 @@ public class UdfpsAnimation extends ImageView {
         mAnimParams.format = PixelFormat.TRANSLUCENT;
         mAnimParams.type = WindowManager.LayoutParams.TYPE_VOLUME_OVERLAY; // it must be behind Udfps icon
         mAnimParams.flags =  WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
-                | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
+                | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
                 | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
         mAnimParams.gravity = Gravity.TOP | Gravity.CENTER;
         mAnimParams.y = (int) (props.getLocation().sensorLocationY * scaleFactor) - (int) (props.getLocation().sensorRadius * scaleFactor)
@@ -111,12 +112,12 @@ public class UdfpsAnimation extends ImageView {
 
         setScaleType(ImageView.ScaleType.CENTER_INSIDE);
 
-        Uri udfpsAnimStyle = Settings.Secure.getUriFor(Settings.Secure.UDFPS_ANIM_STYLE);
+        Uri udfpsAnimStyle = Settings.System.getUriFor(Settings.System.UDFPS_ANIM_STYLE);
         ContentObserver contentObserver = new ContentObserver(null) {
             @Override
             public void onChange(boolean selfChange, Uri uri) {
-                int value = Settings.Secure.getIntForUser(mContext.getContentResolver(),
-                        Settings.Secure.UDFPS_ANIM_STYLE, 0, UserHandle.USER_CURRENT);
+                int value = Settings.System.getIntForUser(mContext.getContentResolver(),
+                        Settings.System.UDFPS_ANIM_STYLE, 0, UserHandle.USER_CURRENT);
                 int style = (value < 0 || value >= mStyleNames.length) ? 0 : value;
                 mContext.getMainExecutor().execute(() -> {
                     updateAnimationStyle(style);

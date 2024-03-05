@@ -54,6 +54,11 @@ import com.android.systemui.statusbar.policy.BatteryController;
 import com.android.systemui.statusbar.policy.DeviceProvisionedController;
 import com.android.systemui.statusbar.policy.OnHeadsUpChangedListener;
 import com.android.systemui.util.Assert;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.content.res.Resources;
+import android.provider.Settings;
+import android.os.UserHandle;
 
 import dagger.Lazy;
 
@@ -70,6 +75,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi;
 public final class DozeServiceHost implements DozeHost {
     private static final String TAG = "DozeServiceHost";
     private final ArrayList<Callback> mCallbacks = new ArrayList<>();
+    private final Context mContext;
     private final DozeLog mDozeLog;
     private final PowerManager mPowerManager;
     private boolean mAnimateWakeup;
@@ -126,6 +132,7 @@ public final class DozeServiceHost implements DozeHost {
             NotificationIconAreaController notificationIconAreaController,
             DozeInteractor dozeInteractor,
             PulseLightNotifManager pulseLightNotifManager,
+            Context context,
             EdgeLightViewController edgeLightViewController) {
         super();
         mDozeLog = dozeLog;
@@ -149,6 +156,7 @@ public final class DozeServiceHost implements DozeHost {
         mDozeInteractor = dozeInteractor;
         pulseLightNotifManager.addListener(mPulseLightNotifListener);
         mEdgeLightViewController = edgeLightViewController;
+        mContext = context;
         mPulseLightOnFaceDownOnly = context.getResources()
                 .getBoolean(R.bool.config_showEdgeLightOnlyWhenFaceDown);
     }

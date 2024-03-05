@@ -34,7 +34,7 @@ import com.android.settingslib.Utils
 import com.android.systemui.R
 import com.android.systemui.people.PeopleSpaceUtils
 
-import com.android.internal.derp.hardware.LineageHardwareManager
+import lineageos.hardware.LineageHardwareManager;
 
 class PulseLightView @JvmOverloads constructor(
     context: Context?,
