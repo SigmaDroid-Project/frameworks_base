@@ -123,7 +123,7 @@ public class AmbientDisplayConfiguration {
     /** @hide */
     public boolean pickupGestureAmbient(int user) {
         return boolSettingDefaultOff(Settings.Secure.DOZE_PICK_UP_GESTURE_AMBIENT, user)
-                && pickupGestureEnabled(user) && pulseOnNotificationEnabled(user);
+                && pickupGestureEnabled(user) && pulseOnNotificationAvailable();
     }
 
     /** @hide */
@@ -168,7 +168,7 @@ public class AmbientDisplayConfiguration {
     /** @hide */
     public boolean singleTapGestureAmbient(int user) {
         return boolSettingDefaultOff(Settings.Secure.DOZE_SINGLE_TAP_GESTURE_AMBIENT, user)
-                && tapGestureEnabled(user) && pulseOnNotificationEnabled(user);
+                && tapGestureEnabled(user) && pulseOnNotificationAvailable();
     }
 
     /** @hide */
@@ -310,7 +310,7 @@ public class AmbientDisplayConfiguration {
                 boolean isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
                             status == BatteryManager.BATTERY_STATUS_FULL;
                 int plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
-                boolean isPlugged = plugged == BatteryManager.BATTERY_PLUGGED_AC || 
+                boolean isPlugged = plugged == BatteryManager.BATTERY_PLUGGED_AC ||
                             plugged == BatteryManager.BATTERY_PLUGGED_USB ||
                             plugged == BatteryManager.BATTERY_PLUGGED_WIRELESS;
                 return isPlugged && isCharging;
