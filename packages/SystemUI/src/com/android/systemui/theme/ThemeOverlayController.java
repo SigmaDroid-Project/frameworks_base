@@ -351,11 +351,11 @@ public class ThemeOverlayController implements CoreStartable, Dumpable {
                 if (jsonObject.has(OVERLAY_CATEGORY_ACCENT_COLOR) ||
                         jsonObject.has(OVERLAY_CATEGORY_SYSTEM_PALETTE) ||
                         jsonObject.has(OVERLAY_CATEGORY_BG_COLOR)) {
-                    jsonObject.remove(OVERLAY_CATEGORY_DYNAMIC_COLOR);
-                    jsonObject.remove(OVERLAY_CATEGORY_ACCENT_COLOR);
-                    jsonObject.remove(OVERLAY_CATEGORY_BG_COLOR);
-                    jsonObject.remove(OVERLAY_CATEGORY_SYSTEM_PALETTE);
-                    jsonObject.remove(OVERLAY_COLOR_INDEX);
+                        jsonObject.remove(OVERLAY_CATEGORY_DYNAMIC_COLOR);
+                        jsonObject.remove(OVERLAY_CATEGORY_ACCENT_COLOR);
+                        jsonObject.remove(OVERLAY_CATEGORY_BG_COLOR);
+                        jsonObject.remove(OVERLAY_CATEGORY_SYSTEM_PALETTE);
+                        jsonObject.remove(OVERLAY_COLOR_INDEX);
                 }
                 // Keep color_both value because users can change either or both home and
                 // lock screen wallpapers.
