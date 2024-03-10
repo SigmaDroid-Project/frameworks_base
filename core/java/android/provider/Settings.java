@@ -6498,12 +6498,6 @@ public final class Settings {
         public static final String WIFI_STANDARD_ICON = "wifi_standard_icon";
 
         /**
-         * QS Header
-         * @hide
-         */
-        public static final String QS_HEADER_IMAGE = "qs_header_image";
-
-        /**
          * Edge scrolling haptics intensity
          * @hide
          */
