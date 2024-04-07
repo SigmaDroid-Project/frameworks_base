@@ -69,7 +69,6 @@ import com.android.compose.animation.Expandable
 import com.android.compose.modifiers.background
 import com.android.compose.theme.LocalAndroidColorScheme
 import com.android.compose.theme.colorAttr
-import com.android.systemui.R
 import com.android.systemui.animation.Expandable
 import com.android.systemui.common.shared.model.Icon
 import com.android.systemui.common.ui.compose.Icon
@@ -90,7 +89,8 @@ fun FooterActions(
 ) {
     val context = LocalContext.current
 
-    // Collect alphas as soon as we are composed, even when not visible.
+    // Collect visibility and alphas as soon as we are composed, even when not visible.
+    // val isVisible by viewModel.isVisible.collectAsState()
     val alpha by viewModel.alpha.collectAsState()
     val backgroundAlpha = viewModel.backgroundAlpha.collectAsState()
 
@@ -133,11 +133,10 @@ fun FooterActions(
             Modifier.background(
                 backgroundColor,
                 backgroundAlpha::value,
-                RoundedCornerShape(backgroundTopRadius),
+                RoundedCornerShape(topStart = backgroundTopRadius, topEnd = backgroundTopRadius),
             )
         }
 
-    val horizontalPadding = dimensionResource(R.dimen.qs_content_horizontal_padding)
     Row(
         modifier
             .fillMaxWidth()
@@ -146,8 +145,6 @@ fun FooterActions(
             .padding(
                 top = dimensionResource(R.dimen.qs_footer_actions_top_padding),
                 bottom = dimensionResource(R.dimen.qs_footer_actions_bottom_padding),
-                start = horizontalPadding,
-                end = horizontalPadding,
             )
             .layout { measurable, constraints ->
                 // All buttons have a 4dp padding to increase their touch size. To be consistent
@@ -236,7 +233,8 @@ private fun IconButton(
     modifier: Modifier = Modifier,
 ) {
     Expandable(
-        color = colorAttr(model.backgroundColor),
+        color = colorAttr(R.attr.underSurface),
+
         shape = CircleShape,
         onClick = model.onClick,
         modifier = modifier,
@@ -323,7 +321,7 @@ private fun TextButton(
         shape = CircleShape,
         color = colorAttr(R.attr.underSurface),
         contentColor = LocalAndroidColorScheme.current.onSurfaceVariant,
-        borderStroke = BorderStroke(1.dp, colorAttr(R.attr.shadeInactive)),
+        borderStroke = BorderStroke(1.dp, colorAttr(R.attr.onShadeActive)),
         modifier = modifier.padding(horizontal = 4.dp),
         onClick = onClick,
     ) {

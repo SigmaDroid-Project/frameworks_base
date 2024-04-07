@@ -64,6 +64,7 @@ import com.android.systemui.qs.TileUtils
 import com.android.systemui.qs.logging.QSLogger
 import com.android.systemui.qs.tileimpl.QSIconViewImpl.QS_ANIM_LENGTH
 import com.android.systemui.res.R
+import android.graphics.Color
 import java.util.Objects
 import android.provider.Settings.System
 
