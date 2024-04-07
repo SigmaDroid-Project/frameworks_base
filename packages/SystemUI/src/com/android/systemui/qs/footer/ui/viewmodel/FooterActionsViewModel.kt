@@ -89,111 +89,6 @@ class FooterActionsViewModel(
     private val _backgroundAlpha = MutableStateFlow(1f)
     val backgroundAlpha: StateFlow<Float> = _backgroundAlpha.asStateFlow()
 
-    /** The model for the security button. */
-    val security: Flow<FooterActionsSecurityButtonViewModel?> =
-        footerActionsInteractor.securityButtonConfig
-            .map { config ->
-                val (icon, text, isClickable) = config ?: return@map null
-                FooterActionsSecurityButtonViewModel(
-                    icon,
-                    text,
-                    if (isClickable) this::onSecurityButtonClicked else null,
-                )
-            }
-            .distinctUntilChanged()
-
-    /** The model for the foreground services button. */
-    val foregroundServices: Flow<FooterActionsForegroundServicesButtonViewModel?> =
-        combine(
-                footerActionsInteractor.foregroundServicesCount,
-                footerActionsInteractor.hasNewForegroundServices,
-                security,
-            ) { foregroundServicesCount, hasNewChanges, securityModel ->
-                if (foregroundServicesCount <= 0) {
-                    return@combine null
-                }
-
-                val text =
-                    icuMessageFormat(
-                        context.resources,
-                        R.string.fgs_manager_footer_label,
-                        foregroundServicesCount,
-                    )
-                FooterActionsForegroundServicesButtonViewModel(
-                    foregroundServicesCount,
-                    text = text,
-                    displayText = securityModel == null,
-                    hasNewChanges = hasNewChanges,
-                    this::onForegroundServiceButtonClicked,
-                )
-            }
-            .distinctUntilChanged()
-
-    /** The model for the user switcher button. */
-    val userSwitcher: Flow<FooterActionsButtonViewModel?> =
-        footerActionsInteractor.userSwitcherStatus
-            .map { userSwitcherStatus ->
-                when (userSwitcherStatus) {
-                    UserSwitcherStatusModel.Disabled -> null
-                    is UserSwitcherStatusModel.Enabled -> {
-                        if (userSwitcherStatus.currentUserImage == null) {
-                            Log.e(
-                                TAG,
-                                "Skipped the addition of user switcher button because " +
-                                    "currentUserImage is missing",
-                            )
-                            return@map null
-                        }
-
-                        userSwitcherButton(userSwitcherStatus)
-                    }
-                }
-            }
-            .distinctUntilChanged()
-
-    /** The model for the settings button. */
-    val settings: FooterActionsButtonViewModel =
-        FooterActionsButtonViewModel(
-            id = R.id.settings_button_container,
-            Icon.Resource(
-                R.drawable.ic_settings,
-                ContentDescription.Resource(R.string.accessibility_quick_settings_settings)
-            ),
-            iconTint =
-                Utils.getColorStateListDefaultColor(
-                    context,
-                    R.color.qs_color_button_settings,
-                ),
-            this::onSettingsButtonClicked,
-            this::onSettingsButtonLongClicked
-        )
-
-    /** The model for the power button. */
-    val power: FooterActionsButtonViewModel? =
-        if (showPowerButton) {
-            FooterActionsButtonViewModel(
-                id = R.id.pm_lite,
-                Icon.Resource(
-                    R.drawable.ic_qs_lock_power_off,
-                    ContentDescription.Resource(R.string.accessibility_quick_settings_power_menu)
-                ),
-                iconTint =
-                    Utils.getColorStateListDefaultColor(
-                        context,
-                        R.color.qs_color_button_power,
-                    ),
-                this::onPowerButtonClicked,
-                this::doNothingLongClick,
-            )
-        } else {
-            null
-        }
-
-    /** Called when the visibility of the UI rendering this model should be changed. */
-    fun onVisibilityChangeRequested(visible: Boolean) {
-        _isVisible.value = visible
-    }
-
     /** Called when the expansion of the Quick Settings changed. */
     fun onQuickSettingsExpansionChanged(expansion: Float, isInSplitShade: Boolean, customAlpha: Float) {
         if (isInSplitShade) {
@@ -207,107 +102,6 @@ class FooterActionsViewModel(
             val delay = 0.9f
             _alpha.value = max(0f, expansion - delay) / (1 - delay)
             _backgroundAlpha.value = customAlpha
-        }
-    }
-
-    /**
-     * Observe the device monitoring dialog requests and show the dialog accordingly. This function
-     * will suspend indefinitely and will need to be cancelled to stop observing.
-     *
-     * Important: [quickSettingsContext] must be the [Context] associated to the
-     * [Quick Settings fragment][com.android.systemui.qs.QSFragment], and the call to this function
-     * must be cancelled when that fragment is destroyed.
-     */
-    suspend fun observeDeviceMonitoringDialogRequests(quickSettingsContext: Context) {
-        footerActionsInteractor.deviceMonitoringDialogRequests.collect {
-            footerActionsInteractor.showDeviceMonitoringDialog(
-                quickSettingsContext,
-                expandable = null,
-            )
-        }
-    }
-
-    private fun onSecurityButtonClicked(quickSettingsContext: Context, expandable: Expandable) {
-        if (falsingManager.isFalseTap(FalsingManager.LOW_PENALTY)) {
-            return
-        }
-
-        footerActionsInteractor.showDeviceMonitoringDialog(quickSettingsContext, expandable)
-    }
-
-    private fun onForegroundServiceButtonClicked(expandable: Expandable) {
-        if (falsingManager.isFalseTap(FalsingManager.LOW_PENALTY)) {
-            return
-        }
-
-        footerActionsInteractor.showForegroundServicesDialog(expandable)
-    }
-
-    private fun onUserSwitcherClicked(expandable: Expandable) {
-        if (falsingManager.isFalseTap(FalsingManager.LOW_PENALTY)) {
-            return
-        }
-
-        footerActionsInteractor.showUserSwitcher(expandable)
-    }
-
-    private fun onSettingsButtonClicked(expandable: Expandable) {
-        if (falsingManager.isFalseTap(FalsingManager.LOW_PENALTY)) {
-            return
-        }
-
-        footerActionsInteractor.showSettings(expandable)
-    }
-
-    private fun onSettingsButtonLongClicked(expandable: Expandable): Boolean {
-        if (falsingManager.isFalseTap(FalsingManager.LOW_PENALTY)) {
-            return false
-        }
-
-        return footerActionsInteractor.showCustomSettings(expandable)
-    }
-
-    private fun doNothingLongClick(expandable: Expandable): Boolean {
-        return false
-    }
-
-    private fun onPowerButtonClicked(expandable: Expandable) {
-        val mKeyguard = Dependency.get(KeyguardStateController::class.java)
-        if (mKeyguard.isShowing() && mKeyguard.isMethodSecure() 
-                && Settings.System.getIntForUser(context.getContentResolver(),
-                Settings.System.LOCKSCREEN_ENABLE_POWER_MENU, 1, UserHandle.USER_CURRENT) == 0) {
-            return
-        }
-        if (falsingManager.isFalseTap(FalsingManager.LOW_PENALTY)) {
-            return
-        }
-
-        footerActionsInteractor.showPowerMenuDialog(globalActionsDialogLite, expandable)
-    }
-
-    private fun userSwitcherButton(
-        status: UserSwitcherStatusModel.Enabled
-    ): FooterActionsButtonViewModel {
-        val icon = status.currentUserImage!!
-
-        return FooterActionsButtonViewModel(
-            id = R.id.multi_user_switch,
-            icon =
-                Icon.Loaded(
-                    icon,
-                    ContentDescription.Loaded(
-                        userSwitcherContentDescription(status.currentUserName)
-                    ),
-                ),
-            iconTint = null,
-            onClick = this::onUserSwitcherClicked,
-            onLongClick = this::doNothingLongClick,
-        )
-    }
-
-    private fun userSwitcherContentDescription(currentUser: String?): String? {
-        return currentUser?.let { user ->
-            context.getString(R.string.accessibility_quick_settings_user, user)
         }
     }
 
@@ -350,8 +144,262 @@ class FooterActionsViewModel(
             )
         }
     }
+}
 
-    companion object {
-        private const val TAG = "FooterActionsViewModel"
+fun FooterActionsViewModel(
+    @Application appContext: Context,
+    footerActionsInteractor: FooterActionsInteractor,
+    falsingManager: FalsingManager,
+    globalActionsDialogLite: GlobalActionsDialogLite,
+    showPowerButton: Boolean,
+    keyguardStateController: KeyguardStateController
+): FooterActionsViewModel {
+    suspend fun observeDeviceMonitoringDialogRequests(quickSettingsContext: Context) {
+        footerActionsInteractor.deviceMonitoringDialogRequests.collect {
+            footerActionsInteractor.showDeviceMonitoringDialog(
+                quickSettingsContext,
+                expandable = null,
+            )
+        }
     }
+
+    fun onSecurityButtonClicked(quickSettingsContext: Context, expandable: Expandable) {
+        if (falsingManager.isFalseTap(FalsingManager.LOW_PENALTY)) {
+            return
+        }
+
+        footerActionsInteractor.showDeviceMonitoringDialog(quickSettingsContext, expandable)
+    }
+
+    fun onForegroundServiceButtonClicked(expandable: Expandable) {
+        if (falsingManager.isFalseTap(FalsingManager.LOW_PENALTY)) {
+            return
+        }
+
+        footerActionsInteractor.showForegroundServicesDialog(expandable)
+    }
+
+    fun onUserSwitcherClicked(expandable: Expandable) {
+        if (falsingManager.isFalseTap(FalsingManager.LOW_PENALTY)) {
+            return
+        }
+
+        footerActionsInteractor.showUserSwitcher(expandable)
+    }
+
+    fun onSettingsButtonClicked(expandable: Expandable) {
+        if (falsingManager.isFalseTap(FalsingManager.LOW_PENALTY)) {
+            return
+        }
+
+        footerActionsInteractor.showSettings(expandable)
+    }
+
+    fun onSettingsButtonLongClicked(expandable: Expandable): Boolean {
+        if (falsingManager.isFalseTap(FalsingManager.LOW_PENALTY)) {
+            return false
+        }
+
+        return footerActionsInteractor.showCustomSettings(expandable)
+    }
+
+    fun doNothingLongClick(expandable: Expandable): Boolean {
+        return false
+    }
+
+    fun onPowerButtonClicked(expandable: Expandable) {
+        if (keyguardStateController.isShowing() && keyguardStateController.isMethodSecure() 
+                && Settings.System.getIntForUser(appContext.getContentResolver(),
+                Settings.System.LOCKSCREEN_ENABLE_POWER_MENU, 1, UserHandle.USER_CURRENT) == 0) {
+            return
+        }
+        if (falsingManager.isFalseTap(FalsingManager.LOW_PENALTY)) {
+            return
+        }
+
+        footerActionsInteractor.showPowerMenuDialog(globalActionsDialogLite, expandable)
+    }
+
+    val qsThemedContext = ContextThemeWrapper(appContext, R.style.Theme_SystemUI_QuickSettings)
+
+    val security =
+        footerActionsInteractor.securityButtonConfig
+            .map { config ->
+                config?.let { securityButtonViewModel(it, ::onSecurityButtonClicked) }
+            }
+            .distinctUntilChanged()
+
+    val foregroundServices =
+        combine(
+                footerActionsInteractor.foregroundServicesCount,
+                footerActionsInteractor.hasNewForegroundServices,
+                security,
+            ) { foregroundServicesCount, hasNewChanges, securityModel ->
+                if (foregroundServicesCount <= 0) {
+                    return@combine null
+                }
+
+                foregroundServicesButtonViewModel(
+                    qsThemedContext,
+                    foregroundServicesCount,
+                    securityModel,
+                    hasNewChanges,
+                    ::onForegroundServiceButtonClicked,
+                )
+            }
+            .distinctUntilChanged()
+
+    val userSwitcher =
+        footerActionsInteractor.userSwitcherStatus
+            .map { userSwitcherStatus ->
+                when (userSwitcherStatus) {
+                    UserSwitcherStatusModel.Disabled -> null
+                    is UserSwitcherStatusModel.Enabled -> {
+                        if (userSwitcherStatus.currentUserImage == null) {
+                            Log.e(
+                                TAG,
+                                "Skipped the addition of user switcher button because " +
+                                    "currentUserImage is missing",
+                            )
+                            return@map null
+                        }
+
+                        userSwitcherButtonViewModel(
+                            qsThemedContext,
+                            userSwitcherStatus,
+                            ::onUserSwitcherClicked,
+                            ::doNothingLongClick
+                        )
+                    }
+                }
+            }
+            .distinctUntilChanged()
+
+    val settings = settingsButtonViewModel(qsThemedContext, ::onSettingsButtonClicked, ::onSettingsButtonLongClicked)
+    val power =
+        if (showPowerButton) {
+            powerButtonViewModel(qsThemedContext, ::onPowerButtonClicked, ::doNothingLongClick)
+        } else {
+            null
+        }
+
+    return FooterActionsViewModel(
+        security = security,
+        foregroundServices = foregroundServices,
+        userSwitcher = userSwitcher,
+        settings = settings,
+        power = power,
+        observeDeviceMonitoringDialogRequests = ::observeDeviceMonitoringDialogRequests,
+    )
+}
+
+fun securityButtonViewModel(
+    config: SecurityButtonConfig,
+    onSecurityButtonClicked: (Context, Expandable) -> Unit,
+): FooterActionsSecurityButtonViewModel {
+    val (icon, text, isClickable) = config
+    return FooterActionsSecurityButtonViewModel(
+        icon,
+        text,
+        if (isClickable) onSecurityButtonClicked else null,
+    )
+}
+
+fun foregroundServicesButtonViewModel(
+    qsThemedContext: Context,
+    foregroundServicesCount: Int,
+    securityModel: FooterActionsSecurityButtonViewModel?,
+    hasNewChanges: Boolean,
+    onForegroundServiceButtonClicked: (Expandable) -> Unit,
+): FooterActionsForegroundServicesButtonViewModel {
+    val text =
+        icuMessageFormat(
+            qsThemedContext.resources,
+            R.string.fgs_manager_footer_label,
+            foregroundServicesCount,
+        )
+
+    return FooterActionsForegroundServicesButtonViewModel(
+        foregroundServicesCount,
+        text = text,
+        displayText = securityModel == null,
+        hasNewChanges = hasNewChanges,
+        onForegroundServiceButtonClicked,
+    )
+}
+
+fun userSwitcherButtonViewModel(
+    qsThemedContext: Context,
+    status: UserSwitcherStatusModel.Enabled,
+    onUserSwitcherClicked: (Expandable) -> Unit,
+    doNothingLongClick: (Expandable) -> Boolean,
+): FooterActionsButtonViewModel {
+    val icon = status.currentUserImage!!
+    return FooterActionsButtonViewModel(
+        id = R.id.multi_user_switch,
+        icon =
+            Icon.Loaded(
+                icon,
+                ContentDescription.Loaded(
+                    userSwitcherContentDescription(qsThemedContext, status.currentUserName)
+                ),
+            ),
+        iconTint = null,
+        backgroundColor = R.attr.shadeInactive,
+        onClick = onUserSwitcherClicked,
+        onLongClick = doNothingLongClick,
+    )
+}
+
+private fun userSwitcherContentDescription(
+    qsThemedContext: Context,
+    currentUser: String?
+): String? {
+    return currentUser?.let { user ->
+        qsThemedContext.getString(R.string.accessibility_quick_settings_user, user)
+    }
+}
+
+fun settingsButtonViewModel(
+    qsThemedContext: Context,
+    onSettingsButtonClicked: (Expandable) -> Unit,
+    onSettingsButtonLongClicked: (Expandable) -> Boolean,
+): FooterActionsButtonViewModel {
+    return FooterActionsButtonViewModel(
+        id = R.id.settings_button_container,
+        Icon.Resource(
+            R.drawable.ic_settings,
+            ContentDescription.Resource(R.string.accessibility_quick_settings_settings)
+        ),
+        iconTint =
+            Utils.getColorAttrDefaultColor(
+                qsThemedContext,
+                R.attr.onShadeInactiveVariant,
+            ),
+        backgroundColor = R.attr.shadeInactive,
+        onSettingsButtonClicked,
+        onSettingsButtonLongClicked,
+    )
+}
+
+fun powerButtonViewModel(
+    qsThemedContext: Context,
+    onPowerButtonClicked: (Expandable) -> Unit,
+    doNothingLongClick: (Expandable) -> Boolean,
+): FooterActionsButtonViewModel {
+    return FooterActionsButtonViewModel(
+        id = R.id.pm_lite,
+        Icon.Resource(
+            android.R.drawable.ic_lock_power_off,
+            ContentDescription.Resource(R.string.accessibility_quick_settings_power_menu)
+        ),
+        iconTint =
+            Utils.getColorAttrDefaultColor(
+                qsThemedContext,
+                R.attr.onShadeActive,
+            ),
+        backgroundColor = R.attr.shadeActive,
+        onPowerButtonClicked,
+        doNothingLongClick,
+    )
 }

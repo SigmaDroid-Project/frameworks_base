@@ -233,9 +233,10 @@ class FooterActionsViewBinder @Inject constructor() {
         }
 
         val backgroundResource =
-            when (model.id) {
-                R.id.pm_lite -> R.drawable.qs_footer_action_circle_color
-                else -> R.drawable.qs_footer_action_circle
+            when (model.backgroundColor) {
+                R.attr.shadeInactive -> R.drawable.qs_footer_action_circle
+                R.attr.shadeActive -> R.drawable.qs_footer_action_circle_color
+                else -> error("Unsupported icon background resource ${model.backgroundColor}")
             }
         buttonView.setBackgroundResource(backgroundResource)
         buttonView.setOnClickListener { model.onClick(Expandable.fromView(buttonView)) }
