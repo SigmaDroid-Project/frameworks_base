@@ -20,7 +20,7 @@ import android.content.res.Resources;
 import android.provider.Settings;
 import android.util.TypedValue;
 
-import com.android.systemui.R;
+import com.android.systemui.res.R;
 import com.android.systemui.Dependency;
 import com.android.systemui.tuner.TunerService;
 
