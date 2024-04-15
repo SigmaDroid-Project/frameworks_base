@@ -267,8 +267,8 @@ public class QuickQSPanel extends QSPanel implements TunerService.Tunable {
         @Override
         protected void onConfigurationChanged(Configuration newConfig) {
             super.onConfigurationChanged(newConfig);
-            updateResources();
-            mQSPanel.setMaxTiles(getResourceColumns());
+            updateSettings();
+            requestLayout();
         }
 
         @Override
