@@ -271,7 +271,7 @@ public class EdgeEffect {
         callerHasVibratePermission = mContext.checkCallingOrSelfPermission(
                     android.Manifest.permission.VIBRATE) == PackageManager.PERMISSION_GRANTED;
         vibrateIntensity = Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.EDGE_SCROLLING_HAPTICS_INTENSITY, 1);
+                Settings.System.EDGE_SCROLLING_HAPTICS_INTENSITY, 3);
     }
 
     @EdgeEffectType
