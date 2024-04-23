@@ -124,7 +124,7 @@ open class QSTileViewImpl @JvmOverloads constructor(
 
     private val qsTileHaptic: Int = Settings.System.getIntForUser(
             context.contentResolver,
-            Settings.System.QS_PANEL_TILE_HAPTIC, 0, UserHandle.USER_CURRENT
+            Settings.System.QS_PANEL_TILE_HAPTIC, 1, UserHandle.USER_CURRENT
         )
 
     private var initialX = 0f
