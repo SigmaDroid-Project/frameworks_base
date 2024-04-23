@@ -268,7 +268,7 @@ public class GestureNavigationSettingsObserver extends ContentObserver {
 
     public int getEdgeHapticIntensity() {
         return Settings.Secure.getIntForUser(mContext.getContentResolver(),
-                Settings.Secure.BACK_GESTURE_HAPTIC_INTENSITY, 1, UserHandle.USER_CURRENT);
+                Settings.Secure.BACK_GESTURE_HAPTIC_INTENSITY, 3, UserHandle.USER_CURRENT);
     }
 
     public boolean areNavigationButtonForcedVisible() {
