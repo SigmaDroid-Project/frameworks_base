@@ -13579,12 +13579,6 @@ public final class Settings {
          */
         public static final String DOZE_PICK_UP_GESTURE_AMBIENT = "doze_pick_up_gesture_ambient";
 
-       /**
-         * Whether to show ambient instead of waking for the tap gesture
-         * @hide
-         */
-        public static final String DOZE_SINGLE_TAP_GESTURE_AMBIENT = "doze_single_tap_gesture_ambient";
-
         /**
          * Whether to always show the time on media controls
          * @hide
