@@ -14138,12 +14138,6 @@ public final class Settings {
         public static final String CHARGING_VIBRATION_ENABLED = "charging_vibration_enabled";
 
         /**
-         * Ringtone for battery charge level warning.
-         * @hide
-         */
-        public static final String BATTERY_LEVEL_CHARGE_SOUND_ALARM = "battery_level_charge_ringtone";
-
-        /**
          * Whether we keep the device on while the device is plugged in.
          * Supported values are:
          * <ul>
