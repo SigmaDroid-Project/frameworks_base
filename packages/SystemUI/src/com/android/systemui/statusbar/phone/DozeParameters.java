@@ -482,8 +482,6 @@ public class DozeParameters implements
                 Settings.Secure.getUriFor(Settings.Secure.DOZE_PICK_UP_GESTURE);
         private final Uri mAlwaysOnEnabled =
                 Settings.Secure.getUriFor(Settings.Secure.DOZE_ALWAYS_ON);
-        private final Uri mPickupGestureAmbient =
-                Settings.Secure.getUriFor(Settings.Secure.DOZE_PICK_UP_GESTURE_AMBIENT);
         private final Context mContext;
 
         SettingsObserver(Context context, Handler handler) {
@@ -497,7 +495,6 @@ public class DozeParameters implements
                     UserHandle.USER_ALL);
             resolver.registerContentObserver(mPickupGesture, false, this, UserHandle.USER_ALL);
             resolver.registerContentObserver(mAlwaysOnEnabled, false, this, UserHandle.USER_ALL);
-            resolver.registerContentObserver(mPickupGestureAmbient, false, this, UserHandle.USER_ALL);
             update(null);
         }
 
@@ -514,10 +511,6 @@ public class DozeParameters implements
                 // the quick pickup gesture is dependent on alwaysOn being disabled and
                 // the pickup gesture being enabled
                 updateQuickPickupEnabled();
-            } else if (mPickupGestureAmbient.equals(uri)) {
-                int pickupGestureAmbient = Settings.Secure.getInt(mContext.getContentResolver(), Settings.Secure.DOZE_PICK_UP_GESTURE_AMBIENT, 0);
-                int raiseToWakeGesture = pickupGestureAmbient == 1 ? 0 : 1;
-                Settings.Secure.putInt(mContext.getContentResolver(), Settings.Secure.RAISE_TO_WAKE_GESTURE, raiseToWakeGesture);
             }
         }
     }
