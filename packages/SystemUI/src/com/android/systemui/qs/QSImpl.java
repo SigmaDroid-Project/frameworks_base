@@ -74,6 +74,7 @@ import com.android.systemui.statusbar.policy.RemoteInputQuickSettingsDisabler;
 import com.android.systemui.statusbar.policy.SecureLockscreenQSDisabler;
 import com.android.systemui.tuner.TunerService;
 import com.android.systemui.util.Utils;
+import com.android.systemui.util.WallpaperDepthUtils;
 
 import dalvik.annotation.optimization.NeverCompile;
 
@@ -184,6 +185,7 @@ public class QSImpl implements QS, CommandQueue.Callbacks, StatusBarStateControl
     private final SceneContainerFlags mSceneContainerFlags;
 
     private final TunerService mTunerService;
+    private WallpaperDepthUtils mWallpaperDepthUtils;
 
     private float mCustomAlpha = 1f;
 
@@ -312,6 +314,7 @@ public class QSImpl implements QS, CommandQueue.Callbacks, StatusBarStateControl
         mCommandQueue.addCallback(this);
 
         mTunerService.addTunable(this, QS_TRANSPARENCY);
+        mWallpaperDepthUtils = WallpaperDepthUtils.getInstance(mRootView.getContext());
     }
 
     private void bindFooterActionsView(View root) {
