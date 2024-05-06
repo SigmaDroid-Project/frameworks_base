@@ -86,6 +86,7 @@ import com.android.systemui.util.AlarmTimeout;
 import com.android.systemui.util.kotlin.JavaAdapter;
 import com.android.systemui.util.wakelock.DelayedWakeLock;
 import com.android.systemui.util.wakelock.WakeLock;
+import com.android.systemui.util.WallpaperDepthUtils;
 import com.android.systemui.wallpapers.data.repository.WallpaperRepository;
 
 import java.io.PrintWriter;
