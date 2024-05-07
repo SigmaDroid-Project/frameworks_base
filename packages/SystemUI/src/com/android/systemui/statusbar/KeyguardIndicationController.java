@@ -1310,7 +1310,7 @@ public class KeyguardIndicationController {
             }
             if (mChargingVoltage > 0) {
                 batteryInfo = (batteryInfo == "" ? "" : batteryInfo + " · ") +
-                        String.format("%.1f", (mChargingVoltage / 1000 / 1000)) + "V";
+                        String.format("%.1f", (float) (mChargingVoltage / 1000 / 1000)) + "V";
             }
             if (mTemperature > 0) {
                 if (batteryTempUnit) {
