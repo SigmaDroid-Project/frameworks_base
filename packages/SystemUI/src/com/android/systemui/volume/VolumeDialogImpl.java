@@ -379,6 +379,8 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
     private int customVolumeStyles = 0;
     private ThemeUtils mThemeUtils;
 
+    private boolean mShowMediaButton = true;
+
     public VolumeDialogImpl(
             Context context,
             VolumeDialogController volumeDialogController,
@@ -479,6 +481,17 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
                 Settings.Secure.getUriFor(Settings.Secure.VOLUME_DIALOG_DISMISS_TIMEOUT),
                 false, volumeTimeoutObserver);
         volumeTimeoutObserver.onChange(true);
+        ContentObserver volumeMediaButtonObserver = new ContentObserver(null) {
+            @Override
+            public void onChange(boolean selfChange) {
+                mShowMediaButton = mSecureSettings.get().getInt(
+                        "volume_show_media_button", 1) != 0;
+            }
+        };
+        mContext.getContentResolver().registerContentObserver(
+                Settings.Secure.getUriFor("volume_show_media_button"),
+                false, volumeMediaButtonObserver);
+        volumeMediaButtonObserver.onChange(true);
 
         initDimens();
 
@@ -1564,7 +1577,7 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
 
     private boolean isMediaControllerAvailable() {
         final MediaController mediaController = getActiveLocalMediaController();
-        return mediaController != null && !TextUtils.isEmpty(mediaController.getPackageName());
+        return mediaController != null && !TextUtils.isEmpty(mediaController.getPackageName()) && mShowMediaButton;
     }
 
     private void initSettingsH(int lockTaskModeState) {
