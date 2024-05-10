@@ -75,4 +75,10 @@
     <java-symbol type="string" name="config_batterymeterLandPowersavePathMiUIPill" />
     <java-symbol type="string" name="config_batterymeterLandErrorPerimeterPathMiUIPill" />
 
+    <!-- Enable face auth only when swiping security view -->
+    <java-symbol type="bool" name="config_faceAuthOnlyOnSecurityView" />
+
+    <!-- Whether device supports an alt. ambient display -->
+    <java-symbol type="bool" name="config_alt_ambient_display"/>
+
 </resources>
