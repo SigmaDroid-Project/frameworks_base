@@ -282,6 +282,10 @@ public class systemUtils {
         FireActions.killForegroundApp();
     }
 
+    public static void killForegroundApp() {
+        FireActions.killForegroundApp();
+    }
+
     public static void toggleCameraFlash() {
         FireActions.toggleCameraFlash();
     }
