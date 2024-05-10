@@ -7108,13 +7108,6 @@ public final class Settings {
         public static final String VOWIFI_ICON_STYLE = "vowifi_icon_style";
 
         /**
-         * Arcane Idle Manager
-         * @hide
-         */
-        @Readable
-        public static final String ARCANE_IDLE_MANAGER = "arcane_idle_manager";
-
-        /**
          * Whether to enable charge battery warning
          * @hide
          */
