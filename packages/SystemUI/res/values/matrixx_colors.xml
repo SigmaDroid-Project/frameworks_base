@@ -1,3 +1,20 @@
 <resources>    
     <color name="ambient_batterybar_color">@android:color/system_accent1_600</color>
+    <color name="nf_color_button_text">@color/notif_pill_text</color>
+    <color name="qs_ripple_color">@color/qs_color_accent_primary</color>
+    <color name="qs_color_button_power">@*android:color/qs_color_button_power</color>
+    <color name="qs_color_button_settings">@*android:color/qs_color_button_settings</color>
+    <color name="qs_color_button_brightness">@*android:color/qs_color_button_brightness</color>
+    <color name="qs_color_text_active">@*android:color/qs_color_text_active</color>
+    <color name="qs_color_text_inactive">@*android:color/qs_color_text_inactive</color>
+    <color name="qs_color_text_unavailable">@*android:color/qs_color_text_unavailable</color>
+    <color name="qs_color_icon_active">@*android:color/qs_color_icon_active</color>
+    <color name="qs_color_icon_inactive">@*android:color/qs_color_icon_inactive</color>
+    <color name="qs_color_icon_unavailable">@*android:color/qs_color_icon_unavailable</color>
+    <color name="qs_color_inactive">@*android:color/qs_color_inactive</color>
+    <color name="qs_color_neutral">@*android:color/qs_color_neutral</color>
+    <color name="qs_color_accent_primary">@*android:color/qs_color_accent_primary</color>
+    <color name="qs_color_accent_secondary">@*android:color/qs_color_accent_secondary</color>
+    <color name="qs_color_accent_custom_primary">@*android:color/qs_color_accent_custom_primary</color>
+    <color name="qs_color_accent_custom_secondary">@*android:color/qs_color_accent_custom_secondary</color>
 </resources>
