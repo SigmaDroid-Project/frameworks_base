@@ -71,9 +71,9 @@ import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.concurrent.TimeoutException;
 
-import com.android.internal.util.evolution.AttestationHooks;
-import com.android.internal.util.evolution.GamesPropsUtils;
-import com.android.internal.util.evolution.PixelPropsUtils;
+import com.android.internal.util.crdroid.AttestationHooks;
+import com.android.internal.util.crdroid.GamesPropsUtils;
+import com.android.internal.util.crdroid.PixelPropsUtils;
 
 /**
  * Base class for implementing application instrumentation code.  When running
