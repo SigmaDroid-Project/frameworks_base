@@ -281,7 +281,6 @@ open class QSTileViewImpl @JvmOverloads constructor(
 
         background = createTileBackground()
         setColor(backgroundColor)
-        setOverlayColor(backgroundOverlayColor)
     }
 
     private fun createAndAddLabels() {
