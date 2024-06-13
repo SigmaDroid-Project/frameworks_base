@@ -27,6 +27,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.RippleDrawable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -64,6 +65,8 @@ public class NotificationBackgroundView extends View implements Dumpable {
     private final ColorStateList mLightColoredStatefulColors;
     private final ColorStateList mDarkColoredStatefulColors;
     private final int mNormalColor;
+
+    private static final String TAG = "NotificationBackgroundView";
 
     public NotificationBackgroundView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -140,7 +143,10 @@ public class NotificationBackgroundView extends View implements Dumpable {
         if (mTintColor != mNormalColor) {
             ColorStateList newColor = ContrastColorUtil.isColorDark(mTintColor)
                     ? mDarkColoredStatefulColors : mLightColoredStatefulColors;
-            ((GradientDrawable) getStatefulBackgroundLayer().mutate()).setColor(newColor);
+            Drawable d = getStatefulBackgroundLayer();
+            if (d != null) {
+                ((GradientDrawable) d.mutate()).setColor(newColor);
+            }
         }
     }
 
@@ -169,19 +175,34 @@ public class NotificationBackgroundView extends View implements Dumpable {
 
     public void setCustomBackground(int drawableResId) {
         final Drawable d = mContext.getDrawable(drawableResId);
-        setCustomBackground(d);
+        if (d != null) {
+            setCustomBackground(d);
+        }
     }
 
     private Drawable getBaseBackgroundLayer() {
-        return ((LayerDrawable) mBackground).getDrawable(0);
+        try {
+            return ((LayerDrawable) mBackground).getDrawable(0);
+        }
+        catch (IndexOutOfBoundsException e) {
+            Log.d(TAG, "IndexOutOfBoundsException ", e);
+            return null;
+        }
     }
 
     private Drawable getStatefulBackgroundLayer() {
-        return ((LayerDrawable) mBackground).getDrawable(1);
+        try {
+            return ((LayerDrawable) mBackground).getDrawable(1);
+        }
+        catch (IndexOutOfBoundsException e) {
+            Log.d(TAG, "IndexOutOfBoundsException ", e);
+            return null;
+        }
     }
 
     public void setTint(int tintColor) {
         Drawable baseLayer = getBaseBackgroundLayer();
+        if (baseLayer == null) return;
         baseLayer.mutate().setTintMode(PorterDuff.Mode.SRC_ATOP);
         baseLayer.setTint(tintColor);
         mTintColor = tintColor;
