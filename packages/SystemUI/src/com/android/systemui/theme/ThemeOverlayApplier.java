@@ -134,6 +134,9 @@ public class ThemeOverlayApplier implements Dumpable {
     @VisibleForTesting
     static final String OVERLAY_CATEGORY_NF_STYLE =
             "android.theme.customization.nf_style";
+    @VisibleForTesting
+    static final String OVERLAY_CATEGORY_VOLUME_STYLE =
+            "android.theme.customization.volume_style";
 
     @VisibleForTesting
     static final String OVERLAY_CATEGORY_UI_STYLE_ANDROID =
@@ -171,6 +174,7 @@ public class ThemeOverlayApplier implements Dumpable {
             OVERLAY_CATEGORY_QS_STYLE,
             OVERLAY_CATEGORY_BB_STYLE,
             OVERLAY_CATEGORY_NF_STYLE,
+            OVERLAY_CATEGORY_VOLUME_STYLE,
             OVERLAY_CATEGORY_QS_LANDSCAPE_LAYOUT,
             OVERLAY_CATEGORY_QS_LANDSCAPE_CUTOUT);
 
@@ -190,6 +194,7 @@ public class ThemeOverlayApplier implements Dumpable {
             OVERLAY_CATEGORY_QS_STYLE,
             OVERLAY_CATEGORY_BB_STYLE,
             OVERLAY_CATEGORY_NF_STYLE,
+            OVERLAY_CATEGORY_VOLUME_STYLE,
             OVERLAY_CATEGORY_QS_LANDSCAPE_LAYOUT,
             OVERLAY_CATEGORY_QS_LANDSCAPE_CUTOUT);
 
@@ -240,6 +245,7 @@ public class ThemeOverlayApplier implements Dumpable {
         mCategoryToTargetPackage.put(OVERLAY_CATEGORY_QS_STYLE, SYSUI_PACKAGE);
         mCategoryToTargetPackage.put(OVERLAY_CATEGORY_BB_STYLE, SYSUI_PACKAGE);
         mCategoryToTargetPackage.put(OVERLAY_CATEGORY_NF_STYLE, SYSUI_PACKAGE);
+        mCategoryToTargetPackage.put(OVERLAY_CATEGORY_VOLUME_STYLE, SYSUI_PACKAGE);
         mCategoryToTargetPackage.put(OVERLAY_CATEGORY_QS_LANDSCAPE_LAYOUT, SYSUI_PACKAGE);
         mCategoryToTargetPackage.put(OVERLAY_CATEGORY_QS_LANDSCAPE_CUTOUT, ANDROID_PACKAGE);
 
