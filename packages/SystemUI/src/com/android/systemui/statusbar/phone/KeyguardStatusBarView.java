@@ -41,7 +41,6 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import androidx.annotation.StyleRes;
 import androidx.annotation.VisibleForTesting;
 
 import com.android.settingslib.Utils;
@@ -185,7 +184,10 @@ public class KeyguardStatusBarView extends RelativeLayout {
                         com.android.internal.R.dimen.text_size_small_material));
         lp = (MarginLayoutParams) mCarrierLabel.getLayoutParams();
 
-        lp.setMarginStart(getResources().getDimensionPixelSize(R.dimen.status_bar_padding_start));
+        int marginStart = calculateMargin(
+                getResources().getDimensionPixelSize(R.dimen.keyguard_carrier_text_margin),
+                mPadding.left);
+        lp.setMarginStart(marginStart);
 
         mCarrierLabel.setLayoutParams(lp);
         updateKeyguardStatusBarHeight();
@@ -420,22 +422,13 @@ public class KeyguardStatusBarView extends RelativeLayout {
 
     /** Should only be called from {@link KeyguardStatusBarViewController}. */
     void onOverlayChanged() {
-        final int fallbackTheme = Utils.getThemeAttr(mContext,
-                com.android.internal.R.attr.textAppearanceSmall);
-        @StyleRes int carrierTheme = R.style.TextAppearance_StatusBar_Clock;
-        if (carrierTheme == 0) {
-            carrierTheme = fallbackTheme;
-        }
-        @StyleRes int userSwitcherTheme = R.style.TextAppearance_StatusBar_UserChip;
-        if (userSwitcherTheme == 0) {
-            userSwitcherTheme = fallbackTheme;
-        }
-        mCarrierLabel.setTextAppearance(carrierTheme);
+        int theme = Utils.getThemeAttr(mContext, com.android.internal.R.attr.textAppearanceSmall);
+        mCarrierLabel.setTextAppearance(R.style.TextAppearance_StatusBar_Clock);
         mBatteryView.updatePercentView();
 
         TextView userSwitcherName = mUserSwitcherContainer.findViewById(R.id.current_user_name);
         if (userSwitcherName != null) {
-            userSwitcherName.setTextAppearance(userSwitcherTheme);
+            userSwitcherName.setTextAppearance(theme);
         }
     }
 
@@ -473,6 +466,17 @@ public class KeyguardStatusBarView extends RelativeLayout {
         View v = findViewById(id);
         if (v instanceof DarkReceiver) {
             ((DarkReceiver) v).onDarkChanged(tintAreas, intensity, color);
+        }
+    }
+
+    /**
+     * Calculates the margin that isn't already accounted for in the view's padding.
+     */
+    private int calculateMargin(int margin, int padding) {
+        if (padding >= margin) {
+            return 0;
+        } else {
+            return margin - padding;
         }
     }
 

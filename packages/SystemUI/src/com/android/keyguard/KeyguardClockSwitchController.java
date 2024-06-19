@@ -386,9 +386,9 @@ public class KeyguardClockSwitchController extends ViewController<KeyguardClockS
                     ksv.setVisibility(mShowWeather ? View.VISIBLE : View.GONE);
                 }
 
-                if (mStatusArea == null) {
-                    return;
-                }
+                // if (mStatusArea == null) {
+                //     return;
+                // }
 
                 if (!mShowWeather) {
                     addSmartspaceView();
@@ -508,9 +508,9 @@ public class KeyguardClockSwitchController extends ViewController<KeyguardClockS
             return;
         }
 
-        if (mStatusArea == null) {
-            return;
-        }
+        // if (mStatusArea == null) {
+        //     return;
+        // }
 
         mSmartspaceView = mSmartspaceController.buildAndConnectView(mView);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
@@ -869,9 +869,9 @@ public class KeyguardClockSwitchController extends ViewController<KeyguardClockS
     }
 
     private void removeViewsFromStatusArea() {
-        if (mStatusArea == null) {
-            return;
-        }
+        // if (mStatusArea == null) {
+        //     return;
+        // }
         for (int i = mStatusArea.getChildCount() - 1; i >= 0; i--) {
             final View childView = mStatusArea.getChildAt(i);
             if (childView.getTag(R.id.tag_smartspace_view) != null) {
