@@ -167,6 +167,8 @@ import java.util.function.Consumer;
 
 import javax.security.auth.callback.Callback;
 import com.android.internal.util.crdroid.ThemeUtils;
+import com.android.internal.util.android.VibrationUtils;
+
 
 /**
  * Visual presentation of the volume dialog.
@@ -194,6 +196,10 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
 
     private static final int DRAWER_ANIMATION_DURATION_SHORT = 175;
     private static final int DRAWER_ANIMATION_DURATION = 250;
+    
+    private static final long VIBRATE_HAPTICS_TIMEOUT = 100L;
+    private long lastVibrateTime = 0;
+    private int mVolHapticsIntensity;
 
     /** Shows volume dialog show animation. */
     private static final String TYPE_SHOW = "show";
@@ -504,6 +510,18 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
                 Settings.Secure.getUriFor("volume_show_volume_percent"),
                 false, volumePercentObserver);
         volumePercentObserver.onChange(true);
+
+        ContentObserver volumeHapticsIntensityObserver = new ContentObserver(null) {
+            @Override
+            public void onChange(boolean selfChange) {
+                mVolHapticsIntensity = Settings.System.getInt(mContext.getContentResolver(),
+                        Settings.System.VOLUME_SLIDER_HAPTICS_INTENSITY, 1);
+            }
+        };
+        mContext.getContentResolver().registerContentObserver(
+                Settings.System.getUriFor(Settings.System.VOLUME_SLIDER_HAPTICS_INTENSITY),
+                false, volumeHapticsIntensityObserver);
+        volumeHapticsIntensityObserver.onChange(true);
 
         initDimens();
 
@@ -1153,10 +1171,12 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
             row.header.setFilters(new InputFilter[] {new InputFilter.LengthFilter(13)});
         }
         row.slider = row.view.findViewById(R.id.volume_row_slider);
+        /*
         if (hapticVolumeSlider()) {
             row.createPlugin(mVibratorHelper, mSystemClock);
             HapticSliderViewBinder.bind(row.slider, row.mHapticPlugin);
         }
+        */
         row.slider.setOnSeekBarChangeListener(new VolumeSeekBarChangeListener(row));
         row.number = row.view.findViewById(R.id.volume_number);
 
@@ -2773,6 +2793,7 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
         if (row.tracking) {
             return;  // don't update if user is sliding
         }
+        performVolumeHaptics(row, true);
         final int progress = row.slider.getProgress();
         final int level = getImpliedLevel(row.slider, progress);
         final boolean rowVisible = row.view.getVisibility() == VISIBLE;
@@ -2826,6 +2847,25 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
                             ? vlevel : 0, row.ss.levelMax));
             //Row.header.setTextColor(Utils.getColorAttrDefaultColor(
             //        mContext, android.R.attr.textColorPrimary));
+        }
+    }
+    
+    private void performVolumeHaptics(VolumeRow row, boolean volumeKeys) {
+        final boolean DEBUG = false;
+        if (!mShowing || mVolHapticsIntensity == 0) return;
+        int volHaptics = mVolHapticsIntensity;
+        final int progress = row.slider.getProgress();
+        final int maxVolume = row.ss.levelMax;
+        if (progress >= maxVolume * 100) {
+            volHaptics = 4;
+        }
+        if (DEBUG) {
+            Log.d("performVolumeHaptics: " + (volumeKeys ? "volume keys " : "slider "), String.valueOf(progress));
+        }
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - lastVibrateTime >= VIBRATE_HAPTICS_TIMEOUT) {
+            VibrationUtils.triggerVibration(mContext, volHaptics);
+            lastVibrateTime = currentTime;
         }
     }
 
