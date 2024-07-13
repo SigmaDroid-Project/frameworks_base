@@ -300,6 +300,7 @@ public class BatteryMeterView extends LinearLayout implements DarkReceiver {
      */
     public void onBatteryLevelChanged(@IntRange(from = 0, to = 100) int level, boolean pluggedIn) {
         boolean wasCharging = isCharging();
+        boolean wasPluggedIn = mPluggedIn;
         mPluggedIn = pluggedIn;
         mLevel = level;
         boolean isCharging = isCharging();
@@ -314,7 +315,7 @@ public class BatteryMeterView extends LinearLayout implements DarkReceiver {
         mRLandscapeDrawable.setBatteryLevel(level);
         mLandscapeDrawable.setBatteryLevel(level);
         updatePercentText();
-        if (pluggedIn) {
+        if (wasPluggedIn != mPluggedIn) {
             updateShowPercent();
         }
 
@@ -588,10 +589,10 @@ public class BatteryMeterView extends LinearLayout implements DarkReceiver {
         final boolean drawPercentInside = mShowPercentMode == MODE_DEFAULT &&
                 showBatteryPercent == 1;
         final boolean drawPercentOnly = mShowPercentMode == MODE_ESTIMATE ||
-                showBatteryPercent == 2;
+                showBatteryPercent >= 2;
         boolean shouldShow =
-                (drawPercentOnly && (!drawPercentInside || isCharging()) ||
-                mBatteryStyle == BATTERY_STYLE_TEXT);
+                drawPercentOnly || (mBatteryPercentCharging && isCharging()) ||
+                mBatteryStyle == BATTERY_STYLE_TEXT;
         shouldShow = shouldShow && !mBatteryStateUnknown;
 
         setBatteryDrawableState(
