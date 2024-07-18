@@ -123,6 +123,8 @@ class BackPanel(
             maximumValue = 1f
     )
 
+    var triggerLongSwipe = false
+
     private val allAnimatedFloat = setOf(
             arrowLength,
             arrowHeight,
@@ -295,11 +297,9 @@ class BackPanel(
         arrowPath.lineTo(0f, 0f)
         arrowPath.lineTo(dx, dy)
         arrowPath.moveTo(dx, -dy)
-        if (drawDoubleArrow) {
-            arrowPath.addPath(arrowPath,
-                    arrowPaint.strokeWidth * 2.0f * (if (isLeftPanel) 1 else -1), 0.0f)
+        if (triggerLongSwipe) {
+            arrowPath.addPath(arrowPath, arrowPaint.strokeWidth * 2.0f * -1, 0.0f)
         }
-
         return arrowPath
     }
 
