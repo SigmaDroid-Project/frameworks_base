@@ -945,7 +945,7 @@ public class ApplicationPackageManager extends PackageManager {
 
     @Override
     public int checkPermission(String permName, String pkgName) {
-        int res = PermissionManager.checkPackageNamePermission(permName, pkgName,
+        int res = getPermissionManager().checkPackageNamePermission(permName, pkgName,
                 mContext.getDeviceId(), getUserId());
         if (res != PERMISSION_GRANTED) {
             // some Microsoft apps crash when INTERNET permission check fails, see
