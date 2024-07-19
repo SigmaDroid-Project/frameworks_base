@@ -64,7 +64,7 @@
                     android:layout_height="match_parent"
                     android:scaleType="fitCenter"
                     android:padding="@dimen/volume_dialog_ringer_icon_padding"
-                    android:tint="?android:attr/textColorPrimary"
+                    android:tint="@color/alpha_color_primary"
                     android:layout_gravity="center"
                     android:soundEffectsEnabled="false" />
             </FrameLayout>
@@ -110,7 +110,7 @@
                 android:layout_width="@dimen/volume_dialog_tap_target_size"
                 android:layout_height="@dimen/volume_dialog_tap_target_size"
                 android:contentDescription="@string/accessibility_volume_settings"
-                android:tint="?android:attr/textColorPrimaryInverse"
+                android:tint="@color/alpha_color_primary_inverse"
                 android:layout_gravity="center"
                 android:soundEffectsEnabled="false"
                 android:padding="10dp"
@@ -137,7 +137,7 @@
                 android:background="@drawable/volume_drawer_selection_bg"
                 android:layout_width="@dimen/volume_dialog_tap_target_size"
                 android:layout_height="@dimen/volume_dialog_tap_target_size"
-                android:tint="?android:attr/textColorPrimaryInverse"
+                android:tint="@color/alpha_color_primary_inverse"
                 android:layout_gravity="center"
                 android:soundEffectsEnabled="false"/>
         </FrameLayout>
@@ -162,7 +162,7 @@
                 android:background="@drawable/volume_drawer_selection_bg"
                 android:layout_width="@dimen/volume_dialog_tap_target_size"
                 android:layout_height="@dimen/volume_dialog_tap_target_size"
-                android:tint="?android:attr/textColorPrimaryInverse"
+                android:tint="@color/alpha_color_primary_inverse"
                 android:layout_gravity="center"
                 android:soundEffectsEnabled="false"/>
         </com.android.systemui.animation.view.LaunchableFrameLayout>
@@ -187,7 +187,7 @@
                 android:layout_width="@dimen/volume_dialog_tap_target_size"
                 android:layout_height="@dimen/volume_dialog_tap_target_size"
                 android:background="@drawable/volume_drawer_selection_bg"
-                android:tint="?android:attr/textColorPrimaryInverse"
+                android:tint="@color/alpha_color_primary_inverse"
                 android:layout_gravity="center"
                 android:soundEffectsEnabled="false"/>
         </FrameLayout>
