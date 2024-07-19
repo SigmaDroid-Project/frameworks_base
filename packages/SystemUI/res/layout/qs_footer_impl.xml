@@ -19,7 +19,7 @@
 <com.android.systemui.qs.QSFooterView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/qs_footer"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="@dimen/qs_footer_height"
     android:layout_marginStart="@dimen/qs_footer_margin"
     android:layout_marginEnd="@dimen/qs_footer_margin"
     android:layout_marginBottom="@dimen/qs_footers_margin_bottom"
@@ -31,9 +31,8 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="@dimen/qs_footer_height"
-            android:layout_gravity="center_vertical"
-            android:paddingHorizontal="@dimen/qs_tile_margin_horizontal">
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical">
 
             <TextView
                 android:id="@+id/build"
@@ -46,16 +45,12 @@
                 android:ellipsize="marquee"
                 android:focusable="true"
                 android:gravity="center_vertical"
+                android:textDirection="locale"
+                android:textAlignment="viewStart"
                 android:singleLine="true"
-                android:textAppearance="@style/TextAppearance.QS.Status.Build"
+                android:textAppearance="@style/TextAppearance.QS.Status.DataUsage"
+                android:textColor="?android:attr/textColorSecondary"
                 android:visibility="gone" />
-
-            <View
-                android:id="@+id/spacer"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1" />
-
 
             <com.android.systemui.qs.PageIndicator
                 android:id="@+id/footer_page_indicator"
