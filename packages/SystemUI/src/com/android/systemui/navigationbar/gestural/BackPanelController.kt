@@ -300,9 +300,9 @@ internal constructor(
         configurationController.removeCallback(configurationListener)
     }
 
-    override fun setLongSwipeEnabled(enabled: Boolean) {
-        isExtendedSwipe = enabled;
-    }
+    // override fun setLongSwipeEnabled(enabled: Boolean) {
+    //     isExtendedSwipe = enabled;
+    // }
 
     override fun onMotionEvent(event: MotionEvent) {
         velocityTracker!!.addMovement(event)
@@ -693,6 +693,7 @@ internal constructor(
     }
 
     override fun setLongSwipeEnabled(enabled: Boolean) {
+        isExtendedSwipe = enabled;
         longSwipeThreshold = if (enabled) MathUtils.min(
             displaySize.x * 0.5f, layoutParams.width * 2.5f) else 0.0f
         isLongSwipeEnabled = longSwipeThreshold > 0
