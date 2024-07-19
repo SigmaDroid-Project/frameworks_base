@@ -20,7 +20,7 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:androidprv="http://schemas.android.com/apk/prv/res/android"
     android:autoMirrored="true">
-    <item android:id="@+id/volume_seekbar_progress_solid">
+    <item android:id="@*android:id/volume_seekbar_progress_solid">
         <shape>
             <size android:height="@dimen/volume_dialog_slider_width" />
             <solid android:color="?android:attr/colorAccent" />
@@ -28,7 +28,7 @@
         </shape>
     </item>
     <item
-        android:id="@+id/volume_seekbar_progress_icon"
+        android:id="@*android:id/volume_seekbar_progress_icon"
         android:gravity="center_vertical|right"
         android:height="@dimen/rounded_slider_icon_size"
         android:width="@dimen/rounded_slider_icon_size"

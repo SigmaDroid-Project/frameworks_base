@@ -12,4 +12,8 @@
     <!-- QS panel styles -->
     <java-symbol type="id" name="qs_state_layer" />
 
+    <!-- Volume styles -->
+    <java-symbol type="id" name="volume_seekbar_progress_solid" />
+    <java-symbol type="id" name="volume_seekbar_progress_icon" />
+
 </resources>
