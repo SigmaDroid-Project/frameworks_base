@@ -18,4 +18,6 @@
 -->
 <resources>
   <item type="id" name="qs_state_layer" />
+  <item type="id" name="volume_seekbar_progress_solid" />
+  <item type="id" name="volume_seekbar_progress_icon" />
 </resources>

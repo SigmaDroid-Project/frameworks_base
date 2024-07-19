@@ -37,4 +37,7 @@
     <color name="qs_color_accent_custom_primary">@color/system_accent3_400</color>
     <color name="qs_color_accent_custom_secondary">@color/system_accent3_200</color>
 
+    <color name="alpha_color_primary">@color/system_neutral2_10</color>
+    <color name="alpha_color_primary_inverse">@color/system_neutral2_900</color>
+
 </resources>
