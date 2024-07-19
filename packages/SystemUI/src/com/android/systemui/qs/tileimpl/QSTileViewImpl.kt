@@ -29,7 +29,6 @@ import android.graphics.drawable.RippleDrawable
 import android.os.Trace
 import android.os.UserHandle
 import android.provider.Settings.System
-import android.provider.Settings
 import android.service.quicksettings.Tile
 import android.text.TextUtils
 import android.util.Log
@@ -106,14 +105,6 @@ open class QSTileViewImpl @JvmOverloads constructor(
             updateHeight()
         }
 
-    private val qsTileHaptic: Int = Settings.System.getIntForUser(
-            context.contentResolver,
-            Settings.System.QS_PANEL_TILE_HAPTIC, 1, UserHandle.USER_CURRENT
-        )
-
-    private var initialX = 0f
-    private var initialY = 0f
-
     private val colorActive = Utils.getColorStateListDefaultColor(
             context, R.color.qs_color_accent_primary)
     private val colorInactive = Utils.getColorStateListDefaultColor(context,
@@ -133,6 +124,18 @@ open class QSTileViewImpl @JvmOverloads constructor(
             Utils.getColorStateListDefaultColor(context, R.color.qs_color_text_inactive)
     private val colorSecondaryLabelUnavailable = Utils.getColorStateListDefaultColor(context,
             R.color.qs_color_text_unavailable)
+
+    @SuppressLint("NewApi")
+    private var randomTint: Int = Color.rgb(
+        (randomColor.nextInt(256) / 2f + 0.5).toFloat(),
+        randomColor.nextInt(256).toFloat(),
+        randomColor.nextInt(256).toFloat()
+    )
+
+    private val colorActiveRandom = Utils.applyAlpha(ACTIVE_ALPHA, randomTint)
+    private val colorLabelActiveRandom = randomTint
+    private val colorSecondaryLabelActiveRandom = randomTint
+    private lateinit var iconContainer: LinearLayout
 
     private lateinit var label: TextView
     protected lateinit var secondaryLabel: TextView
