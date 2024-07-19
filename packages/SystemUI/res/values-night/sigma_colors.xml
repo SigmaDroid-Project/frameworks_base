@@ -32,4 +32,7 @@
     <color name="qs_color_accent_secondary">@*android:color/qs_color_accent_secondary</color>
     <color name="qs_color_accent_custom_primary">@*android:color/qs_color_accent_custom_primary</color>
     <color name="qs_color_accent_custom_secondary">@*android:color/qs_color_accent_custom_secondary</color>
+
+    <color name="alpha_color_primary">@*android:color/alpha_color_primary</color>
+    <color name="alpha_color_primary_inverse">@*android:color/alpha_color_primary_inverse</color>
 </resources>
