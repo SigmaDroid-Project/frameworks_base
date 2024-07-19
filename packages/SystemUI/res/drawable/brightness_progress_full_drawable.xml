@@ -22,7 +22,7 @@
         android:height="@dimen/rounded_slider_height">
         <shape>
             <size android:height="@dimen/rounded_slider_height" />
-            <solid android:color="@*android:color/qs_color_accent_primary" />
+            <solid android:color="?attr/shadeActive" />
             <corners android:radius="@dimen/rounded_slider_corner_radius"/>
         </shape>
     </item>
@@ -41,7 +41,7 @@
         android:right="@dimen/rounded_slider_icon_inset">
         <com.android.systemui.util.AlphaTintDrawableWrapper
             android:drawable="@drawable/ic_brightness"
-            android:tint="@color/qs_color_text_active"
+            android:tint="?attr/onShadeActive"
         />
     </item>
 </layer-list>
