@@ -80,9 +80,11 @@ public class TileUtils {
     }
 
     public static float getQSTileLabelSize(Context context) {
-        return (float) Settings.System.getIntForUser(context.getContentResolver(),
+        int labelSize = Settings.System.getIntForUser(context.getContentResolver(),
                 Settings.System.QS_TILE_LABEL_SIZE,
-                14, UserHandle.USER_CURRENT);
+                15, UserHandle.USER_CURRENT);
+        if (getQsUiStyle(context) != 0) labelSize = labelSize - 2;
+        return (float) labelSize;
     }
 
     public static float getQSTileSecondaryLabelSize(Context context) {
@@ -96,4 +98,10 @@ public class TileUtils {
                 Settings.System.QS_TILE_VERTICAL_LAYOUT,
                 defaultValue, UserHandle.USER_CURRENT) != 0;
     }
+
+   public static int getQsUiStyle(Context context) {
+       return Settings.System.getIntForUser(context.getContentResolver(),
+                Settings.System.QS_TILE_UI_STYLE,
+                0, UserHandle.USER_CURRENT);
+   }
 }
