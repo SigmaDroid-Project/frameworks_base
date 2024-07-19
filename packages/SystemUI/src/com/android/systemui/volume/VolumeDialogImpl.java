@@ -1179,10 +1179,11 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
                         android.R.id.progress)).getDrawable();
 
         row.sliderProgressSolid = seekbarProgressDrawable.findDrawableByLayerId(
-                R.id.volume_seekbar_progress_solid);
+                com.android.internal.R.id.volume_seekbar_progress_solid);
 
         final RotateDrawable sliderProgressIcon = (RotateDrawable)
-                seekbarProgressDrawable.findDrawableByLayerId(R.id.volume_seekbar_progress_icon);
+                seekbarProgressDrawable.findDrawableByLayerId(
+                com.android.internal.R.id.volume_seekbar_progress_icon);
 
         if (sliderProgressIcon == null) {
             // do nothing
@@ -2428,7 +2429,7 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
         final VolumeRow ringer = findRow(STREAM_RING);
         final VolumeRow notif = findRow(STREAM_NOTIFICATION);
 
-        if (ringer != null && ringer.ss.muted) {
+        if (ringer != null && ringer.ss != null && ringer.ss.muted) {
             final int ringerLevel = ringer.ss.levelMin * 100;
             if (ringer.slider.getProgress() != ringerLevel) {
                 ringer.slider.setProgress(ringerLevel, true);
@@ -2440,7 +2441,7 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
                         ringer.ss.levelMax));
             }
         }
-        if (notif != null && notif.ss.muted) {
+        if (notif != null && notif.ss != null && notif.ss.muted) {
             final int notifLevel = notif.ss.levelMin * 100;
             if (notif.slider.getProgress() != notifLevel) {
                 notif.slider.setProgress(notifLevel, true);
@@ -2547,11 +2548,11 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
 
     private void updateVolumeRowH(VolumeRow row) {
         if (D.BUG) Log.i(TAG, "updateVolumeRowH s=" + row.stream);
+        if (row == null || mState == null) return;
         if (row.isAppVolume) {
             updateAppVolumeRow(row);
             return;
         }
-        if (mState == null) return;
         final StreamState ss = mState.states.get(row.stream);
         if (ss == null) return;
         row.ss = ss;
@@ -2719,6 +2720,7 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
     }
 
     private void updateVolumeRowTintH(VolumeRow row, boolean isActive) {
+        if (row == null || row.slider == null) return;
         if (isActive) {
             row.slider.requestFocus();
         }
@@ -2740,19 +2742,21 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
         final ColorStateList inverseTextTint = Utils.getColorAttr(
                 mContext, com.android.internal.R.attr.textColorOnAccent);
 
-        row.sliderProgressSolid.setTintList(colorTint);
-        if (row.sliderProgressIcon != null) {
-            row.sliderProgressIcon.setTintList(bgTint);
-        }
+        if (row.sliderProgressSolid != null) {
+            row.sliderProgressSolid.setTintList(colorTint);
+            if (row.sliderProgressIcon != null) {
+                row.sliderProgressIcon.setTintList(bgTint);
+            }
 
-        if (row.icon != null) {
-            row.icon.setImageTintList(inverseTextTint);
-            row.icon.setImageAlpha(alpha);
-        }
+            if (row.icon != null) {
+                //row.icon.setImageTintList(inverseTextTint);
+                row.icon.setImageAlpha(alpha);
+            }
 
-        if (row.number != null) {
-            row.number.setTextColor(colorTint);
-            row.number.setAlpha(alpha);
+            if (row.number != null) {
+                row.number.setTextColor(colorTint);
+                row.number.setAlpha(alpha);
+            }
         }
     }
 
@@ -2817,6 +2821,8 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
             // update header text
             Util.setText(row.header, Utils.formatPercentage((enable && !row.ss.muted)
                             ? vlevel : 0, row.ss.levelMax));
+            //Row.header.setTextColor(Utils.getColorAttrDefaultColor(
+            //        mContext, android.R.attr.textColorPrimary));
         }
     }
 
@@ -3271,6 +3277,8 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
                     if (mShowVolumePercent) {
                         Util.setText(mRow.header,
                                 Utils.formatPercentage(mRow.ss.levelMin + 1, mRow.ss.levelMax));
+                                //mRow.header.setTextColor(Utils.getColorAttrDefaultColor(
+                               //        mContext, android.R.attr.textColorPrimary));
                     }
                     return;
                 }
@@ -3278,6 +3286,8 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
 
             if (mShowVolumePercent) {
                 Util.setText(mRow.header, Utils.formatPercentage(userLevel, mRow.ss.levelMax));
+                //mRow.header.setTextColor(Utils.getColorAttrDefaultColor(
+                //        mContext, android.R.attr.textColorPrimary));
             }
 
             if (mRow.ss.level != userLevel || mRow.ss.muted && userLevel > 0) {
