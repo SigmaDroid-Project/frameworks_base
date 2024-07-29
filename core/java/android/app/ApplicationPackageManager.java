@@ -834,6 +834,7 @@ public class ApplicationPackageManager extends PackageManager {
             };
 
     private static final String[] pTensorCodenames = {
+            "akita",
             "husky",
             "shiba",
             "felix",
@@ -917,7 +918,7 @@ public class ApplicationPackageManager extends PackageManager {
         }
         if (packageName != null
                 && packageName.equals("com.google.android.apps.photos")
-                && SystemProperties.getBoolean("persist.sys.pixelprops.gphotos", true)) {
+                && SystemProperties.getBoolean("persist.sys.pixelprops.gphotos", false)) {
             if (Arrays.asList(featuresPixel).contains(name)) return false;
             if (Arrays.asList(featuresPixelOthers).contains(name)) return true;
             if (Arrays.asList(featuresTensor).contains(name)) return false;
