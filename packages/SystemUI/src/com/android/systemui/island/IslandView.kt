@@ -307,6 +307,7 @@ class IslandView : ExtendedFloatingActionButton {
         val resources = context.resources
         val bitmap = drawableToBitmap(iconDrawable)
         val roundedIcon = CircleFramedDrawable(bitmap, this.iconSize)
+        recycleBitmap((this.icon as? BitmapDrawable)?.bitmap)
         this.icon = roundedIcon
         this.iconTint = null
         this.bringToFront()
