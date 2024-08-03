@@ -148,9 +148,6 @@ public class ThemeOverlayApplier implements Dumpable {
     @VisibleForTesting
     static final String OVERLAY_CATEGORY_QS_LANDSCAPE_LAYOUT =
             "android.theme.customization.qs_landscape_layout";
-    @VisibleForTesting
-    static final String OVERLAY_CATEGORY_QS_LANDSCAPE_CUTOUT =
-            "android.theme.customization.qs_landscape_cutout";
 
     /*
      * All theme customization categories used by the system, in order that they should be applied,
@@ -175,8 +172,7 @@ public class ThemeOverlayApplier implements Dumpable {
             OVERLAY_CATEGORY_BB_STYLE,
             OVERLAY_CATEGORY_NF_STYLE,
             OVERLAY_CATEGORY_VOLUME_STYLE,
-            OVERLAY_CATEGORY_QS_LANDSCAPE_LAYOUT,
-            OVERLAY_CATEGORY_QS_LANDSCAPE_CUTOUT);
+            OVERLAY_CATEGORY_QS_LANDSCAPE_LAYOUT);
 
     /* Categories that need to be applied to the current user as well as the system user. */
     @VisibleForTesting
@@ -195,8 +191,7 @@ public class ThemeOverlayApplier implements Dumpable {
             OVERLAY_CATEGORY_BB_STYLE,
             OVERLAY_CATEGORY_NF_STYLE,
             OVERLAY_CATEGORY_VOLUME_STYLE,
-            OVERLAY_CATEGORY_QS_LANDSCAPE_LAYOUT,
-            OVERLAY_CATEGORY_QS_LANDSCAPE_CUTOUT);
+            OVERLAY_CATEGORY_QS_LANDSCAPE_LAYOUT);
 
     /* Allowed overlay categories for each target package. */
     private final Map<String, Set<String>> mTargetPackageToCategories = new ArrayMap<>();
@@ -247,7 +242,6 @@ public class ThemeOverlayApplier implements Dumpable {
         mCategoryToTargetPackage.put(OVERLAY_CATEGORY_NF_STYLE, SYSUI_PACKAGE);
         mCategoryToTargetPackage.put(OVERLAY_CATEGORY_VOLUME_STYLE, SYSUI_PACKAGE);
         mCategoryToTargetPackage.put(OVERLAY_CATEGORY_QS_LANDSCAPE_LAYOUT, SYSUI_PACKAGE);
-        mCategoryToTargetPackage.put(OVERLAY_CATEGORY_QS_LANDSCAPE_CUTOUT, ANDROID_PACKAGE);
 
         dumpManager.registerDumpable(TAG, this);
     }
