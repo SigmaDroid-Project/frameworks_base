@@ -157,9 +157,6 @@ import com.android.systemui.volume.ui.navigation.VolumeNavigator;
 
 import dagger.Lazy;
 import lineageos.providers.LineageSettings;
-
-// import com.android.internal.util.android.VibrationUtils;
-
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -382,8 +379,6 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
     
     private int customVolumeStyles = 0;
     private ThemeUtils mThemeUtils;
-    private VolumeUtils mVolumeUtils;
-
 
     private boolean mShowMediaButton = true;
     private boolean mShowVolumePercent = true;
@@ -3338,7 +3333,8 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
                             userLevel);
                 }
             }
-            performVolumeHaptics(mRow, false);
+            VolumeUtils volumeUtils = new VolumeUtils(mContext, mController.getAudioManager());
+            volumeUtils.playSoundForStreamType(mRow.stream);
         }
 
         @Override
@@ -3377,7 +3373,6 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
                 mHandler.sendMessageDelayed(mHandler.obtainMessage(H.RECHECK, mRow),
                         USER_ATTEMPT_GRACE_PERIOD);
             }
-            mVolumeUtils.playSoundForStreamType(mRow.stream);
         }
     }
 
