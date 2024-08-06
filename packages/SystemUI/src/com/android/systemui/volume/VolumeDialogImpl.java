@@ -164,6 +164,8 @@ import java.util.function.Consumer;
 
 import javax.security.auth.callback.Callback;
 import com.android.internal.util.crdroid.ThemeUtils;
+import com.android.internal.util.android.VibrationUtils;
+
 
 /**
  * Visual presentation of the volume dialog.
