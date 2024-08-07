@@ -108,7 +108,7 @@ public class ScrimController implements ViewTreeObserver.OnPreDrawListener, Dump
         CoreStartable, TunerService.Tunable {
 
     static final String TAG = "ScrimController";
-    private static final boolean DEBUG = Log.isLoggable(TAG, Log.DEBUG);
+    private static final boolean DEBUG = true;
 
     // debug mode colors scrims with below debug colors, irrespectively of which state they're in
     public static final boolean DEBUG_MODE = false;
@@ -188,7 +188,7 @@ public class ScrimController implements ViewTreeObserver.OnPreDrawListener, Dump
     /**
      * Default alpha value for most scrims.
      */
-    protected static final float KEYGUARD_SCRIM_ALPHA = 0.0f;
+    protected static final float KEYGUARD_SCRIM_ALPHA = 0.2f;
     /**
      * Scrim opacity when the phone is about to wake-up.
      */
