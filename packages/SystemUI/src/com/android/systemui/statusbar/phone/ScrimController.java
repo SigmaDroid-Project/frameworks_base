@@ -1167,6 +1167,11 @@ public class ScrimController implements ViewTreeObserver.OnPreDrawListener, Dump
      * device is dozing when the light sensor is on.
      */
     public void setAodFrontScrimAlpha(float alpha) {
+    
+         // Ensure alpha is fully opaque during AOD mode
+        if (mState == ScrimState.AOD) {
+            alpha = 0.0f; // Fully transparent
+        }
 
         Log.d("ScrimController", "Setting AOD Front Scrim Alpha: " + alpha);
 
