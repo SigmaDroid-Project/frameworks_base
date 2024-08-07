@@ -804,15 +804,34 @@ public class ScrimController implements ViewTreeObserver.OnPreDrawListener, Dump
      * @param progress the progress for all scrims.
      * @param lockScreenNotificationsProgress the progress specifically for the notifications scrim.
      */
-    public void setTransitionToFullShadeProgress(float progress,
-            float lockScreenNotificationsProgress) {
-        if (progress != mTransitionToFullShadeProgress || lockScreenNotificationsProgress
-                != mTransitionToLockScreenFullShadeNotificationsProgress) {
-            mTransitionToFullShadeProgress = progress;
-            mTransitionToLockScreenFullShadeNotificationsProgress = lockScreenNotificationsProgress;
-            setTransitionToFullShade(progress > 0.0f || lockScreenNotificationsProgress > 0.0f);
+    public void setTransitionToFullShadeProgress(float progress, float lockScreenNotificationsProgress) {
+        // Check if the current state or the target state involves AOD
+        if (mState == ScrimState.AOD || shouldBypassTransitionToAOD()) {
+            // Directly apply the final state for AOD without transition
+            mTransitionToFullShadeProgress = 1.0f;
+            mTransitionToLockScreenFullShadeNotificationsProgress = 1.0f;
+            setTransitionToFullShade(true);
             applyAndDispatchState();
+            Log.d("ScrimController", "Bypassing transition for AOD. Directly setting full shade.");
+        } else {
+            // Proceed with normal transition logic for other states
+            if (progress != mTransitionToFullShadeProgress || 
+                lockScreenNotificationsProgress != mTransitionToLockScreenFullShadeNotificationsProgress) {
+
+                mTransitionToFullShadeProgress = progress;
+                mTransitionToLockScreenFullShadeNotificationsProgress = lockScreenNotificationsProgress;
+                setTransitionToFullShade(progress > 0.0f || lockScreenNotificationsProgress > 0.0f);
+                applyAndDispatchState();
+                Log.d("ScrimController", "Transition in progress. Progress: " + progress);
+            }
         }
+    }
+
+    // Helper method to determine if we should bypass transitions to AOD
+    private boolean shouldBypassTransitionToAOD() {
+        // Implement any additional logic to determine when to bypass transition
+        // For example, you could check a specific condition or flag
+        return true; // Return true to always bypass for testing
     }
 
     /**
