@@ -1167,6 +1167,9 @@ public class ScrimController implements ViewTreeObserver.OnPreDrawListener, Dump
      * device is dozing when the light sensor is on.
      */
     public void setAodFrontScrimAlpha(float alpha) {
+
+        Log.d("ScrimController", "Setting AOD Front Scrim Alpha: " + alpha);
+
         if (mInFrontAlpha != alpha && shouldUpdateFrontScrimAlpha()) {
             mInFrontAlpha = alpha;
             updateScrims();
@@ -1177,16 +1180,17 @@ public class ScrimController implements ViewTreeObserver.OnPreDrawListener, Dump
     }
 
     private boolean shouldUpdateFrontScrimAlpha() {
+        boolean shouldUpdate = false;
         if (mState == ScrimState.AOD
                 && (mDozeParameters.getAlwaysOn() || mDockManager.isDocked())) {
-            return true;
+            shouldUpdate = true;
         }
 
         if (mState == ScrimState.PULSING) {
-            return true;
+            shouldUpdate = true;
         }
-
-        return false;
+        Log.d("ScrimController", "Should Update Front Scrim Alpha: " + shouldUpdate);
+        return shouldUpdate;
     }
 
     /**
@@ -1220,6 +1224,7 @@ public class ScrimController implements ViewTreeObserver.OnPreDrawListener, Dump
     }
 
     protected void updateScrims() {
+        Log.d("ScrimController", "Updating scrims with alpha: " + mInFrontAlpha);
         // Make sure we have the right gradients and their opacities will satisfy GAR.
         if (mNeedsDrawableColorUpdate) {
             mNeedsDrawableColorUpdate = false;
