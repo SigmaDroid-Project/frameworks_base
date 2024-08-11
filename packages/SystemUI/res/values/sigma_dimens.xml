@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+
+    <!-- Brightness bar percentage  -->
+    <dimen name="bb_percentage_margin_left">6dp</dimen>
+    <dimen name="bb_percentage_margin_right">0dp</dimen>
+
+</resources>
