@@ -197,7 +197,7 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
     private static final int DRAWER_ANIMATION_DURATION_SHORT = 175;
     private static final int DRAWER_ANIMATION_DURATION = 250;
     
-    private static final long VIBRATE_HAPTICS_TIMEOUT = 100L;
+    private static final long VIBRATE_HAPTICS_TIMEOUT = 25L;
     private long lastVibrateTime = 0;
     private int mVolHapticsIntensity;
 
