@@ -18,7 +18,16 @@ package com.android.systemui.settings.brightness;
 
 import static com.android.systemui.Flags.hapticBrightnessSlider;
 
+import android.content.ContentResolver;
 import android.content.Context;
+import android.database.ContentObserver;
+import android.net.Uri;
+import android.os.Handler;
+import android.os.AsyncTask;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
+import android.os.UserHandle;
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -55,6 +64,9 @@ import javax.inject.Inject;
 public class BrightnessSliderController extends ViewController<BrightnessSliderView> implements
         ToggleSlider {
 
+    private static final Uri SHOW_BRIGHTNESS_BAR_PERCENTAGE =
+            Settings.System.getUriFor(Settings.System.SHOW_BRIGHTNESS_BAR_PERCENTAGE);
+
     private Listener mListener;
     private ToggleSlider mMirror;
     private ImageView mIcon;
@@ -64,6 +76,10 @@ public class BrightnessSliderController extends ViewController<BrightnessSliderV
     private final UiEventLogger mUiEventLogger;
 
     private final SeekableSliderHapticPlugin mBrightnessSliderHapticPlugin;
+    private Context mContext;
+
+    private final BrightnessSliderObserver mBrightnessSliderObserver;
+    private Handler mHandler;
 
     private final Gefingerpoken mOnInterceptListener = new Gefingerpoken() {
         @Override
@@ -92,6 +108,11 @@ public class BrightnessSliderController extends ViewController<BrightnessSliderV
         mUiEventLogger = uiEventLogger;
         mBrightnessSliderHapticPlugin = brightnessSliderHapticPlugin;
         mIcon = mView.findViewById(R.id.brightness_icon);
+        mHandler = mView.getHandler();
+        if (mHandler == null) {
+            mHandler = new Handler();
+        }
+        mBrightnessSliderObserver = new BrightnessSliderObserver(mHandler);
     }
 
     /**
@@ -109,6 +130,8 @@ public class BrightnessSliderController extends ViewController<BrightnessSliderV
     protected void onViewAttached() {
         mView.setOnSeekBarChangeListener(mSeekListener);
         mView.setOnInterceptListener(mOnInterceptListener);
+        updatePercentageVisibility();
+        mBrightnessSliderObserver.startObserving();
     }
 
     @Override
@@ -116,6 +139,7 @@ public class BrightnessSliderController extends ViewController<BrightnessSliderV
         mView.setOnSeekBarChangeListener(null);
         mView.setOnDispatchTouchEventListener(null);
         mView.setOnInterceptListener(null);
+        mBrightnessSliderObserver.stopObserving();
     }
 
     @Override
@@ -218,7 +242,7 @@ public class BrightnessSliderController extends ViewController<BrightnessSliderV
             new SeekBar.OnSeekBarChangeListener() {
         @Override
         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-            mView.GetValueBrightness(progress);
+            mView.setPercentage(progress);
             if (mListener != null) {
                 mListener.onChanged(mTracking, progress, false);
                 if (fromUser) {
@@ -256,6 +280,42 @@ public class BrightnessSliderController extends ViewController<BrightnessSliderV
             }
         }
     };
+
+    private class BrightnessSliderObserver extends ContentObserver {
+
+        BrightnessSliderObserver(Handler handler) {
+            super(handler);
+        }
+
+        @Override
+        public void onChange(boolean selfChange, Uri uri) {
+            if (selfChange) return;
+
+            if (SHOW_BRIGHTNESS_BAR_PERCENTAGE.equals(uri)) {
+                updatePercentageVisibility();
+            }
+        }
+
+        public void startObserving() {
+            final ContentResolver cr = getContext().getContentResolver();
+            cr.unregisterContentObserver(this);
+            cr.registerContentObserver(
+                    SHOW_BRIGHTNESS_BAR_PERCENTAGE,
+                    false, this, UserHandle.USER_CURRENT);
+        }
+
+        public void stopObserving() {
+            getContext().getContentResolver().unregisterContentObserver(this);
+        }
+
+    }
+
+    private void updatePercentageVisibility() {
+        boolean showPercentage = Settings.System.getIntForUser(getContext().getContentResolver(),
+                Settings.System.SHOW_BRIGHTNESS_BAR_PERCENTAGE, 0, UserHandle.USER_CURRENT) == 1;
+        mView.updatePercentageVisibility(showPercentage);
+    }
+
 
     /**
      * Creates a {@link BrightnessSliderController} with its associated view.
