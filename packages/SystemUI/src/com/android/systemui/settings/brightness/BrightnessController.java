@@ -382,7 +382,7 @@ public class BrightnessController implements ToggleSlider.Listener, MirroredBrig
         // Give haptic feedback only if brightness is changed manually
         if (mBrightnessSliderHaptic > 0 && mVibrator != null && tracking) {
             long currentTime = System.currentTimeMillis();
-            if (currentTime - lastVibrateTime >= 100L) {
+            if (currentTime - lastVibrateTime >= 25L) {
                 VibrationUtils.triggerVibration(mContext, mBrightnessSliderHaptic);
                 lastVibrateTime = currentTime;
             }
