@@ -52,7 +52,7 @@ import java.util.Collections;
 public class BrightnessSliderView extends LinearLayout {
 
     @NonNull
-    private TextView mTextPersen;
+    private TextView mPercentageView;
     private ToggleSeekBar mSlider;
     private DispatchTouchEventListener mListener;
     private Gefingerpoken mOnInterceptListener;
@@ -77,12 +77,9 @@ public class BrightnessSliderView extends LinearLayout {
 
         mSlider = requireViewById(R.id.slider);
         mSlider.setAccessibilityLabel(getContentDescription().toString());
-        mTextPersen = requireViewById(R.id.percentbrightness);    
-	    Handler h = new Handler();
-        TextBrightness text = new TextBrightness(h);
-        text.BTObserver();
-	    ShowingTextBrightness();
-	    GetValueBrightness(mSlider.getProgress());
+
+        mPercentageView = requireViewById(R.id.brightness_percentage);
+        setPercentage(getValue());
 
         // Finds the progress drawable. Assumes brightness_progress_drawable.xml
         try {
@@ -95,46 +92,14 @@ public class BrightnessSliderView extends LinearLayout {
             // Nothing to do, mProgressDrawable will be null.
         }
     }
-    
-    public void GetValueBrightness(int value) {
-            int make100 = value * 100 / mSlider.getMax();
-            mTextPersen.setText(String.valueOf(make100) + "%");
+
+    public void setPercentage(int value) {
+        int percentage = value * 100 / getMax();
+        mPercentageView.setText(String.valueOf(percentage) + "%");
     }
 
-    private void ShowingTextBrightness() {
-            int showHide = Settings.System.getInt(getContext().getContentResolver(),"BRIGHTNESS_TEXTVIEW", 0);
-	    if (showHide == 1) {
-	    LinearLayout.LayoutParams bright = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT); 
-            bright.setMargins(20, 0, 0, 0);
-	    mTextPersen.setLayoutParams(bright);								 
-            mTextPersen.setVisibility(View.VISIBLE);
-            } else {
-            LinearLayout.LayoutParams bright = new LinearLayout.LayoutParams(0, 0); 
-            bright.setMargins(0, 0, 0, 0);
-	    mTextPersen.setLayoutParams(bright);	
-            mTextPersen.setVisibility(View.GONE);
-            }
-
-    }
-
-    public class TextBrightness extends ContentObserver {
-            public TextBrightness(Handler h) {
-            super(h);
-            BTObserver();
-            }
-
-            @Override
-            public void onChange(boolean selfChange) {
-                   super.onChange(selfChange);
-                   ShowingTextBrightness();
-            }
-
-            public void BTObserver()
-            {
-                   ContentResolver cr = getContext().getContentResolver();
-                   cr.registerContentObserver(Settings.System.getUriFor("BRIGHTNESS_TEXTVIEW"), false, this);  
-            }
+    public void updatePercentageVisibility(boolean visible) {
+        mPercentageView.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
     /**
