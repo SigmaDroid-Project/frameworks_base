@@ -7468,6 +7468,12 @@ public final class Settings {
         public static final String SMART_5G = "smart_5g";
 
         /**
+         * Whether to show/hide text percentage view on brightness bar
+         * @hide
+         */
+         public static final String SHOW_BRIGHTNESS_BAR_PERCENTAGE = "show_brightness_bar_percentage";
+
+        /**
          * These are all public system settings
          *
          * @hide
@@ -7598,6 +7604,7 @@ public final class Settings {
             PRIVATE_SETTINGS.add(NAVIGATION_BAR_IME_SPACE);
             PRIVATE_SETTINGS.add(TRANSPARENT_POWER_MENU);
             PRIVATE_SETTINGS.add(TRANSPARENT_POWER_DIALOG_DIM);
+            PRIVATE_SETTINGS.add(SHOW_BRIGHTNESS_BAR_PERCENTAGE);
         }
 
         /**
