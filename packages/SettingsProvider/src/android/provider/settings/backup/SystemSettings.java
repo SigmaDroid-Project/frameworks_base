@@ -116,7 +116,6 @@ public class SystemSettings {
                 Settings.System.NOTIFICATION_COOLDOWN_ENABLED,
                 Settings.System.NOTIFICATION_COOLDOWN_ALL,
                 Settings.System.NOTIFICATION_COOLDOWN_VIBRATE_UNLOCKED,
-                Settings.System.HAPTIC_ON_SLIDER,
                 Settings.System.SHOW_BRIGHTNESS_BAR_PERCENTAGE
         ));
         if (Flags.backUpSmoothDisplayAndForcePeakRefreshRate()) {
