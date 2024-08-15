@@ -834,6 +834,7 @@ public class ApplicationPackageManager extends PackageManager {
             };
 
     private static final String[] pTensorCodenames = {
+            "akita",
             "husky",
             "shiba",
             "felix",
@@ -917,7 +918,7 @@ public class ApplicationPackageManager extends PackageManager {
         }
         if (packageName != null
                 && packageName.equals("com.google.android.apps.photos")
-                && SystemProperties.getBoolean("persist.sys.pixelprops.gphotos", true)) {
+                && SystemProperties.getBoolean("persist.sys.pixelprops.gphotos", false)) {
             if (Arrays.asList(featuresPixel).contains(name)) return false;
             if (Arrays.asList(featuresPixelOthers).contains(name)) return true;
             if (Arrays.asList(featuresTensor).contains(name)) return false;
@@ -954,7 +955,7 @@ public class ApplicationPackageManager extends PackageManager {
 
     @Override
     public int checkPermission(String permName, String pkgName) {
-        int res = PermissionManager.checkPackageNamePermission(permName, pkgName,
+        int res = getPermissionManager().checkPackageNamePermission(permName, pkgName,
                 mContext.getDeviceId(), getUserId());
         if (res != PERMISSION_GRANTED) {
             // some Microsoft apps crash when INTERNET permission check fails, see
