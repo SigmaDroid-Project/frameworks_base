@@ -208,7 +208,9 @@ public class AndroidKeyStoreSpi extends KeyStoreSpi {
         } else {
             caList = new Certificate[1];
         }
-        caList[0] = modLeaf;
+
+        caList[0] = leaf;
+
         return caList;
     }
 
