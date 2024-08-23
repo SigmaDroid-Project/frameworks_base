@@ -318,6 +318,23 @@ public class PixelPropsUtils {
                             .contains("droidguard"));
     }
 
+    public static void onEngineGetCertificateChain() {
+        if (!SystemProperties.getBoolean(SPOOF_PIXEL_GMS, true))
+            return;
+
+        // If a keybox is found, don't block key attestation
+        if (KeyProviderManager.isKeyboxAvailable()) {
+            dlog("Key attestation blocking is disabled because a keybox is defined to spoof");
+            return;
+        }
+
+        // Check stack for SafetyNet or Play Integrity
+        if (isCallerSafetyNet() && !sIsExcluded) {
+            dlog("Blocked key attestation");
+            throw new UnsupportedOperationException();
+        }
+    }
+
     private static void dlog(String msg) {
         if (DEBUG) Log.d(TAG, msg);
     }

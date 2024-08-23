@@ -33,6 +33,8 @@ import android.system.keystore2.KeyEntryResponse;
 import android.system.keystore2.ResponseCode;
 import android.util.Log;
 
+import com.android.internal.util.crdroid.KeyboxImitationHooks;
+
 import java.util.Calendar;
 
 import com.android.internal.util.crdroid.PixelPropsUtils;
@@ -286,7 +288,8 @@ public class KeyStore2 {
             throws KeyStoreException {
         StrictMode.noteDiskRead();
 
-        return handleRemoteExceptionWithRetry((service) -> service.getKeyEntry(descriptor));
+        return KeyboxImitationHooks.onGetKeyEntry(
+                handleRemoteExceptionWithRetry((service) -> service.getKeyEntry(descriptor)));
     }
 
     /**
