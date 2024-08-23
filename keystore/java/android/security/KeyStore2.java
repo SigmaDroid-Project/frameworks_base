@@ -32,9 +32,9 @@ import android.system.keystore2.KeyEntryResponse;
 import android.system.keystore2.ResponseCode;
 import android.util.Log;
 
-import com.android.internal.util.crdroid.AttestationHooks;
-
 import java.util.Calendar;
+
+import com.android.internal.util.crdroid.PixelPropsUtils;
 
 /**
  * @hide This should not be made public in its present form because it
@@ -286,8 +286,7 @@ public class KeyStore2 {
         StrictMode.noteDiskRead();
 
         KeyEntryResponse response = handleRemoteExceptionWithRetry((service) -> service.getKeyEntry(descriptor));
-
-        return AttestationHooks.onGetKeyEntry(response);
+        return PixelPropsUtils.onGetKeyEntry(response);
     }
 
     /**
