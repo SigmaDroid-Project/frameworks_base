@@ -30,9 +30,7 @@ import android.graphics.Insets
 import android.os.Bundle
 import android.os.Trace
 import android.os.Trace.TRACE_TAG_APP
-import android.os.UserHandle;
 import android.provider.AlarmClock
-import android.provider.Settings
 import android.view.DisplayCutout
 import android.view.View
 import android.view.WindowInsets
@@ -73,8 +71,6 @@ import com.android.systemui.statusbar.policy.ConfigurationController
 import com.android.systemui.statusbar.policy.NextAlarmController
 import com.android.systemui.statusbar.policy.VariableDateView
 import com.android.systemui.statusbar.policy.VariableDateViewController
-import com.android.systemui.tuner.TunerService
-import com.android.systemui.tuner.TunerService.Tunable
 import com.android.systemui.util.ViewController
 import java.io.PrintWriter
 import javax.inject.Inject
@@ -106,10 +102,10 @@ constructor(
     private val shadeCarrierGroupControllerBuilder: ShadeCarrierGroupController.Builder,
     private val combinedShadeHeadersConstraintManager: CombinedShadeHeadersConstraintManager,
     private val demoModeController: DemoModeController,
+    private val qsBatteryModeController: QsBatteryModeController,
     private val nextAlarmController: NextAlarmController,
     private val activityStarter: ActivityStarter,
     private val statusOverlayHoverListenerFactory: StatusOverlayHoverListenerFactory,
-    private val tunerService: TunerService,
 ) : ViewController<View>(header), Dumpable {
 
     companion object {
@@ -124,15 +120,6 @@ constructor(
 
         @VisibleForTesting internal val DEFAULT_CLOCK_INTENT = Intent(AlarmClock.ACTION_SHOW_ALARMS)
 
-        internal val QS_BATTERY_STYLE =
-            "system:" + Settings.System.QS_BATTERY_STYLE
-
-        internal val STATUS_BAR_BATTERY_STYLE =
-            "system:" + Settings.System.STATUS_BAR_BATTERY_STYLE
-
-        internal val QS_SHOW_BATTERY_PERCENT =
-            "system:" + Settings.System.QS_SHOW_BATTERY_PERCENT
-
         private fun Int.stateToString() =
             when (this) {
                 QQS_HEADER_CONSTRAINT -> "QQS Header"
@@ -143,13 +130,6 @@ constructor(
     }
 
     var shadeCollapseAction: Runnable? = null
-
-    private var qsBatteryPercent = Settings.System.getIntForUser(
-             context.contentResolver, Settings.System.QS_SHOW_BATTERY_PERCENT, 2, UserHandle.USER_CURRENT)
-    private var batteryStyle = Settings.System.getIntForUser(
-             context.contentResolver, Settings.System.STATUS_BAR_BATTERY_STYLE, 0, UserHandle.USER_CURRENT)
-    private var qsBatteryStyle = Settings.System.getIntForUser(
-             context.contentResolver, Settings.System.QS_BATTERY_STYLE, -1, UserHandle.USER_CURRENT)
 
     private lateinit var iconManager: StatusBarIconController.TintedIconManager
     private lateinit var carrierIconSlots: List<String>
@@ -163,6 +143,7 @@ constructor(
     private val systemIconsHoverContainer: View =
         header.requireViewById(R.id.hover_system_icons_container)
 
+    private var roundedCorners = 0
     private var cutout: DisplayCutout? = null
     private var lastInsets: WindowInsets? = null
     private var nextAlarmIntent: PendingIntent? = null
@@ -330,16 +311,6 @@ constructor(
             nextAlarmIntent = nextAlarm?.showIntent
         }
 
-    fun updateQsBatteryStyle() {
-        if (qsBatteryStyle >= 0)  {
-            batteryIcon.setBatteryStyle(qsBatteryStyle)
-        } else {
-            batteryIcon.setBatteryStyle(batteryStyle)
-        }
-        batteryIcon.setBatteryPercent(qsBatteryPercent)
-        updateBatteryResources(true)
-    }
-
     override fun onInit() {
         variableDateViewControllerFactory.create(date as VariableDateView).init()
         batteryMeterViewController.init()
@@ -359,29 +330,6 @@ constructor(
             shadeCarrierGroupControllerBuilder.setShadeCarrierGroup(mShadeCarrierGroup).build()
 
         privacyIconsController.onParentVisible()
-
-        tunerService.addTunable(object : TunerService.Tunable {
-            override fun onTuningChanged(key: String?, value: String?) {
-                qsBatteryStyle = TunerService.parseInteger(value, -1)
-                updateQsBatteryStyle()
-            }
-        }, QS_BATTERY_STYLE)
-
-        tunerService.addTunable(object : TunerService.Tunable {
-            override fun onTuningChanged(key: String?, value: String?) {
-                batteryStyle = TunerService.parseInteger(value, 0)
-                updateQsBatteryStyle()
-            }
-        }, STATUS_BAR_BATTERY_STYLE)
-
-        tunerService.addTunable(object : TunerService.Tunable {
-            override fun onTuningChanged(key: String?, value: String?) {
-                qsBatteryPercent = TunerService.parseInteger(value, 2)
-                updateQsBatteryStyle()
-            }
-        }, QS_SHOW_BATTERY_PERCENT)
-
-        updateQsBatteryStyle()
     }
 
     override fun onViewAttached() {
@@ -512,6 +460,13 @@ constructor(
             view.setPadding(view.paddingLeft, sbInsets.top, view.paddingRight, view.paddingBottom)
         }
         view.updateAllConstraints(changes)
+        updateBatteryMode()
+    }
+
+    private fun updateBatteryMode() {
+        qsBatteryModeController.getBatteryMode(cutout, qsExpandedFraction)?.let {
+            batteryIcon.setPercentShowMode(it)
+        }
     }
 
     private fun updateScrollY() {
@@ -574,6 +529,7 @@ constructor(
         if (!largeScreenActive && visible) {
             logInstantEvent("updatePosition: $qsExpandedFraction")
             header.progress = qsExpandedFraction
+            updateBatteryMode()
         }
     }
 
@@ -608,19 +564,18 @@ constructor(
         val padding = resources.getDimensionPixelSize(R.dimen.qs_panel_padding)
         header.setPadding(padding, header.paddingTop, padding, header.paddingBottom)
         updateQQSPaddings()
-        updateBatteryResources(false)
-    }
+        qsBatteryModeController.updateResources()
 
-    private fun updateBatteryResources(forceUpdate: Boolean) {
         val textColor = Utils.getColorAttrDefaultColor(context, android.R.attr.textColorPrimary)
         val colorStateList = Utils.getColorAttr(context, android.R.attr.textColorPrimary)
-        if (textColor != textColorPrimary || forceUpdate) {
+        // val currentBatteryStyle = batteryIcon.getBatteryStyle()
+        if (textColor != textColorPrimary) {
             var textColorSecondary = Utils.getColorAttrDefaultColor(context,
                     android.R.attr.textColorSecondary)
-            val currentBatteryStyle = batteryIcon.getBatteryStyle()
-            if (currentBatteryStyle == 1 || currentBatteryStyle == 2 || currentBatteryStyle == 3) {
-                textColorSecondary = Utils.getColorAttrDefaultColor(header.context, android.R.attr.textColorHint)
-            }
+            // batteryStyle = currentBatteryStyle
+            // if (batteryStyle == 1 || batteryStyle == 2 || batteryStyle == 3) {
+            //     textColorSecondary = Utils.getColorAttrDefaultColor(header.context, android.R.attr.textColorHint)
+            // }
             textColorPrimary = textColor
             if (iconManager != null) {
                 iconManager.setTint(

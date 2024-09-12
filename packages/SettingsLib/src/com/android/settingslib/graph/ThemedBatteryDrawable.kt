@@ -243,7 +243,7 @@ open class ThemedBatteryDrawable(private val context: Context, frameColor: Int) 
             fillPaint.color = levelColor
 
             // Show colorError below this level
-            if (batteryLevel <= criticalLevel && !charging) {
+            if (batteryLevel <= Companion.CRITICAL_LEVEL && !charging) {
                 c.save()
                 c.clipPath(scaledFill)
                 c.drawPath(levelPath, fillPaint)
@@ -262,10 +262,8 @@ open class ThemedBatteryDrawable(private val context: Context, frameColor: Int) 
             // If power save is enabled draw the level path with colorError
             c.drawPath(levelPath, errorPaint)
             // And draw the plus sign on top of the fill
-            if (!showPercent) {
-                fillPaint.color = fillColor
-                c.drawPath(scaledPlus, fillPaint)
-            }
+            fillPaint.color = fillColor
+            c.drawPath(scaledPlus, fillPaint)
         }
         c.restore()
 
@@ -451,6 +449,7 @@ open class ThemedBatteryDrawable(private val context: Context, frameColor: Int) 
     companion object {
         const val WIDTH = 12f
         const val HEIGHT = 20f
+        private const val CRITICAL_LEVEL = 20
         // On a 12x20 grid, how wide to make the fill protection stroke.
         // Scales when our size changes
         private const val PROTECTION_STROKE_WIDTH = 3f
