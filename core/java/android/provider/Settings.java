@@ -6773,12 +6773,6 @@ public final class Settings {
         public static final String NAVBAR_STYLE = "navbar_style";
 
         /**
-         * Whether to show or hide alert slider notifications on supported devices
-         * @hide
-         */
-        public static final String ALERT_SLIDER_NOTIFICATIONS = "alert_slider_notifications";
-
-        /**
          * Whether to show heads up only for dialer and sms apps
          * @hide
          */
