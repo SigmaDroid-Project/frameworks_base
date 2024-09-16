@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2017 The Android Open Source Project
- * Copyright (C) 2019 The LineageOS Project
+ * Copyright (C) 2020-2024 crDroid Android Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +15,9 @@
  */
 package com.android.settingslib.graph
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.ValueAnimator
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.*
@@ -23,26 +25,18 @@ import android.graphics.drawable.Drawable
 import android.util.TypedValue
 import com.android.settingslib.R
 import com.android.settingslib.Utils
-import kotlin.math.max
 import kotlin.math.min
 
-class CircleBatteryDrawable(private val context: Context, frameColor: Int) : Drawable() {
+class FullCircleBatteryDrawable(private val context: Context, frameColor: Int) : Drawable() {
     private val criticalLevel: Int
     private val warningString: String
     private val framePaint: Paint
     private val batteryPaint: Paint
-    private val warningTextPaint: Paint
     private val textPaint: Paint
-    private val boltPaint: Paint
-    private val plusPaint: Paint
     private val powerSavePaint: Paint
     private val colors: IntArray
-    private val boltPoints: FloatArray
-    private val boltPath = Path()
     private val padding = Rect()
     private val frame = RectF()
-    private val boltFrame = RectF()
-    private val pathEffect = DashPathEffect(floatArrayOf(3f,2f),0f)
 
     private var chargeColor: Int
     private var iconTint = Color.WHITE
@@ -50,9 +44,8 @@ class CircleBatteryDrawable(private val context: Context, frameColor: Int) : Dra
     private var intrinsicHeight: Int
     private var height = 0
     private var width = 0
-
-    private var BATTERY_STYLE_CIRCLE = 1
-    private var BATTERY_STYLE_DOTTED_CIRCLE = 2
+    private var chargingAnimator: ValueAnimator? = null
+    private var batteryAlpha: Int
 
     // Dual tone implies that battery level is a clipped overlay over top of the whole shape
     private var dualTone = false
@@ -63,8 +56,16 @@ class CircleBatteryDrawable(private val context: Context, frameColor: Int) : Dra
 
     var charging = false
         set(value) {
+            val previousCharging = charging
             field = value
-            postInvalidate()
+            if (value) {
+                if (!previousCharging) {
+                    startChargingAnimation(ValueAnimator.INFINITE)
+                }
+            } else {
+                cancelChargingAnimation()
+                postInvalidate()
+            }
         }
 
     var powerSaveEnabled = false
@@ -85,11 +86,38 @@ class CircleBatteryDrawable(private val context: Context, frameColor: Int) : Dra
             postInvalidate()
         }
 
-    var meterStyle = BATTERY_STYLE_CIRCLE
-        set(value) {
-            field = value
+    private fun startChargingAnimation(repeat: Int) {
+        val alpha = batteryPaint.alpha
+        chargingAnimator = ValueAnimator.ofInt(alpha, 0, alpha)
+        chargingAnimator?.addUpdateListener {
+            batteryAlpha = it.animatedValue as Int
             postInvalidate()
         }
+
+        chargingAnimator?.addListener(object: AnimatorListenerAdapter() {
+            override fun onAnimationCancel(animation: Animator) {
+                super.onAnimationCancel(animation)
+                batteryAlpha = alpha
+                postInvalidate()
+                onAnimationEnd(animation)
+            }
+
+            override fun onAnimationEnd(animation: Animator) {
+                super.onAnimationEnd(animation)
+                chargingAnimator = null
+            }
+        })
+        chargingAnimator?.repeatCount = repeat
+        chargingAnimator?.duration = 4000
+        chargingAnimator?.startDelay = 500
+        chargingAnimator?.start()
+    }
+
+    private fun cancelChargingAnimation() {
+        if (chargingAnimator != null) {
+            chargingAnimator?.cancel()
+        }
+    }
 
     // an approximation of View.postInvalidate()
     private fun postInvalidate() {
@@ -106,9 +134,9 @@ class CircleBatteryDrawable(private val context: Context, frameColor: Int) : Dra
         val res = context.resources
         height = bounds.bottom - padding.bottom - (bounds.top + padding.top)
         width = bounds.right - padding.right - (bounds.left + padding.left)
-        warningTextPaint.textSize = height * 0.75f
         intrinsicHeight = res.getDimensionPixelSize(R.dimen.battery_height)
         intrinsicWidth = res.getDimensionPixelSize(R.dimen.battery_height)
+        textPaint.textSize = height * 0.7f
     }
 
     override fun getPadding(padding: Rect): Boolean {
@@ -154,7 +182,6 @@ class CircleBatteryDrawable(private val context: Context, frameColor: Int) : Dra
 
         iconTint = fillColor
         framePaint.color = bgColor
-        boltPaint.color = fillColor
         chargeColor = fillColor
 
         invalidateSelf()
@@ -162,81 +189,70 @@ class CircleBatteryDrawable(private val context: Context, frameColor: Int) : Dra
 
     override fun draw(c: Canvas) {
         if (batteryLevel == -1) return
+
+        val strokeWidth = powerSavePaint.strokeWidth
         val circleSize = min(width, height)
-        val strokeWidth = circleSize / 6.5f
-        framePaint.strokeWidth = strokeWidth
-        framePaint.style = Paint.Style.STROKE
-        batteryPaint.strokeWidth = strokeWidth
-        batteryPaint.style = Paint.Style.STROKE
-        if (meterStyle == BATTERY_STYLE_DOTTED_CIRCLE) {
-            batteryPaint.pathEffect = pathEffect
-            powerSavePaint.pathEffect = pathEffect
-        } else {
-            batteryPaint.pathEffect = null
-            powerSavePaint.pathEffect = null
+        var circleRadius = (circleSize / 2f)
+        var drawFrac = batteryLevel / 100f
+
+        if (!charging && powerSaveEnabled) {
+            circleRadius -= strokeWidth / 2.0f
         }
-        powerSavePaint.strokeWidth = strokeWidth
+
+        framePaint.strokeWidth = 0f
+        framePaint.style = Paint.Style.FILL_AND_STROKE
+        batteryPaint.strokeWidth = 0f
+        batteryPaint.style = Paint.Style.FILL_AND_STROKE
         frame[
                 strokeWidth / 2.0f + padding.left, strokeWidth / 2.0f,
                 circleSize - strokeWidth / 2.0f + padding.left
         ] = circleSize - strokeWidth / 2.0f
         // set the battery charging color
         batteryPaint.color = batteryColorForLevel(batteryLevel)
-        if (charging) { // define the bolt shape
-            val bl = frame.left + frame.width() / 3.0f
-            val bt = frame.top + frame.height() / 3.4f
-            val br = frame.right - frame.width() / 4.0f
-            val bb = frame.bottom - frame.height() / 5.6f
-            if (boltFrame.left != bl ||
-                boltFrame.top != bt ||
-                boltFrame.right != br ||
-                boltFrame.bottom != bb
-            ) {
-                boltFrame[bl, bt, br] = bb
-                boltPath.reset()
-                boltPath.moveTo(
-                    boltFrame.left + boltPoints[0] * boltFrame.width(),
-                    boltFrame.top + boltPoints[1] * boltFrame.height()
-                )
-                var i = 2
-                while (i < boltPoints.size) {
-                    boltPath.lineTo(
-                        boltFrame.left + boltPoints[i] * boltFrame.width(),
-                        boltFrame.top + boltPoints[i + 1] * boltFrame.height()
-                    )
-                    i += 2
-                }
-                boltPath.lineTo(
-                    boltFrame.left + boltPoints[0] * boltFrame.width(),
-                    boltFrame.top + boltPoints[1] * boltFrame.height()
-                )
-            }
-            c.drawPath(boltPath, boltPaint)
-        }
-        // draw thin gray ring first
-        c.drawArc(frame, 270f, 360f, false, framePaint)
-        // draw colored arc representing charge level
-        if (batteryLevel > 0) {
-            if (!charging && powerSaveEnabled) {
-                c.drawArc(frame, 270f, 3.6f * batteryLevel, false, powerSavePaint)
+        if (chargingAnimator != null) {
+            if (batteryLevel == 100) {
+                cancelChargingAnimation()
             } else {
-                c.drawArc(frame, 270f, 3.6f * batteryLevel, false, batteryPaint)
+                batteryPaint.alpha = batteryAlpha
             }
         }
+
+        if (batteryLevel <= criticalLevel) {
+            drawFrac = 0f
+        }
+
+        // draw outer circle first
+        c.drawCircle(frame.centerX(), frame.centerY(), circleRadius, framePaint)
+
+        c.save()
         // compute percentage text
-        if (!charging && batteryLevel != 100 && showPercent) {
-            textPaint.color = getColorForLevel(batteryLevel)
-            textPaint.textSize = height * 0.52f
+        if (batteryLevel != 100 && showPercent) {
             val textHeight = -textPaint.fontMetrics.ascent
             val pctText =
                 if (batteryLevel > criticalLevel)
                     batteryLevel.toString()
                 else
                     warningString
-            val pctX = width * 0.5f
-            val pctY = (height + textHeight) * 0.47f
-            c.drawText(pctText, pctX, pctY, textPaint)
+            val pctY = (height + textHeight) * 0.45f
+            textPaint.color = batteryColorForLevel(batteryLevel)
+            c.drawText(pctText, frame.centerX(), pctY, textPaint)
+            var textPath = Path()
+            textPaint.getTextPath(pctText, 0, pctText.length, frame.centerX(),
+                pctY, textPath)
+            c.clipOutPath(textPath)
         }
+
+        // draw colored circle representing charge level
+        if (drawFrac != 0f) {
+            c.drawCircle(frame.centerX(), frame.centerY(), circleRadius
+                * drawFrac, batteryPaint)
+        }
+
+        if (!charging && powerSaveEnabled) {
+            c.drawCircle(frame.centerX(), frame.centerY(), circleRadius,
+                powerSavePaint)
+        }
+        c.restore()
     }
 
     // Some stuff required by Drawable.
@@ -245,39 +261,10 @@ class CircleBatteryDrawable(private val context: Context, frameColor: Int) : Dra
     override fun setColorFilter(colorFilter: ColorFilter?) {
         framePaint.colorFilter = colorFilter
         batteryPaint.colorFilter = colorFilter
-        warningTextPaint.colorFilter = colorFilter
-        boltPaint.colorFilter = colorFilter
-        plusPaint.colorFilter = colorFilter
+        textPaint.colorFilter = colorFilter
     }
 
     override fun getOpacity() = PixelFormat.UNKNOWN
-
-    companion object {
-        private fun loadPoints(
-            res: Resources,
-            pointArrayRes: Int
-        ): FloatArray {
-            val pts = res.getIntArray(pointArrayRes)
-            var maxX = 0
-            var maxY = 0
-            run {
-                var i = 0
-                while (i < pts.size) {
-                    maxX = max(maxX, pts[i])
-                    maxY = max(maxY, pts[i + 1])
-                    i += 2
-                }
-            }
-            val ptsF = FloatArray(pts.size)
-            var i = 0
-            while (i < pts.size) {
-                ptsF[i] = pts[i].toFloat() / maxX
-                ptsF[i + 1] = pts[i + 1].toFloat() / maxY
-                i += 2
-            }
-            return ptsF
-        }
-    }
 
     init {
         val res = context.resources
@@ -306,31 +293,20 @@ class CircleBatteryDrawable(private val context: Context, frameColor: Int) : Dra
         framePaint.isDither = true
         batteryPaint = Paint(Paint.ANTI_ALIAS_FLAG)
         batteryPaint.isDither = true
+        batteryAlpha = batteryPaint.alpha
         textPaint = Paint(Paint.ANTI_ALIAS_FLAG)
         textPaint.typeface = Typeface.create("sans-serif-condensed", Typeface.BOLD)
         textPaint.textAlign = Paint.Align.CENTER
-        warningTextPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        warningTextPaint.typeface = Typeface.create("sans-serif", Typeface.BOLD)
-        warningTextPaint.textAlign = Paint.Align.CENTER
-        if (colors.size > 1) {
-            warningTextPaint.color = colors[1]
-        }
+        textPaint.strokeWidth = 2f
+        textPaint.style = Paint.Style.STROKE
         chargeColor = Utils.getColorStateListDefaultColor(context, R.color.meter_consumed_color)
-        boltPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        boltPaint.color = Utils.getColorStateListDefaultColor(
-            context,
-            R.color.batterymeter_bolt_color
-        )
-        boltPoints =
-            loadPoints(res, R.array.batterymeter_bolt_points)
-        plusPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        plusPaint.color = Utils.getColorStateListDefaultColor(
+        powerSavePaint = Paint(Paint.ANTI_ALIAS_FLAG)
+        powerSavePaint.color = Utils.getColorStateListDefaultColor(
             context,
             R.color.batterymeter_saver_color
         )
-        powerSavePaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        powerSavePaint.color = plusPaint.color
         powerSavePaint.style = Paint.Style.STROKE
+        powerSavePaint.strokeWidth = 3f
         intrinsicWidth = res.getDimensionPixelSize(R.dimen.battery_width)
         intrinsicHeight = res.getDimensionPixelSize(R.dimen.battery_height)
 
