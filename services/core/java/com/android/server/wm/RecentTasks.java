@@ -407,43 +407,83 @@ class RecentTasks {
      * any dependent services (like SystemUI) is started.
      */
     void loadRecentsComponent(Resources res) {
+        // Log the start of the method
+        Slog.d(TAG, "loadRecentsComponent: Starting to load recents component.");
+    
+        // Retrieve the default launcher index
         int defaultLauncher = SystemProperties.getInt("persist.sys.default_launcher", 0);
-        final String rawRecentsComponent = res.getStringArray(com.android.internal.R.array.config_launcherComponents)[defaultLauncher];
-        if (TextUtils.isEmpty(rawRecentsComponent)) {
+        Slog.d(TAG, "loadRecentsComponent: defaultLauncher index = " + defaultLauncher);
+    
+        // Retrieve the raw recents component string based on the default launcher
+        String[] launcherComponents = res.getStringArray(com.android.internal.R.array.config_launcherComponents);
+        if (launcherComponents == null) {
+            Slog.w(TAG, "loadRecentsComponent: launcherComponents array is null.");
             return;
         }
-
+    
+        if (defaultLauncher < 0 || defaultLauncher >= launcherComponents.length) {
+            Slog.w(TAG, "loadRecentsComponent: defaultLauncher index out of bounds. Index = " + defaultLauncher);
+            return;
+        }
+    
+        final String rawRecentsComponent = launcherComponents[defaultLauncher];
+        Slog.d(TAG, "loadRecentsComponent: rawRecentsComponent = " + rawRecentsComponent);
+    
+        // Check if the rawRecentsComponent is empty
+        if (TextUtils.isEmpty(rawRecentsComponent)) {
+            Slog.w(TAG, "loadRecentsComponent: rawRecentsComponent is empty. Exiting method.");
+            return;
+        }
+    
+        // Convert the string to a ComponentName
         final ComponentName cn = ComponentName.unflattenFromString(rawRecentsComponent);
         if (cn != null) {
+            Slog.d(TAG, "loadRecentsComponent: ComponentName = " + cn.flattenToString());
             try {
+                // Retrieve the ApplicationInfo for the component
                 final ApplicationInfo appInfo = AppGlobals.getPackageManager().getApplicationInfo(
                         cn.getPackageName(),
                         PackageManager.MATCH_UNINSTALLED_PACKAGES
                                 | PackageManager.MATCH_DISABLED_COMPONENTS,
                         mService.mContext.getUserId());
+    
                 if (appInfo != null) {
+                    Slog.d(TAG, "loadRecentsComponent: ApplicationInfo found. UID = " + appInfo.uid);
                     mRecentsUid = appInfo.uid;
                     mRecentsComponent = cn;
+                    Slog.i(TAG, "loadRecentsComponent: Recents component set to " + mRecentsComponent
+                            + " with UID " + mRecentsUid);
+                } else {
+                    Slog.w(TAG, "loadRecentsComponent: ApplicationInfo is null for component " + cn);
                 }
             } catch (RemoteException e) {
-                Slog.w(TAG, "Could not load application info for recents component: " + cn);
+                Slog.e(TAG, "loadRecentsComponent: RemoteException while loading ApplicationInfo for recents component: " + cn, e);
             }
+        } else {
+            Slog.w(TAG, "loadRecentsComponent: ComponentName is null after unflattening rawRecentsComponent.");
         }
+    
+        // Log the end of the method
+        Slog.d(TAG, "loadRecentsComponent: Finished loading recents component.");
     }
-
+    
     /**
      * @return whether the current caller has the same uid as the recents component.
      */
     boolean isCallerRecents(int callingUid) {
-        return UserHandle.isSameApp(callingUid, mRecentsUid);
+        boolean isRecents = UserHandle.isSameApp(callingUid, mRecentsUid);
+        Slog.d(TAG, "isCallerRecents: callingUid = " + callingUid + ", mRecentsUid = " + mRecentsUid + ", isRecents = " + isRecents);
+        return isRecents;
     }
-
+    
     /**
      * @return whether the given component is the recents component and shares the same uid as the
      * recents component.
      */
     boolean isRecentsComponent(ComponentName cn, int uid) {
-        return cn.equals(mRecentsComponent) && UserHandle.isSameApp(uid, mRecentsUid);
+        boolean isRecentsComponent = cn.equals(mRecentsComponent) && UserHandle.isSameApp(uid, mRecentsUid);
+        Slog.d(TAG, "isRecentsComponent: cn = " + cn + ", uid = " + uid + ", isRecentsComponent = " + isRecentsComponent);
+        return isRecentsComponent;
     }
 
     /**
