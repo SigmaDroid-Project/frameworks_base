@@ -329,7 +329,7 @@ public class PixelPropsUtils {
         }
 
         // Check stack for SafetyNet or Play Integrity
-        if (isCallerSafetyNet() && !sIsExcluded) {
+        if (isCallerSafetyNet()) {
             dlog("Blocked key attestation");
             throw new UnsupportedOperationException();
         }

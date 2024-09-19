@@ -8,6 +8,7 @@ import android.app.ActivityThread;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.util.Log;
+import android.content.res.Resources;
 
 import com.android.internal.R;
 
