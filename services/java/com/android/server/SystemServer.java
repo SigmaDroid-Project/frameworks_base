@@ -1570,6 +1570,16 @@ public final class SystemServer implements Dumpable {
             mSystemServiceManager.startService(KeyChainSystemService.class);
             t.traceEnd();
 
+            // Start KeyboxService
+            t.traceBegin("StartKeyboxService");
+            try {
+                ServiceManager.addService("keybox", new KeyboxService(context));
+                Slog.i("SystemServer", "KeyboxService started");
+            } catch (Throwable e) {
+                Slog.e("SystemServer", "Error starting KeyboxService", e);
+            }
+            t.traceEnd();
+
             t.traceBegin("StartBinaryTransparencyService");
             mSystemServiceManager.startService(BinaryTransparencyService.class);
             t.traceEnd();
