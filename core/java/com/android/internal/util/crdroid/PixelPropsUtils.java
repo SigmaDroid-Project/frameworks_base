@@ -44,7 +44,6 @@ public class PixelPropsUtils {
 
     private static final String SPOOF_PIXEL_GMS = "persist.sys.pixelprops.gms";
     private static final String SPOOF_PIXEL_GPHOTOS = "persist.sys.pixelprops.gphotos";
-    private static final String SPOOF_PIXEL_NETFLIX = "persist.sys.pixelprops.netflix";
     private static final String ENABLE_PROP_OPTIONS = "persist.sys.pixelprops.all";
     private static final String ENABLE_GAME_PROP_OPTIONS = "persist.sys.gameprops.enabled";
     private static final String SPOOF_PIXEL_GOOGLE_APPS = "persist.sys.pixelprops.google";
@@ -92,7 +91,6 @@ public class PixelPropsUtils {
         propsToChangePixel5a.put("MODEL", "Pixel 5a");
         propsToChangePixel5a.put("ID", "AP2A.240805.005");
         propsToChangePixel5a.put("FINGERPRINT", "google/barbet/barbet:14/AP2A.240805.005/12025142:user/release-keys");
-
     }
 
     public static void setProps(String packageName) {
