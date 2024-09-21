@@ -52,6 +52,8 @@ public final class QuickSwitchService extends SystemService {
         "com.nothing.launcher"
     );
 
+    private static final String GOOGLE_WP_PKG = "com.google.android.apps.wallpaper";
+
     private static final String TAG = "QuickSwitchService";
     private static final int THREAD_PRIORITY_DEFAULT = android.os.Process.THREAD_PRIORITY_DEFAULT;
 
@@ -103,6 +105,17 @@ public final class QuickSwitchService extends SystemService {
                     }
                 } catch (IllegalArgumentException ignored) {}
             }
+
+            // Enable google wallpaper picker when defaultLauncher is 1, enable otherwise
+            if (defaultLauncher == 1) {
+                mPM.setApplicationEnabledSetting(GOOGLE_WP_PKG,
+                        PackageManager.COMPONENT_ENABLED_STATE_DEFAULT,
+                        0, userId, mOpPackageName);
+            } else {
+                mPM.setApplicationEnabledSetting(GOOGLE_WP_PKG,
+                        PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                        0, userId, mOpPackageName);
+            }
         } catch (RemoteException e) {
             e.rethrowAsRuntimeException();
         }
@@ -117,6 +130,10 @@ public final class QuickSwitchService extends SystemService {
                 if (i != defaultLauncher) {
                     disabledDefaultLaunchers.add(LAUNCHER_PACKAGES.get(i));
                 }
+            }
+            // Include the wallpaper picker if defaultLauncher is not 1
+            if (defaultLauncher != 1) {
+                disabledDefaultLaunchers.add(GOOGLE_WP_PKG);
             }
             disabledLaunchersCache = disabledDefaultLaunchers;
         }
