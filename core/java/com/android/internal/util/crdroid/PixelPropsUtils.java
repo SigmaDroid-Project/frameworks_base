@@ -40,10 +40,12 @@ public class PixelPropsUtils {
     private static final String TAG = PixelPropsUtils.class.getSimpleName();
     private static final String PROP_HOOKS = "persist.sys.pihooks_";
     private static final String PROP_HOOKS_MAINLINE = "persist.sys.pihooks_mainline_";
-    private static final boolean DEBUG = SystemProperties.getBoolean(PROP_HOOKS + "DEBUG", false);
+    private static final boolean DEBUG = SystemProperties.getBoolean(PROP_HOOKS + "DEBUG", true);
 
     private static final String SPOOF_PIXEL_GMS = "persist.sys.pixelprops.gms";
     private static final String SPOOF_PIXEL_GPHOTOS = "persist.sys.pixelprops.gphotos";
+    private static final String SPOOF_PIXEL_GPHOTOS_MAINLINE = "persist.sys.pixelprops.gphotos_mainline";
+    private static final String SPOOF_PIXEL_GCAM_MAINLINE = "persist.sys.pixelprops.gcam_mainline";
     private static final String ENABLE_PROP_OPTIONS = "persist.sys.pixelprops.all";
     private static final String ENABLE_GAME_PROP_OPTIONS = "persist.sys.gameprops.enabled";
     private static final String SPOOF_PIXEL_GOOGLE_APPS = "persist.sys.pixelprops.google";
@@ -130,9 +132,9 @@ public class PixelPropsUtils {
 
         if (Arrays.asList(packagesToSpoofAsMainlineDevice).contains(packageName) && !isExcludedProcess) {
             if (SystemProperties.getBoolean(SPOOF_PIXEL_GOOGLE_APPS, true)) {
-                if (!isMainlineDevice) {
+                // if (!isMainlineDevice) {
                     propsToChange.putAll(propsToChangeMainline);
-                }
+                // }
             }
         }
 
@@ -140,9 +142,17 @@ public class PixelPropsUtils {
             if (SystemProperties.getBoolean(SPOOF_PIXEL_GPHOTOS, true)) {
                 propsToChange.putAll(propsToChangePixelXL);
             } else {
-                if (!isMainlineDevice) {
+                if (SystemProperties.getBoolean(SPOOF_PIXEL_GPHOTOS_MAINLINE, true)) {
+                    propsToChange.putAll(propsToChangeMainline);
+                } else {
                     propsToChange.putAll(propsToChangePixel5a);
                 }
+            }
+        }
+
+        if (packageName.equals("com.google.android.GoogleCamera")) {
+            if (SystemProperties.getBoolean(SPOOF_PIXEL_GCAM_MAINLINE, true)) {
+                propsToChange.putAll(propsToChangeMainline);
             }
         }
         
@@ -296,9 +306,9 @@ public class PixelPropsUtils {
         final int gmsUid;
         try {
             gmsUid = context.getPackageManager().getApplicationInfo("com.google.android.gms", 0).uid;
-            //dlog("shouldBypassTaskPermission: gmsUid:" + gmsUid + " callingUid:" + callingUid);
+            dlog("shouldBypassTaskPermission: gmsUid:" + gmsUid + " callingUid:" + callingUid);
         } catch (Exception e) {
-            //Log.e(TAG, "shouldBypassTaskPermission: unable to get gms uid", e);
+            Log.e(TAG, "shouldBypassTaskPermission: unable to get gms uid", e);
             return false;
         }
         return gmsUid == callingUid;
