@@ -53,6 +53,7 @@ public class PixelPropsUtils {
     private static final Map<String, Object> propsToChangeMainline;
     private static final Map<String, Object> propsToChangePixelXL;
     private static final Map<String, Object> propsToChangePixel5a;
+    private static final Map<String, Object> propsToChangePixel8Pro;
 
     private static final ComponentName GMS_ADD_ACCOUNT_ACTIVITY = ComponentName.unflattenFromString(
             "com.google.android.gms/.auth.uiflows.minutemaid.MinuteMaidActivity");
@@ -93,6 +94,15 @@ public class PixelPropsUtils {
         propsToChangePixel5a.put("MODEL", "Pixel 5a");
         propsToChangePixel5a.put("ID", "AP2A.240805.005");
         propsToChangePixel5a.put("FINGERPRINT", "google/barbet/barbet:14/AP2A.240805.005/12025142:user/release-keys");
+        propsToChangePixel8Pro = new HashMap<>();
+        propsToChangePixel8Pro.put("BRAND", "google");
+        propsToChangePixel8Pro.put("MANUFACTURER", "Google");
+        propsToChangePixel8Pro.put("DEVICE", "husky");
+        propsToChangePixel8Pro.put("PRODUCT", "husky");
+        propsToChangePixel8Pro.put("HARDWARE", "husky");
+        propsToChangePixel8Pro.put("MODEL", "Pixel 8 Pro");
+        propsToChangePixel8Pro.put("ID", "AP31.240617.015");
+        propsToChangePixel8Pro.put("FINGERPRINT", "google/husky_beta/husky:15/AP31.240617.015/12207491:user/release-keys");
     }
 
     public static void setProps(String packageName) {
@@ -145,12 +155,12 @@ public class PixelPropsUtils {
                 if (SystemProperties.getBoolean(SPOOF_PIXEL_GPHOTOS_MAINLINE, true)) {
                     propsToChange.putAll(propsToChangeMainline);
                 } else {
-                    propsToChange.putAll(propsToChangePixel5a);
+                    propsToChange.putAll(propsToChangePixel8Pro);
                 }
             }
         }
 
-        if (packageName.equals("com.google.android.GoogleCamera")) {
+        if (packageName.equals("com.google.android.googlecamera")) {
             if (SystemProperties.getBoolean(SPOOF_PIXEL_GCAM_MAINLINE, true)) {
                 propsToChange.putAll(propsToChangeMainline);
             }
